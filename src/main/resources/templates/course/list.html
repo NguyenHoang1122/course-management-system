@@ -2,9 +2,36 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>List Course</title>
 </head>
 <body>
-
+<h1>List Course</h1>
+<table>
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Create Date</th>
+        <th>Intructor</th>
+        <th>Lesson</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="course,stt : ${courses}">
+        <td th:text="${stt.index + 1}"></td>
+        <td th:text="${course.title}"></td>
+        <td th:text="${course.description}"></td>
+        <td th:text="${course.price}"></td>
+        <td th:text="${course.createdAt}"></td>
+        <td th:text="${course.instructor.fullname}"></td>
+        <td>
+            <span th:each="lesson : ${course.lessons}"
+            th:text="${lesson.title} + ', '"></span>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>
