@@ -13,8 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           CustomUserDetailsService userDetailsService) throws Exception {
+
         http
+                .userDetailsService(userDetailsService)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register", "/courses/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

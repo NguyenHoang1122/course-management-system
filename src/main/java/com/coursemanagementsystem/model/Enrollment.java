@@ -21,4 +21,6 @@ public class Enrollment {
     private Course course;
 
     private LocalDateTime enrolledAt;
+
+    private String status;
 }
