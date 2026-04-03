@@ -3,7 +3,7 @@ package com.coursemanagementsystem.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -11,14 +11,14 @@ import java.util.List;
 @Data
 public class Course {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title; //ten khoa hoc
     private String description; //mieu ta khoa hoc
     private Double price; //gia
 
-    private LocalDateTime createdAt; //Ngay tao khoa hoc
+    private LocalDate createdAt; //Ngay tao khoa hoc
 
     @ManyToOne
     @JoinColumn(name = "instructor_id")
