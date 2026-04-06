@@ -2,9 +2,21 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Detail Course</title>
 </head>
 <body>
-
+<h1>Chi tiết khóa học</h1>
+<p><strong>Title: </strong> <span th:text="${course.title}"></span></p>
+<p><strong>Description: </strong> <span th:text="${course.description}"></span></p>
+<p><strong>Price: </strong> <span th:text="${course.price}"></span></p>
+<p><strong>Create Date: </strong> <span th:text="${course.createdAt}"></span></p>
+<p><strong>Instructor: </strong> <span th:text="${course.instructor.getFullname()}"></span></p>
+<ul>
+    <li th:each="lesson : ${course.lessons}">
+        <p><strong>Tên bài:</strong> <span th:text="${lesson.title}"></span></p>
+        <p><strong>Mô tả:</strong> <span th:text="${lesson.videoUrl}"></span></p>
+    </li>
+</ul>
+<a th:href="@{/courses}">Back to list</a>
 </body>
 </html>

@@ -24,6 +24,6 @@ public class Course {
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course",fetch = FetchType.LAZY)
     private List<Lesson> lessons;
 }

@@ -18,7 +18,7 @@ public class CourseService {
     }
 
     public Course findById(Long id) {
-        return null;
+        return courseRepository.findById(id).orElse(null);
     }
 
     public Course save(Course course) {
