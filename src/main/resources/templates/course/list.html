@@ -12,10 +12,8 @@
         <th>STT</th>
         <th>Title</th>
         <th>Description</th>
-        <th>Price</th>
         <th>Create Date</th>
-        <th>Intructor</th>
-        <th>Lesson</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -23,12 +21,9 @@
         <td th:text="${stt.index + 1}"></td>
         <td th:text="${course.title}"></td>
         <td th:text="${course.description}"></td>
-        <td th:text="${course.price}"></td>
         <td th:text="${course.createdAt}"></td>
-        <td th:text="${course.instructor.fullname}"></td>
         <td>
-            <span th:each="lesson : ${course.lessons}"
-            th:text="${lesson.title} + ', '"></span>
+            <a th:href="@{'/courses/' + ${course.id}}">View</a>
         </td>
     </tr>
     </tbody>
