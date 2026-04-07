@@ -16,13 +16,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String userName) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
+                .withUsername(user.getUserName())
                 .password(user.getPassword())
                 .roles(user.getRole().getName()) // ví dụ: ADMIN, STUDENT
                 .build();

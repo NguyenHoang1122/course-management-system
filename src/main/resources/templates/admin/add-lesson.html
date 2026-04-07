@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Lesson</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h2>Add Lesson</h2>
+
+<form th:action="@{/admin/save-lesson}" th:object="${lessonDTO}" method="post">
+
+    <input type="hidden" th:field="*{courseId}"/>
+
+    <div>
+        <label>Title:</label>
+        <input type="text" th:field="*{title}" placeholder="Enter lesson title"/>
+    </div>
+
+    <div>
+        <label>Video URL:</label>
+        <input type="text" th:field="*{videoUrl}" placeholder="Enter video link"/>
+    </div>
+
+    <div>
+        <button type="submit">Save</button>
+    </div>
+
+</form>
+
+</body>
+</html>
