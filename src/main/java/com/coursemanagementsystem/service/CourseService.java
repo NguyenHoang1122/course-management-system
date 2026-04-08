@@ -24,14 +24,30 @@ public class CourseService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public void saveFromDTO(CourseDTO courseDTO) {
-        Course course = modelMapper.map(courseDTO, Course.class);
+    public void saveFromDTO(CourseDTO dto) {
 
-        if (courseDTO.getInstructorId() != null) {
-            User instructor = userRepository.findById(courseDTO.getInstructorId()).orElse(null);
+        Course course;
+
+        if (dto.getId() != null) {
+            // Lấy entity từ DB
+            course = courseRepository.findById(dto.getId())
+                    .orElseThrow(() -> new RuntimeException("Course not found"));
+
+            //  Map vào object cũ (đúng cách)
+            modelMapper.map(dto, course);
+
+        } else {
+            // CREATE
+            course = modelMapper.map(dto, Course.class);
+            course.setCreatedAt(LocalDate.now());
+        }
+
+        // 👉 xử lý relation riêng
+        if (dto.getInstructorId() != null) {
+            User instructor = userRepository.findById(dto.getInstructorId()).orElse(null);
             course.setInstructor(instructor);
         }
-        course.setCreatedAt(LocalDate.now());
+
         courseRepository.save(course);
     }
 

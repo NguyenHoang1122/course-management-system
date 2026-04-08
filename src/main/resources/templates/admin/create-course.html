@@ -78,28 +78,30 @@
                     </small>
                 </div>
 
-                <!-- Price -->
                 <div class="form-group">
                     <label for="price">
-                        <i class="fas fa-dollar-sign"></i> Giá Khóa Học (VND) <span style="color: var(--danger-color);">*</span>
+                        <i class="fas fa-dollar-sign"></i> Giá Khóa Học (VND)
+                        <span style="color: var(--danger-color);">*</span>
                     </label>
+
                     <input
-                        type="number"
-                        id="price"
-                        th:field="*{price}"
-                        class="form-control"
-                        placeholder="Nhập giá khóa học"
-                        required
-                        min="0"
-                        step="1000">
+                            type="number"
+                            id="price"
+                            th:field="*{price}"
+                            class="form-control"
+                            placeholder="Nhập giá khóa học"
+                            required
+                            min="0"
+                            step="1000">
+
                     <div class="invalid-feedback">
                         Vui lòng nhập giá khóa học hợp lệ.
                     </div>
+
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.
                     </small>
                 </div>
-
                 <!-- Instructor -->
                 <div class="form-group">
                     <label for="instructorId">
@@ -215,15 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
     instructorSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         previewInstructor.textContent = selectedOption.text || 'Chưa chọn giảng viên';
-    });
-
-    // Format price input
-    priceInput.addEventListener('input', function() {
-        let value = this.value.replace(/[^\d]/g, '');
-        if (value) {
-            value = parseInt(value).toLocaleString('vi-VN');
-        }
-        this.value = value;
     });
 });
 </script>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout.html" lang="en">
+<head>
+    <title th:text="${pageTitle} ?: 'About Us | Course Management System'">About Us | Course Management System</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+<!-- About Area Start -->
+<section class="about-area section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-6 col-lg-6">
+                <div class="about-caption mb-50">
+                    <div class="section-tittle mb-35">
+                        <span>About Our Platform</span>
+                        <h2>Empowering Learning for Everyone</h2>
+                    </div>
+                    <div class="about-pera">
+                        <p>Welcome to Course Management System, where learning meets innovation. We are dedicated to providing high-quality online education that empowers individuals to achieve their goals and advance their careers.</p>
+                        <p>Our platform offers a wide range of courses taught by industry experts, interactive learning experiences, and flexible scheduling to fit your lifestyle.</p>
+                    </div>
+                    <a th:href="@{/courses}" class="border-btn border-btn2 mt-40">Explore Courses</a>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6">
+                <div class="about-img">
+                    <img th:src="@{/img/gallery/about.png}" alt="About Us" class="wow fadeInRight" data-wow-delay="0.3s">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- About Area End -->
+
+<!-- Mission Area Start -->
+<section class="services-area gray-bg section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="section-tittle text-center mb-80">
+                    <span>Our Mission</span>
+                    <h2>What Drives Us</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="features-icon">
+                        <i class="flaticon-quality"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Quality Education</h3>
+                        <p>We ensure every course meets the highest standards of educational excellence and relevance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="features-icon">
+                        <i class="flaticon-accessibility"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Accessible Learning</h3>
+                        <p>Learn anytime, anywhere with our flexible online platform accessible on all devices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="features-icon">
+                        <i class="flaticon-innovation"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Innovation</h3>
+                        <p>We continuously innovate our teaching methods and technology to enhance learning outcomes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Mission Area End -->
+
+<!-- ...existing footer from layout... -->
+    </div>
+</body>
+</html>
