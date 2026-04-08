@@ -50,6 +50,7 @@
         <div class="form-container">
             <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" th:object="${lessonDTO}" method="post" class="needs-validation" novalidate>
 
+                <input type="hidden" th:field="*{id}" />
                 <!-- Hidden Course ID -->
                 <input type="hidden" th:field="*{courseId}" th:value="${courseId}">
 
