@@ -2,6 +2,8 @@ package com.coursemanagementsystem.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class CourseDTO {
     private Long id;
@@ -10,4 +12,6 @@ public class CourseDTO {
     private Double price;
 
     private Long instructorId;
+    
+    private List<?> lessons;
 }

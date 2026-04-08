@@ -39,4 +39,12 @@ public class LessonService {
 
         lessonRepository.save(lesson);
     }
+
+    public Lesson findById(Long id) {
+        return lessonRepository.findById(id).orElse(null);
+    }
+
+    public void deleteById(Long id) {
+        lessonRepository.deleteById(id);
+    }
 }

@@ -1,32 +1,322 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Lesson</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thêm Bài Học - Course Management System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
-
-<h2>Add Lesson</h2>
-
-<form th:action="@{/admin/save-lesson}" th:object="${lessonDTO}" method="post">
-
-    <input type="hidden" th:field="*{courseId}"/>
-
-    <div>
-        <label>Title:</label>
-        <input type="text" th:field="*{title}" placeholder="Enter lesson title"/>
+<div class="admin-container">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1><i class="fas fa-plus"></i> <span th:if="${lessonDTO.id == null}">Thêm Bài Học Mới</span><span th:if="${lessonDTO.id != null}">Chỉnh Sửa Bài Học</span></h1>
+        <p th:if="${lessonDTO.id == null}">Thêm bài học vào khóa học</p>
+        <p th:if="${lessonDTO.id != null}">Chỉnh sửa thông tin bài học</p>
     </div>
 
-    <div>
-        <label>Video URL:</label>
-        <input type="text" th:field="*{videoUrl}" placeholder="Enter video link"/>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/courses}">Khóa Học</a></li>
+            <li class="breadcrumb-item"><a th:href="@{'/courses/' + ${courseId}}">Chi Tiết</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${lessonDTO.id == null ? 'Thêm Bài Học' : 'Chỉnh Sửa Bài Học'}">Thêm Bài Học</li>
+        </ol>
+    </nav>
+
+    <!-- Course Info -->
+    <div class="admin-content">
+        <div class="course-info-card">
+            <div class="d-flex align-items-center">
+                <div class="course-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <h4 th:text="${courseTitle}" style="margin: 0; color: var(--secondary-color);"></h4>
+                    <p style="margin: 0; color: var(--text-muted);">Đang thêm bài học mới</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div>
-        <button type="submit">Save</button>
-    </div>
+    <!-- Form -->
+    <div class="admin-content">
+        <div class="form-container">
+            <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" th:object="${lessonDTO}" method="post" class="needs-validation" novalidate>
 
-</form>
+                <!-- Hidden Course ID -->
+                <input type="hidden" th:field="*{courseId}" th:value="${courseId}">
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title">
+                        <i class="fas fa-heading"></i> Tên Bài Học <span style="color: var(--danger-color);">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        th:field="*{title}"
+                        class="form-control"
+                        placeholder="Nhập tên bài học"
+                        required
+                        minlength="3"
+                        maxlength="255">
+                    <div class="invalid-feedback">
+                        Vui lòng nhập tên bài học (tối thiểu 3 ký tự).
+                    </div>
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Tên bài học nên mô tả rõ nội dung chính của bài học.
+                    </small>
+                </div>
+
+                <!-- Video URL -->
+                <div class="form-group">
+                    <label for="videoUrl">
+                        <i class="fas fa-video"></i> Link Video (YouTube/Vimeo)
+                    </label>
+                    <input
+                        type="url"
+                        id="videoUrl"
+                        th:field="*{videoUrl}"
+                        class="form-control"
+                        placeholder="https://www.youtube.com/watch?v=... hoặc https://vimeo.com/...">
+                    <div class="invalid-feedback">
+                        Vui lòng nhập link video hợp lệ.
+                    </div>
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Hỗ trợ YouTube và Vimeo. Để trống nếu chưa có video.
+                    </small>
+                </div>
+
+                <!-- Video Preview -->
+                <div class="form-group" id="videoPreview" style="display: none;">
+                    <label>
+                        <i class="fas fa-eye"></i> Xem Trước Video
+                    </label>
+                    <div class="video-preview-container">
+                        <iframe id="videoFrame" width="100%" height="315" allow="fullscreen"></iframe>
+                    </div>
+                </div>
+
+                <!-- Tips Section -->
+                <div class="admin-content" style="margin-top: 30px;">
+                    <h4 style="color: var(--secondary-color); margin-bottom: 20px;">
+                        <i class="fas fa-lightbulb"></i> Mẹo Tạo Bài Học Hiệu Quả
+                    </h4>
+
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h5>Mục tiêu rõ ràng</h5>
+                            <p>Đặt tên bài học thể hiện rõ mục tiêu học tập</p>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h5>Thời lượng phù hợp</h5>
+                            <p>Mỗi bài học nên kéo dài 10-30 phút</p>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h5>Nội dung có cấu trúc</h5>
+                            <p>Giới thiệu → Nội dung chính → Tóm tắt</p>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <h5>Video chất lượng</h5>
+                            <p>Sử dụng video HD với âm thanh rõ ràng</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-group" style="margin-top: 40px;">
+                    <div class="d-flex gap-3 justify-content-center">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu Bài Học
+                        </button>
+                        <a th:href="@{'/courses/' + ${courseId}}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay Lại
+                        </a>
+                        <a th:href="@{/courses}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .course-info-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 0;
+    }
+
+    .course-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        opacity: 0.9;
+    }
+
+    .video-preview-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: var(--white);
+        padding: 10px;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .tip-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .tip-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .tip-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .tip-card h5 {
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .tip-card p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Fix cho phần select bị che chữ */
+    .form-control {
+        padding: 12px 16px;
+        line-height: 1.5;
+        min-height: 44px;
+    }
+
+    @media (max-width: 768px) {
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .course-info-card .d-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .course-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Video preview functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const videoUrlInput = document.getElementById('videoUrl');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoFrame = document.getElementById('videoFrame');
+
+    function updateVideoPreview() {
+        const url = videoUrlInput.value.trim();
+
+        if (url) {
+            let embedUrl = '';
+
+            // YouTube
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                const videoId = url.includes('youtu.be')
+                    ? url.split('youtu.be/')[1]?.split('?')[0]
+                    : url.split('v=')[1]?.split('&')[0];
+
+                if (videoId) {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                }
+            }
+            // Vimeo
+            else if (url.includes('vimeo.com')) {
+                const videoId = url.split('vimeo.com/')[1]?.split('/')[0];
+                if (videoId) {
+                    embedUrl = `https://player.vimeo.com/video/${videoId}`;
+                }
+            }
+
+            if (embedUrl) {
+                videoFrame.src = embedUrl;
+                videoPreview.style.display = 'block';
+            } else {
+                videoPreview.style.display = 'none';
+            }
+        } else {
+            videoPreview.style.display = 'none';
+            videoFrame.src = '';
+        }
+    }
+
+    videoUrlInput.addEventListener('input', updateVideoPreview);
+    videoUrlInput.addEventListener('blur', updateVideoPreview);
+
+    // Initial check
+    updateVideoPreview();
+});
+</script>
 
 </body>
 </html>

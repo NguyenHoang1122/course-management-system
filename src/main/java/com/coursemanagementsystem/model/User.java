@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,12 @@ public class User {
     private String userName;
     private String password;
     private String fullName;
+    private String email;
+    private String phone;
+    private String gender;
+    private String avatar; // URL ảnh đại diện
+    private LocalDate dateOfBirth;
+    private String address;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")

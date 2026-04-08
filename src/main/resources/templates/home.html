@@ -1,0 +1,310 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Courses | Education Management System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/owl.carousel.min.css}">
+    <link rel="stylesheet" th:href="@{/css/slicknav.css}">
+    <link rel="stylesheet" th:href="@{/css/flaticon.css}">
+    <link rel="stylesheet" th:href="@{/css/progressbar_barfiller.css}">
+    <link rel="stylesheet" th:href="@{/css/gijgo.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}">
+    <link rel="stylesheet" th:href="@{/css/animated-headline.css}">
+    <link rel="stylesheet" th:href="@{/css/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/themify-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/slick.css}">
+    <link rel="stylesheet" th:href="@{/css/nice-select.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+
+<body>
+
+<!-- Header Area Start -->
+<header class="header-area">
+    <div class="header-top">
+        <div class="container">
+            <div class="row d-flex justify-content-between align-items-center">
+                <div class="col-lg-8">
+                    <div class="header-contact-info">
+                        <div class="single-contact-info">
+                            <i class="fas fa-phone"></i>
+                            <span>+84 123 456 789</span>
+                        </div>
+                        <div class="single-contact-info">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@coursemanagementsystem.com</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="header-right-info text-right">
+                        <ul>
+                            <li><a th:href="@{/auth/login}" class="theme-color">Sign In</a></li>
+                            <li><a th:href="@{/auth/register}" class="theme-color">Sign Up</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-bottom header-sticky sticky-bar">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-xl-2 col-lg-2">
+                    <div class="logo">
+                        <a th:href="@{/}">
+                            <img th:src="@{/img/logo/logo.png}" alt="Logo" style="height: 60px;">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6">
+                    <div class="main-menu d-none d-lg-block">
+                        <nav>
+                            <ul id="navigation">
+                                <li><a th:href="@{/}">Home</a></li>
+                                <li><a th:href="@{/courses}">Courses</a></li>
+                                <li><a th:href="@{/about}">About</a></li>
+                                <li><a th:href="@{/contact}">Contact</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 d-none d-lg-block">
+                    <div class="header-right-btn">
+                        <a th:href="@{/auth/login}" class="btn theme-bg">Sign In</a>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="mobile_menu d-block d-lg-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Header Area End -->
+
+<!-- Slider Area Start -->
+<div class="slider-area slider-height"
+     th:style="|background-image: url(@{/img/hero/h1_hero.png})|">
+
+    <div class="single-slider">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-8 col-lg-9 col-sm-10">
+
+                    <div class="hero__caption">
+                        <span class="wow fadeInUp" data-wow-delay="0.2s">
+                            Welcome to Our Platform
+                        </span>
+
+                        <h1 class="wow fadeInUp" data-wow-delay="0.4s">
+                            Discover Your Learning Journey
+                        </h1>
+
+                        <p class="wow fadeInUp" data-wow-delay="0.6s">
+                            Learn from industry experts and master new skills
+                            with our comprehensive online courses.
+                        </p>
+
+                        <div class="hero__btn">
+                            <a class="btn hero-btn wow fadeInUp"
+                               data-wow-delay="0.8s"
+                               th:href="@{/courses}">
+                                Explore Courses
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- Slider Area End -->
+
+<!-- About Area Start -->
+<section class="about-area about-area1 section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-5 col-lg-6 col-md-9">
+                <div class="about-caption mb-50">
+                    <div class="section-tittle mb-35 pt-3">
+                        <span>Why Choose Us?</span>
+                        <h2>Discover Quality Learning</h2>
+                    </div>
+                    <div class="about-pera">
+                        <p class="wow fadeInUp" data-wow-delay="0.2s">We offer comprehensive courses designed by industry experts to help you advance your career and skills.</p>
+                        <p class="wow fadeInUp" data-wow-delay="0.4s">Our platform provides interactive learning experiences, certificates, and lifetime access to course materials.</p>
+                    </div>
+                    <a th:href="@{/courses}" class="border-btn border-btn2 mt-40">All Courses</a>
+                </div>
+            </div>
+            <div class="col-xl-7 col-lg-6">
+                <div class="about-img">
+                    <img th:src="@{/img/gallery/featured1.png}" alt="Featured" class="wow fadeInRight" data-wow-delay="0.3s">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- About Area End -->
+
+<!-- Services Area Start -->
+<section class="services-area gray-bg section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="section-tittle text-center mb-80">
+                    <span>Our Services</span>
+                    <h2>Why we are different</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="features-icon">
+                        <i class="flaticon-book"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Comprehensive Curriculum</h3>
+                        <p>Our courses cover everything from basics to advanced topics with structured learning paths.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="features-icon">
+                        <i class="flaticon-certificate"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Verified Certificates</h3>
+                        <p>Earn recognized certificates upon course completion to boost your professional profile.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="features-icon">
+                        <i class="flaticon-customer-service"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Expert Support</h3>
+                        <p>Get help from our dedicated support team and experienced instructors anytime you need it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Services Area End -->
+
+<!-- Footer Area Start -->
+<footer class="footer-area footer-bg">
+    <div class="footer-top footer-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8">
+                    <div class="single-footer-caption">
+                        <div class="single-footer-caption footer-tittle">
+                            <h4>About Us</h4>
+                            <ul>
+                                <li><a th:href="@{/about}">About</a></li>
+                                <li><a th:href="@{/contact}">Contact</a></li>
+                                <li><a href="#">Blog</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8">
+                    <div class="single-footer-caption">
+                        <div class="single-footer-caption footer-tittle">
+                            <h4>Learning</h4>
+                            <ul>
+                                <li><a th:href="@{/courses}">Courses</a></li>
+                                <li><a href="#">Tutorials</a></li>
+                                <li><a href="#">Resources</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8">
+                    <div class="single-footer-caption">
+                        <div class="single-footer-caption footer-tittle">
+                            <h4>Support</h4>
+                            <ul>
+                                <li><a href="#">Help Center</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom-area">
+        <div class="container border-top-generic">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-8">
+                    <div class="footer-copy-right">
+                        <p>
+                            <i class="fas fa-copyright"></i> 2026 Course Management System. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="footer-social text-right">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Footer Area End -->
+<!-- JS -->
+<script th:src="@{/js/vendor/modernizr-3.5.0.min.js}"></script>
+<script th:src="@{/js/vendor/jquery-1.12.4.min.js}"></script>
+<script th:src="@{/js/popper.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery.slicknav.min.js}"></script>
+<script th:src="@{/js/owl.carousel.min.js}"></script>
+<script th:src="@{/js/slick.min.js}"></script>
+<script th:src="@{/js/wow.min.js}"></script>
+<script th:src="@{/js/animated.headline.js}"></script>
+<script th:src="@{/js/jquery.magnific-popup.js}"></script>
+<script th:src="@{/js/gijgo.min.js}"></script>
+<script th:src="@{/js/jquery.nice-select.min.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/jquery.barfiller.js}"></script>
+<script th:src="@{/js/jquery.counterup.min.js}"></script>
+<script th:src="@{/js/waypoints.min.js}"></script>
+<script th:src="@{/js/jquery.countdown.min.js}"></script>
+<script th:src="@{/js/hover-direction-snake.min.js}"></script>
+<script th:src="@{/js/contact.js}"></script>
+<script th:src="@{/js/jquery.form.js}"></script>
+<script th:src="@{/js/jquery.validate.min.js}"></script>
+<script th:src="@{/js/mail-script.js}"></script>
+<script th:src="@{/js/jquery.ajaxchimp.min.js}"></script>
+<script th:src="@{/js/plugins.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>
