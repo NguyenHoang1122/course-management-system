@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+<body>
+
+<h2>Profile</h2>
+
+<p>Username: <span th:text="${user.userName}"></span></p>
+<p>Full name: <span th:text="${user.fullName}"></span></p>
+<p>Email: <span th:text="${user.email}"></span></p>
+<p>Phone: <span th:text="${user.phone}"></span></p>
+<p>Gender: <span th:text="${user.gender}"></span></p>
+<p>Address: <span th:text="${user.address}"></span></p>
+<p>Role: <span th:text="${user.roleName}"></span></p>
+
+<img th:src="${user.avatar}" width="150"/>
+</body>
+</html>

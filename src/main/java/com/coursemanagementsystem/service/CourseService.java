@@ -58,6 +58,9 @@ public class CourseService {
             dto.setInstructorId(course.getInstructor().getId());
         }
 
+        // Set lessons để hiển thị số bài học trong preview
+        dto.setLessons(course.getLessons());
+
         return dto;
     }
 
@@ -68,4 +71,12 @@ public class CourseService {
    public void deleteById(Long id) {
         courseRepository.deleteById(id);
    }
+
+    public Course findByIdWithLessons(Long id) {
+        Course course = courseRepository.findById(id).orElse(null);
+        if (course != null) {
+            course.getLessons().size(); // trigger loading
+        }
+        return course;
+    }
 }

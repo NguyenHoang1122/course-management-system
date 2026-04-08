@@ -1,39 +1,249 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Edit Course</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chỉnh Sửa Khóa Học - Course Management System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
-<h1>Edit Course</h1>
-<form th:action="@{/admin/update}" th:object="${courseDTO}" method="post">
-    <input type="hidden" th:field="*{id}">
-    <div>
-        <label>Title</label>
-        <input type="text" th:field="*{title}">
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
+            <p>Cập nhật thông tin khóa học</p>
+        </div>
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/courses}">Khóa Học</a></li>
+                <li class="breadcrumb-item"><a th:href="@{'/courses/' + ${courseDTO.id}}">Chi Tiết</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh Sửa</li>
+            </ol>
+        </nav>
+
+        <!-- Form -->
+        <div class="admin-content">
+            <div class="form-container">
+                <form th:action="@{/admin/update}" th:object="${courseDTO}" method="post" class="needs-validation"
+                    novalidate>
+
+                    <!-- Hidden ID -->
+                    <input type="hidden" th:field="*{id}">
+
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="title">
+                            <i class="fas fa-heading"></i> Tên Khóa Học <span style="color: var(--danger-color);">*</span>
+                        </label>
+                        <input type="text" id="title" th:field="*{title}" class="form-control"
+                            placeholder="Nhập tên khóa học" required minlength="3" maxlength="255">
+                        <div class="invalid-feedback">
+                            Vui lòng nhập tên khóa học (tối thiểu 3 ký tự).
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">
+                            <i class="fas fa-align-left"></i> Mô Tả Khóa Học <span style="color: var(--danger-color);">*</span>
+                        </label>
+                        <textarea id="description" th:field="*{description}" class="form-control"
+                            placeholder="Nhập mô tả chi tiết về khóa học" rows="5" required minlength="10"></textarea>
+                        <div class="invalid-feedback">
+                            Vui lòng nhập mô tả khóa học (tối thiểu 10 ký tự).
+                        </div>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> Mô tả nên bao gồm mục tiêu học tập và nội dung chính của
+                            khóa học.
+                        </small>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="form-group">
+                        <label for="price">
+                            <i class="fas fa-dollar-sign"></i> Giá Khóa Học (VND) <span style="color: var(--danger-color);">*</span>
+                        </label>
+                        <input type="number" id="price" th:field="*{price}" class="form-control"
+                            placeholder="Nhập giá khóa học" required min="0" step="1000">
+                        <div class="invalid-feedback">
+                            Vui lòng nhập giá khóa học hợp lệ.
+                        </div>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.
+                        </small>
+                    </div>
+
+                    <!-- Instructor -->
+                    <div class="form-group">
+                        <label for="instructorId">
+                            <i class="fas fa-user-tie"></i> Giảng Viên <span style="color: var(--danger-color);">*</span>
+                        </label>
+                        <select id="instructorId" th:field="*{instructorId}" class="form-control" required>
+                            <option value="">-- Chọn Giảng Viên --</option>
+                            <option th:each="user : ${instructors}" th:value="${user.id}" th:text="${user.fullName}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Vui lòng chọn giảng viên cho khóa học.
+                        </div>
+                    </div>
+
+
+                    <!-- Preview Section -->
+                    <div class="admin-content" style="margin-top: 30px;">
+                        <h4 style="color: var(--secondary-color); margin-bottom: 20px;">
+                            <i class="fas fa-eye"></i> Xem Trước Khóa Học
+                        </h4>
+
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <h3 id="preview-title" th:text="${courseDTO.title}">Tên Khóa Học</h3>
+                                <div class="price" id="preview-price"
+                                    th:text="${#numbers.formatDecimal(courseDTO.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    0 VND
+                                </div>
+                            </div>
+
+                            <div class="course-card-body">
+                                <p id="preview-description" th:text="${courseDTO.description}">Mô tả khóa học sẽ hiển thị ở
+                                    đây...</p>
+                                <div class="course-meta-small">
+                                    <small style="color: var(--text-muted);">
+                                        <i class="fas fa-user-tie"></i> <span id="preview-instructor">Chưa chọn giảng viên</span>
+                                    </small>
+                                    <br>
+                                    <small style="color: var(--text-muted);">
+                                        <i class="fas fa-play-circle"></i> <span th:text="${courseDTO.lessons != null ? courseDTO.lessons.size() : 0}">0</span> bài học
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-group" style="margin-top: 40px;">
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Cập Nhật Khóa Học
+                            </button>
+                            <a th:href="@{'/courses/' + ${courseDTO.id}}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay Lại
+                            </a>
+                            <a th:href="@{/courses}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Description</label>
-        <input type="text" th:field="*{description}">
-    </div>
-  <div>
-      <label>Price</label>
-      <input type="text" th:field="*{price}">
-  </div>
-    <div>
-        <label>Instructor</label>
-        <select th:field="*{instructorId}">
-            <option value="">Select Instructor:
-            </option>
-            <option th:each="user : ${instructors}"
-                    th:value="${user.id}"
-                    th:text="${user.fullName}">
-            </option>
-        </select>
-    </div>
-    <div>
-        <button type="submit">Save</button>
-    </div>
-</form>
+
+    <script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Live preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const titleInput = document.getElementById('title');
+        const descriptionInput = document.getElementById('description');
+        const priceInput = document.getElementById('price');
+        const instructorSelect = document.getElementById('instructorId');
+
+        const previewTitle = document.getElementById('preview-title');
+        const previewDescription = document.getElementById('preview-description');
+        const previewPrice = document.getElementById('preview-price');
+        const previewInstructor = document.getElementById('preview-instructor');
+
+        // Hiển thị instructor đã chọn từ trước khi page load
+        function updateInstructorPreview() {
+            const selectedOption = instructorSelect.options[instructorSelect.selectedIndex];
+            previewInstructor.textContent = selectedOption.text || 'Chưa chọn giảng viên';
+        }
+
+        // Update preview on input
+        titleInput.addEventListener('input', function() {
+            previewTitle.textContent = this.value || 'Tên Khóa Học';
+        });
+
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || 'Mô tả khóa học sẽ hiển thị ở đây...';
+        });
+
+        priceInput.addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            previewPrice.textContent = price.toLocaleString('vi-VN') + ' VND';
+        });
+
+        instructorSelect.addEventListener('change', function() {
+            updateInstructorPreview();
+        });
+
+        // Format price input
+        priceInput.addEventListener('input', function() {
+            let value = this.value.replace(/[^\d]/g, '');
+            if (value) {
+                value = parseInt(value).toLocaleString('vi-VN');
+            }
+            this.value = value;
+        });
+
+        // Gọi hàm để cập nhật preview lúc page load
+        updateInstructorPreview();
+    });
+    </script>
+
+    <style>
+    /* Fix cho phần select giảng viên bị che chữ */
+    .form-control {
+        padding: 12px 16px;
+        line-height: 1.5;
+        min-height: 44px;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234255A4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+
+    @media (max-width: 576px) {
+        .form-control {
+            padding: 10px 12px;
+            min-height: 40px;
+        }
+
+        select.form-control {
+            padding-right: 30px;
+        }
+    }
+    </style>
+
 </body>
+
 </html>

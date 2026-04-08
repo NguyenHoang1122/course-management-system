@@ -24,7 +24,7 @@ public class CourseController {
 
     @GetMapping("/{id}")
     public String viewCourse(@PathVariable Long id, Model model) {
-        Course course = courseService.findById(id);
+        Course course = courseService.findByIdWithLessons(id);
         model.addAttribute("course", course);
         return "course/detail";
     }
