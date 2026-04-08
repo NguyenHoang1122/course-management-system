@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<tr th:each="course : ${courses}">
+    <td th:text="${course.title}"></td>
+    <td>
+        <a th:href="@{'/enrollments/enroll/' + ${course.id}}">
+            Đăng ký khóa học
+        </a>
+    </td>
+</tr>
+</body>
+</html>
