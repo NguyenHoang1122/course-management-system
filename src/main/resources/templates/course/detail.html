@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Chi Tiết Khóa Học - Course Management System</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
@@ -13,13 +12,11 @@
 
 <body>
 <div class="admin-container">
-    <!-- Header -->
     <div class="admin-header">
         <h1><i class="fas fa-book-open"></i> Chi Tiết Khóa Học</h1>
         <p>Thông tin chi tiết về khóa học và các bài học</p>
     </div>
 
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
@@ -28,7 +25,6 @@
         </ol>
     </nav>
 
-    <!-- Course Details -->
     <div class="admin-content">
         <div class="row">
             <div class="col-lg-8">
@@ -72,7 +68,6 @@
         </div>
     </div>
 
-    <!-- Lessons Section -->
     <div class="admin-content" th:if="${course.lessons != null and !course.lessons.isEmpty()}">
         <h3 style="color: var(--secondary-color); margin-bottom: 25px;">
             <i class="fas fa-list-ul"></i> Danh Sách Bài Học
@@ -101,18 +96,19 @@
                         <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit"></i> Sửa
                         </a>
-                        <form th:action="@{'/admin/delete-lesson/' + ${lesson.id}}" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa bài học này?')">
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                <i class="fas fa-trash"></i> Xóa
-                            </button>
-                        </form>
+
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm btn-delete-lesson"
+                                th:data-id="${lesson.id}"
+                                th:data-title="${lesson.title}">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Empty Lessons Message -->
     <div class="admin-content" th:if="${course.lessons == null or course.lessons.isEmpty()}">
         <div class="text-center py-5">
             <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
@@ -125,10 +121,9 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="confirmBox" class="modal-overlay">
     <div class="modal-content">
-        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa</h3>
+        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Khóa Học</h3>
         <p>Bạn có chắc chắn muốn xóa khóa học "<strong th:text="${course.title}"></strong>" không?</p>
         <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
 
@@ -145,26 +140,67 @@
     </div>
 </div>
 
+<div id="lessonConfirmBox" class="modal-overlay">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Bài Học</h3>
+        <p>Bạn có chắc chắn muốn xóa bài học "<strong id="lessonTitleDisplay"></strong>" không?</p>
+        <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
+
+        <div class="modal-actions">
+            <form id="deleteLessonForm" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xóa
+                </button>
+            </form>
+            <button type="button" onclick="hideLessonConfirm()" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Xử lý Xóa Khóa học
     function showConfirm() {
         document.getElementById("confirmBox").style.display = "flex";
     }
-
     function hideConfirm() {
         document.getElementById("confirmBox").style.display = "none";
     }
 
-    // Close modal when clicking outside
-    document.getElementById("confirmBox").addEventListener("click", function(event) {
-        if (event.target === this) {
-            hideConfirm();
+    // Xử lý Xóa Bài học (Sử dụng Event Delegation để an toàn và chuyên nghiệp hơn)
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.btn-delete-lesson')) {
+            const button = event.target.closest('.btn-delete-lesson');
+            const lessonId = button.getAttribute('data-id');
+            const lessonTitle = button.getAttribute('data-title');
+
+            showLessonConfirm(lessonId, lessonTitle);
         }
     });
 
-    // Close modal with Escape key
+    function showLessonConfirm(id, title) {
+        document.getElementById("lessonTitleDisplay").innerText = title;
+        document.getElementById("deleteLessonForm").action = '/admin/delete-lesson/' + id;
+        document.getElementById("lessonConfirmBox").style.display = "flex";
+    }
+
+    function hideLessonConfirm() {
+        document.getElementById("lessonConfirmBox").style.display = "none";
+    }
+
+    // Đóng các modal khi click ra ngoài hoặc nhấn Esc
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            hideConfirm();
+            hideLessonConfirm();
+        }
+    }
+
     document.addEventListener("keydown", function(event) {
         if (event.key === "Escape") {
             hideConfirm();
+            hideLessonConfirm();
         }
     });
 </script>
