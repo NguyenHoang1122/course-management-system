@@ -20,6 +20,9 @@ public class LessonService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EnrollmentService enrollmentService;
+
     public void saveFromDTO(LessonDTO dto) {
 
         Lesson lesson;
@@ -46,5 +49,27 @@ public class LessonService {
 
     public void deleteById(Long id) {
         lessonRepository.deleteById(id);
+    }
+
+
+    public Lesson getLessonForUser(Long lessonId, Long userId) {
+
+        Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
+
+        if (lesson == null) {
+            return null;
+        }
+
+        if (lesson.getCourse() == null) {
+            return null;
+        }
+
+        boolean enrolled = enrollmentService.isEnrolled(userId, lesson.getCourse().getId());
+
+        if (!enrolled) {
+            return null;
+        }
+
+        return lesson;
     }
 }

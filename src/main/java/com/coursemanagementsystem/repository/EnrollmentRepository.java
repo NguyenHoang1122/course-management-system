@@ -1,6 +1,7 @@
 package com.coursemanagementsystem.repository;
 
 
+import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Enrollment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByUserId(Long userId);
 
+    List<Course> findCoursesByUserId(Long userId);
+
+
+    boolean existsByUserIdAndCourseId(Long userId, Long courseId);
 }
