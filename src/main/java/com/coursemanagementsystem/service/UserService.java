@@ -37,10 +37,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public UserDTO save(UserDTO userDTO) {
+        User user = modelMapper.map(userDTO, User.class);
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser, UserDTO.class);
+    }
+
     public User findById(Long id) {
         return null;
     }
 
     public void register(String username, String password) {
+
     }
 }

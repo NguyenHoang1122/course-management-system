@@ -1,10 +1,156 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Danh Sách Khóa Học - Course Management System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
+<div class="admin-container">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1><i class="fas fa-graduation-cap"></i> Quản Lý Khóa Học</h1>
+        <p>Quản lý tất cả các khóa học trong hệ thống</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 th:text="${courses != null ? courses.size() : 0}">0</h3>
+            <p><i class="fas fa-book"></i> Tổng Khóa Học</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p><i class="fas fa-dollar-sign"></i> Tổng Giá Trị</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p><i class="fas fa-play-circle"></i> Tổng Bài Học</p>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="color: var(--secondary-color); margin: 0;">
+                <i class="fas fa-list"></i> Danh Sách Khóa Học
+            </h3>
+            <a th:href="@{/admin/create-course}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm Khóa Học Mới
+            </a>
+        </div>
+
+        <!-- Courses Grid -->
+        <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
+            <div th:each="course : ${courses}" class="course-card">
+                <div class="course-card-header">
+                    <h3 th:text="${course.title}"></h3>
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                </div>
+
+                <div class="course-card-body">
+                    <p th:text="${course.description}"
+                       style="-webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;"></p>
+
+                    <div class="course-meta-small">
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-user-tie"></i> <span th:text="${course.instructor.getFullName()}"></span>
+                        </small>
+                        <br>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-calendar-alt"></i> <span th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}"></span>
+                        </small>
+                        <br>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-play-circle"></i> <span th:text="${course.lessons.size()}"></span> bài học
+                        </small>
+                    </div>
+                </div>
+
+                <div class="course-card-footer">
+                    <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a th:href="@{'/admin/edit/' + ${course.id}}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button type="button"
+                            th:attr="onclick='showDeleteConfirm(' + ${course.id} + ', &quot;' + ${course.title} + '&quot;)'"
+                            class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-graduation-cap"
+               style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+            <h4 style="color: var(--text-muted);">Chưa có khóa học nào</h4>
+            <p style="color: var(--text-muted);">Hãy tạo khóa học đầu tiên cho hệ thống.</p>
+            <a th:href="@{/admin/create-course}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tạo Khóa Học Đầu Tiên
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa
+        </h3>
+        <p>Bạn có chắc chắn muốn xóa khóa học "<strong id="courseTitle"></strong>" không?</p>
+        <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
+
+        <div class="modal-actions">
+            <form id="deleteForm" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xóa
+                </button>
+            </form>
+            <button type="button" onclick="hideDeleteConfirm()" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDeleteConfirm(courseId, courseTitle) {
+        document.getElementById('courseTitle').textContent = courseTitle;
+        document.getElementById('deleteForm').action = '/admin/delete/' + courseId;
+        document.getElementById('deleteConfirmModal').style.display = 'flex';
+    }
+
+    function hideDeleteConfirm() {
+        document.getElementById('deleteConfirmModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteConfirmModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            hideDeleteConfirm();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            hideDeleteConfirm();
+        }
+    });
+</script>
 
 </body>
+
 </html>

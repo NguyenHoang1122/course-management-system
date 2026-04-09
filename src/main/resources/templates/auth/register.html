@@ -14,7 +14,7 @@
 <body>
 
 <div class="register-container">
-    <form class="register-wrapper" th:action="@{/register}" method="post">
+    <form class="register-wrapper" th:action="@{/auth/register}" method="post">
 
         <!-- Logo -->
         <div class="logo-login">
@@ -42,15 +42,27 @@
 
         <!-- Email -->
         <div class="form-group">
-            <label for="username">
+            <label for="email">
                 <i class="fas fa-envelope"></i> Email
             </label>
             <input
                 type="email"
-                id="username"
-                name="username"
+                id="email"
+                name="email"
                 placeholder="Nhập email của bạn"
                 required>
+        </div>
+        <!-- Username -->
+        <div class="form-group">
+            <label for="userName">
+                <i class="fas fa-user-circle"></i> Tên đăng nhập
+            </label>
+            <input
+                    type="text"
+                    id="userName"
+                    name="userName"
+                    placeholder="Nhập tên đăng nhập"
+                    required>
         </div>
 
         <!-- Password -->

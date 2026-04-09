@@ -21,6 +21,12 @@ public class AdminController {
     @Autowired
     private LessonService lessonService;
 
+    @GetMapping("/course-list")
+    public String  findALlCourseList(Model model){
+        model.addAttribute("courses", courseService.findAll());
+        return "admin/course-list";
+    }
+
     @GetMapping("/create-course")
     public String createCourse(Model model) {
         model.addAttribute("courseDTO", new CourseDTO());
@@ -103,4 +109,13 @@ public class AdminController {
         return "redirect:/courses";
     }
 
+    @GetMapping("/{id}")
+    public String viewCourse(@PathVariable("id") Long id, Model model) {
+        CourseDTO courseDTO = courseService.findDTOById(id);
+        if (courseDTO == null) {
+            return "redirect:/admin/course-list";
+        }
+        model.addAttribute("course", courseDTO);
+        return "admin/course-detail";
+    }
 }

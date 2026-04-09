@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,8 +19,8 @@ public class SecurityConfig {
 //        http
 //                .userDetailsService(userDetailsService)
 //                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/", "/register", "/courses/**","/admin/**").permitAll()
-////                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/", "/register", "/courses/**").permitAll()
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/my-courses").hasRole("STUDENT")
 //                        .anyRequest().authenticated()
 //                )
