@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lesson Detail</title>
+</head>
+<body>
+
+<h1>Lesson Detail</h1>
+
+<div th:if="${lesson != null}">
+    <h2 th:text="${lesson.title}"></h2>
+    <p th:text="${lesson.content}"></p>
+</div>
+
+</body>
+</html>

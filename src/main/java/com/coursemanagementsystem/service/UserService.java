@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -42,5 +43,30 @@ public class UserService {
     }
 
     public void register(String username, String password) {
+    }
+
+
+    public User findByUsername(String username) {
+        Optional<User> user = userRepository.findByUserName(username);
+
+        if (user.isPresent()) {
+            return user.get();
+        }
+
+        return null;
+    }
+
+
+    public void updateProfile(String username, User userForm) {
+        Optional<User> optionalUser = userRepository.findByUserName(username);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            user.setFullName(userForm.getFullName());
+            user.setEmail(userForm.getEmail());
+
+            userRepository.save(user);
+        }
     }
 }
