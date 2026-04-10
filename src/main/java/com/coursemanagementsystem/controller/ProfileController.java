@@ -1,12 +1,14 @@
 package com.coursemanagementsystem.controller;
 
-import com.coursemanagementsystem.model.Enrollment;
+import com.coursemanagementsystem.dto.UserProfileDTO;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,13 +57,20 @@ public class ProfileController {
         String username = principal.getName();
         User user = userService.findByUsername(username);
 
-        model.addAttribute("user", user);
+        UserProfileDTO profileDTO = new UserProfileDTO();
+        profileDTO.setFullName(user.getFullName());
+        profileDTO.setEmail(user.getEmail());
+        profileDTO.setPhone(user.getPhone());
+        profileDTO.setAddress(user.getAddress());
 
+        model.addAttribute("user", user);
+        model.addAttribute("userProfileDTO", profileDTO);
         return "profile/edit";
     }
 
     @PostMapping("/profile/edit")
-    public String updateProfile(@ModelAttribute("user") User userForm,
+    public String updateProfile(@Valid @ModelAttribute("userProfileDTO") UserProfileDTO profileDTO,
+                                BindingResult bindingResult,
                                 @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
                                 Principal principal,
                                 Model model) {
@@ -78,24 +87,23 @@ public class ProfileController {
 
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
-                userForm.setAvatar(fileService.uploadFile(avatarFile));
+                profileDTO.setAvatar(fileService.uploadFile(avatarFile));
             } catch (Exception ex) {
                 model.addAttribute("user", currentUser);
                 model.addAttribute("updateError", ex.getMessage());
                 return "profile/edit";
             }
         } else {
-            userForm.setAvatar(currentUser.getAvatar());
+            profileDTO.setAvatar(currentUser.getAvatar());
         }
 
-        if (userForm.getFullName() == null || userForm.getFullName().trim().isEmpty()) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("user", currentUser);
-            model.addAttribute("updateError", "Full name is required");
             return "profile/edit";
         }
 
         try {
-            userService.updateProfile(username, userForm);
+            userService.updateProfile(username, profileDTO);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("user", currentUser);
             model.addAttribute("updateError", ex.getMessage());
@@ -126,8 +134,18 @@ public class ProfileController {
             return "redirect:/profile/edit?passwordUpdated=true";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("user", currentUser);
+            model.addAttribute("userProfileDTO", buildProfileDTO(currentUser));
             model.addAttribute("changePasswordError", ex.getMessage());
             return "profile/edit";
         }
+    }
+
+    private UserProfileDTO buildProfileDTO(User user) {
+        UserProfileDTO dto = new UserProfileDTO();
+        dto.setFullName(user.getFullName());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setAddress(user.getAddress());
+        return dto;
     }
 }

@@ -1,6 +1,7 @@
 package com.coursemanagementsystem.service;
 
 import com.coursemanagementsystem.dto.UserDTO;
+import com.coursemanagementsystem.dto.UserProfileDTO;
 import com.coursemanagementsystem.dto.UserRegisterDTO;
 import com.coursemanagementsystem.model.Role;
 import com.coursemanagementsystem.model.User;
@@ -91,22 +92,22 @@ public class UserService {
         return user.orElse(null);
     }
 
-    public void updateProfile(String username, User userForm) {
+    public void updateProfile(String username, UserProfileDTO profileDTO) {
         Optional<User> optionalUser = userRepository.findByUserName(username);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            String email = userForm.getEmail() == null ? "" : userForm.getEmail().trim();
+            String email = profileDTO.getEmail() == null ? "" : profileDTO.getEmail().trim();
             if (!email.isEmpty() && userRepository.existsByEmailAndUserNameNot(email, username)) {
                 throw new IllegalArgumentException("Email already exists");
             }
 
-            user.setFullName(userForm.getFullName() == null ? null : userForm.getFullName().trim());
+            user.setFullName(profileDTO.getFullName() == null ? null : profileDTO.getFullName().trim());
             user.setEmail(email);
-            user.setAvatar(userForm.getAvatar());
-            user.setPhone(userForm.getPhone() == null ? null : userForm.getPhone().trim());
-            user.setAddress(userForm.getAddress() == null ? null : userForm.getAddress().trim());
+            user.setAvatar(profileDTO.getAvatar());
+            user.setPhone(profileDTO.getPhone() == null ? null : profileDTO.getPhone().trim());
+            user.setAddress(profileDTO.getAddress() == null ? null : profileDTO.getAddress().trim());
 
             userRepository.save(user);
         }
