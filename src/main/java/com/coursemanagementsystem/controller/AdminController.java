@@ -7,9 +7,11 @@ import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -36,7 +38,13 @@ public class AdminController {
     }
 
     @PostMapping("/save-course")
-    public String saveCourse(@ModelAttribute("courseDTO") CourseDTO courseDTO) {
+    public String saveCourse(@Valid @ModelAttribute("courseDTO") CourseDTO courseDTO,
+                             BindingResult bindingResult,
+                             Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("instructors", userService.findAllInstructor());
+            return "admin/create-course";
+        }
         courseService.saveFromDTO(courseDTO);
         return "redirect:/courses";
     }
@@ -52,7 +60,14 @@ public class AdminController {
     }
 
     @PostMapping("/save-lesson")
-    public String saveLesson(@ModelAttribute LessonDTO dto) {
+    public String saveLesson(@Valid @ModelAttribute("lessonDTO") LessonDTO dto,
+                             BindingResult bindingResult,
+                             Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseId", dto.getCourseId());
+            model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
+            return "admin/add-lesson";
+        }
         lessonService.saveFromDTO(dto);
         return "redirect:/courses/" + dto.getCourseId();
     }
@@ -65,7 +80,13 @@ public class AdminController {
     }
 
     @PostMapping("/update")
-    public String updateCourse(@ModelAttribute("courseDTO") CourseDTO courseDTO) {
+    public String updateCourse(@Valid @ModelAttribute("courseDTO") CourseDTO courseDTO,
+                               BindingResult bindingResult,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("instructors", userService.findAllInstructor());
+            return "admin/edit-course";
+        }
         courseService.saveFromDTO(courseDTO);
         return "redirect:/courses";
     }
@@ -94,7 +115,14 @@ public class AdminController {
     }
 
     @PostMapping("/update-lesson")
-    public String updateLesson(@ModelAttribute LessonDTO dto) {
+    public String updateLesson(@Valid @ModelAttribute("lessonDTO") LessonDTO dto,
+                               BindingResult bindingResult,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courseId", dto.getCourseId());
+            model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
+            return "admin/add-lesson";
+        }
         lessonService.saveFromDTO(dto);
         return "redirect:/courses/" + dto.getCourseId();
     }

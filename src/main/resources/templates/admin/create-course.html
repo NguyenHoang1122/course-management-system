@@ -52,6 +52,7 @@
                     <div class="invalid-feedback">
                         Vui lòng nhập tên khóa học (tối thiểu 3 ký tự).
                     </div>
+                    <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></small>
                 </div>
 
                 <!-- Description -->
@@ -70,6 +71,7 @@
                     <div class="invalid-feedback">
                         Vui lòng nhập mô tả khóa học (tối thiểu 10 ký tự).
                     </div>
+                    <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Mô tả nên bao gồm mục tiêu học tập và nội dung chính của khóa học.
                     </small>
@@ -94,6 +96,7 @@
                     <div class="invalid-feedback">
                         Vui lòng nhập giá khóa học hợp lệ.
                     </div>
+                    <small th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger"></small>
 
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.

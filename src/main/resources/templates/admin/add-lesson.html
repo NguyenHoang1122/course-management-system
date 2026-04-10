@@ -68,6 +68,7 @@
                     <div class="invalid-feedback">
                         Vui lòng nhập tên bài học (tối thiểu 3 ký tự).
                     </div>
+                    <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Tên bài học nên mô tả rõ nội dung chính của bài học.
                     </small>
@@ -87,6 +88,7 @@
                     <div class="invalid-feedback">
                         Vui lòng nhập link video hợp lệ.
                     </div>
+                    <small th:if="${#fields.hasErrors('videoUrl')}" th:errors="*{videoUrl}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Hỗ trợ YouTube và Vimeo. Để trống nếu chưa có video.
                     </small>

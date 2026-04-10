@@ -1,6 +1,7 @@
 package com.coursemanagementsystem.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -14,8 +15,15 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Course title is required")
+    @Size(max = 200, message = "Title must be less than 200 characters")
     private String title; //ten khoa hoc
+
+    @Size(max = 2000, message = "Description must be less than 2000 characters")
     private String description; //mieu ta khoa hoc
+
+    @NotNull(message = "Price is required")
+    @PositiveOrZero(message = "Price must be zero or positive")
     private Double price; //gia
 
     private LocalDate createdAt; //Ngay tao khoa hoc
