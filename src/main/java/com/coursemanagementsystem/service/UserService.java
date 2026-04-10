@@ -11,17 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -43,7 +49,16 @@ public class UserService {
     }
 
     public List<User> findAllInstructor() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        List<User> result = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getRole() != null && user.getRole().getName().equals("INSTRUCTOR")) {
+                result.add(user);
+            }
+        }
+
+        return result;
     }
 
     public UserDTO save(UserDTO userDTO) {

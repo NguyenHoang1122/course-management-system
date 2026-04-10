@@ -28,23 +28,14 @@ public class LessonController {
         this.enrollmentService = enrollmentService;
     }
 
-    @GetMapping("/lessons/{id}")
-    public String viewLesson(@PathVariable Long id, Model model) {
+    @GetMapping("/lesson/{id}")
+    public String viewLesson(@PathVariable Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
-            return "redirect:/auth/login";
-        }
-
         String username = auth.getName();
-
         User user = userService.findByUsername(username);
 
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-
+        // Lấy Lesson gốc không qua kiểm tra quyền tĩnh
         Lesson lesson = lessonService.findById(id);
 
         if (lesson == null) {
@@ -63,8 +54,12 @@ public class LessonController {
             return "redirect:/courses";
         }
 
-        model.addAttribute("lesson", lesson);
+        if (lesson.getVideoUrl() != null && !lesson.getVideoUrl().isEmpty()) {
+            return "redirect:" + lesson.getVideoUrl();
+        }
 
-        return "lesson/view";
+        // Return to course detailing page if no video available
+        redirectAttributes.addFlashAttribute("error", "Bài học này chưa có video!");
+        return "redirect:/courses/" + lesson.getCourse().getId();
     }
 }

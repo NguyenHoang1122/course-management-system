@@ -84,9 +84,9 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-   public void deleteById(Long id) {
+    public void deleteById(Long id) {
         courseRepository.deleteById(id);
-   }
+    }
 
     public Course findByIdWithLessons(Long id) {
         Course course = courseRepository.findById(id).orElse(null);

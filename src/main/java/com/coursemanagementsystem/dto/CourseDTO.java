@@ -12,6 +12,6 @@ public class CourseDTO {
     private Double price;
 
     private Long instructorId;
-    
+
     private List<?> lessons;
 }
