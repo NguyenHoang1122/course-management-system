@@ -1,50 +1,214 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Chi Tiết Khóa Học - Course Management System</title>
 
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 
 <body>
 <div class="admin-container">
-    <!-- ... existing code ... -->
+    <div class="admin-header">
+        <h1><i class="fas fa-book-open"></i> Chi Tiết Khóa Học</h1>
+        <p>Thông tin chi tiết về khóa học và các bài học</p>
+    </div>
 
-    <div class="admin-content" th:if="${course.lessons != null and !course.lessons.isEmpty()}">
-        <h3 style="color: var(--secondary-color); margin-bottom: 25px;">
-            <i class="fas fa-list-ul"></i> Danh Sách Bài Học
-        </h3>
+<!--    <nav aria-label="breadcrumb">-->
+<!--        <ol class="breadcrumb">-->
+<!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
+<!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
+<!--            <li class="breadcrumb-item active" aria-current="page" th:text="${course.title}">Chi Tiết</li>-->
+<!--        </ol>-->
+<!--    </nav>-->
 
-        <div class="lesson-grid">
-            <div th:each="lesson, iterStat : ${course.lessons}" class="lesson-item">
-                <div class="lesson-info">
-                    <h4>
-                        <span th:text="${iterStat.index + 1}"></span>.
-                        <span th:text="${lesson.title}"></span>
-                    </h4>
-                    <p th:if="${lesson.videoUrl}" th:text="${lesson.videoUrl}"></p>
-                    <p th:unless="${lesson.videoUrl}" style="color: var(--text-muted); font-style: italic;">
-                        Chưa có video
-                    </p>
+    <div class="admin-content">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="course-info">
+                    <h2 th:text="${course.title}" style="color: var(--secondary-color); margin-bottom: 15px;"></h2>
+                    <p class="course-description" th:text="${course.description}" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;"></p>
+
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>
+                                <strong>Ngày Tạo:</strong>
+                                <span th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}"></span>
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-user-tie"></i>
+                            <span>
+                                <strong>Giảng Viên:</strong>
+                                <span th:text="${course.instructor != null ? course.instructor.fullName : '-'}"></span>
+                            </span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>
+                                <strong>Giá:</strong>
+                                <span th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="lesson-actions">
-                    <a th:if="${lesson.videoUrl}" th:href="${lesson.videoUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-play"></i> Xem
+            </div>
+
+            <div class="col-lg-4">
+                <div class="course-actions">
+                    <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson'}" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-plus"></i> Thêm Bài Học
                     </a>
-                    <a th:unless="${lesson.videoUrl}" class="btn btn-outline-secondary btn-sm" disabled>
-                        <i class="fas fa-play"></i> Xem
+                    <a th:href="@{'/admin/edit/' + ${course.id}}" class="btn btn-success w-100 mb-3">
+                        <i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học
+                    </a>
+                    <button type="button" onclick="showConfirm()" class="btn btn-danger w-100 mb-3">
+                        <i class="fas fa-trash"></i> Xóa Khóa Học
+                    </button>
+                    <a th:href="@{/admin/course-list}" class="btn btn-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Quay Lại Danh Sách
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ... existing code ... -->
+    <div class="admin-content" th:if="${course.lessons != null and !course.lessons.isEmpty()}">
+        <h3 style="color: var(--secondary-color); margin-bottom: 25px;">
+            <i class="fas fa-list-ul"></i> Danh Sách Bài Học
+        </h3>
+
+        <div class="lesson-list">
+            <div th:each="lesson, iterStat : ${course.lessons}" class="lesson-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="lesson-info">
+                        <h4>
+                            <span th:text="${iterStat.index + 1}"></span>.
+                            <span th:text="${lesson.title}"></span>
+                        </h4>
+                        <p th:if="${lesson.videoUrl}" th:text="${lesson.videoUrl}"></p>
+                        <p th:unless="${lesson.videoUrl}" style="color: var(--text-muted); font-style: italic;">
+                            Chưa có video
+                        </p>
+                    </div>
+                    <div class="lesson-actions">
+                        <a th:if="${lesson.videoUrl}" th:href="${lesson.videoUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-play"></i> Xem
+                        </a>
+                        <a th:unless="${lesson.videoUrl}" class="btn btn-outline-secondary btn-sm" disabled>
+                            <i class="fas fa-play"></i> Xem
+                        </a>
+                        <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm btn-delete-lesson"
+                                th:data-id="${lesson.id}"
+                                th:data-title="${lesson.title}">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-content" th:if="${course.lessons == null or course.lessons.isEmpty()}">
+        <div class="text-center py-5">
+            <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+            <h4 style="color: var(--text-muted);">Chưa có bài học nào</h4>
+            <p style="color: var(--text-muted);">Hãy thêm bài học đầu tiên cho khóa học này.</p>
+            <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson'}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm Bài Học Đầu Tiên
+            </a>
+        </div>
+    </div>
 </div>
+
+<div id="confirmBox" class="modal-overlay">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Khóa Học</h3>
+        <p>Bạn có chắc chắn muốn xóa khóa học "<strong th:text="${course.title}"></strong>" không?</p>
+        <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
+
+        <div class="modal-actions">
+            <form th:action="@{'/admin/delete/' + ${course.id}}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xóa
+                </button>
+            </form>
+            <button type="button" onclick="hideConfirm()" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="lessonConfirmBox" class="modal-overlay">
+    <div class="modal-content">
+        <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Bài Học</h3>
+        <p>Bạn có chắc chắn muốn xóa bài học "<strong id="lessonTitleDisplay"></strong>" không?</p>
+        <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
+
+        <div class="modal-actions">
+            <form id="deleteLessonForm" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Xóa
+                </button>
+            </form>
+            <button type="button" onclick="hideLessonConfirm()" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showConfirm() {
+        document.getElementById("confirmBox").style.display = "flex";
+    }
+
+    function hideConfirm() {
+        document.getElementById("confirmBox").style.display = "none";
+    }
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.btn-delete-lesson')) {
+            const button = event.target.closest('.btn-delete-lesson');
+            const lessonId = button.getAttribute('data-id');
+            const lessonTitle = button.getAttribute('data-title');
+            showLessonConfirm(lessonId, lessonTitle);
+        }
+    });
+
+    function showLessonConfirm(id, title) {
+        document.getElementById("lessonTitleDisplay").innerText = title;
+        document.getElementById("deleteLessonForm").action = '/admin/delete-lesson/' + id;
+        document.getElementById("lessonConfirmBox").style.display = "flex";
+    }
+
+    function hideLessonConfirm() {
+        document.getElementById("lessonConfirmBox").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            hideConfirm();
+            hideLessonConfirm();
+        }
+    }
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            hideConfirm();
+            hideLessonConfirm();
+        }
+    });
+</script>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>
 </html>

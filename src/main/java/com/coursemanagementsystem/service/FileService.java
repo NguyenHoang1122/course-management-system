@@ -2,14 +2,20 @@ package com.coursemanagementsystem.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class FileService {
+
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp");
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -17,27 +23,28 @@ public class FileService {
     public String uploadFile(MultipartFile file) throws IOException {
 
         if (file.isEmpty()) {
-            throw new RuntimeException("File rỗng");
+            throw new IllegalArgumentException("File is empty");
         }
 
-        // chỉ cho phép ảnh
-        if (!file.getContentType().startsWith("image/")) {
-            throw new RuntimeException("Chỉ cho phép upload ảnh");
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Only image files are allowed");
         }
 
-        // tạo folder nếu chưa có
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        String originalName = StringUtils.cleanPath(file.getOriginalFilename() == null ? "" : file.getOriginalFilename());
+        String extension = StringUtils.getFilenameExtension(originalName);
+
+        if (extension == null || !ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
+            throw new IllegalArgumentException("Unsupported image format");
         }
 
-        // rename tránh trùng
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
+        Files.createDirectories(uploadPath);
 
-        File saveFile = new File(uploadDir + "/" + fileName);
-        file.transferTo(saveFile);
+        String fileName = UUID.randomUUID() + "." + extension.toLowerCase();
+        Path savePath = uploadPath.resolve(fileName);
+        Files.copy(file.getInputStream(), savePath, StandardCopyOption.REPLACE_EXISTING);
 
-        // trả về path để lưu DB
         return "/uploads/" + fileName;
     }
 }

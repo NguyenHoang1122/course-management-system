@@ -9,24 +9,21 @@
     --light-bg: #f7f7fd;
 }
 
-body {
+body.auth-page {
     margin: 0;
     padding: 0;
     font-family: 'Mulish', sans-serif;
     background: linear-gradient(135deg, var(--secondary-color) 0%, #5274ff 50%, var(--primary-color) 100%);
     background-attachment: fixed;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.login-container,
-.register-container {
+body.auth-page .login-container,
+body.auth-page .register-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: calc(100vh - 220px);
     padding: 30px 20px;
 }
 
