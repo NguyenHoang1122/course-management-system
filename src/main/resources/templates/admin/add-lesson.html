@@ -60,14 +60,14 @@
                         <i class="fas fa-heading"></i> Tên Bài Học <span style="color: var(--danger-color);">*</span>
                     </label>
                     <input
-                        type="text"
-                        id="title"
-                        th:field="*{title}"
-                        class="form-control"
-                        placeholder="Nhập tên bài học"
-                        required
-                        minlength="3"
-                        maxlength="255">
+                            type="text"
+                            id="title"
+                            th:field="*{title}"
+                            class="form-control"
+                            placeholder="Nhập tên bài học"
+                            required
+                            minlength="3"
+                            maxlength="255">
                     <div class="invalid-feedback">
                         Vui lòng nhập tên bài học (tối thiểu 3 ký tự).
                     </div>
@@ -82,11 +82,11 @@
                         <i class="fas fa-video"></i> Link Video (YouTube/Vimeo)
                     </label>
                     <input
-                        type="url"
-                        id="videoUrl"
-                        th:field="*{videoUrl}"
-                        class="form-control"
-                        placeholder="https://www.youtube.com/watch?v=... hoặc https://vimeo.com/...">
+                            type="url"
+                            id="videoUrl"
+                            th:field="*{videoUrl}"
+                            class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=... hoặc https://vimeo.com/...">
                     <div class="invalid-feedback">
                         Vui lòng nhập link video hợp lệ.
                     </div>
@@ -252,71 +252,71 @@
 </style>
 
 <script>
-// Form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Video preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoUrlInput = document.getElementById('videoUrl');
+        const videoPreview = document.getElementById('videoPreview');
+        const videoFrame = document.getElementById('videoFrame');
+
+        function updateVideoPreview() {
+            const url = videoUrlInput.value.trim();
+
+            if (url) {
+                let embedUrl = '';
+
+                // YouTube
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    const videoId = url.includes('youtu.be')
+                        ? url.split('youtu.be/')[1]?.split('?')[0]
+                        : url.split('v=')[1]?.split('&')[0];
+
+                    if (videoId) {
+                        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    }
                 }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-})();
-
-// Video preview functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const videoUrlInput = document.getElementById('videoUrl');
-    const videoPreview = document.getElementById('videoPreview');
-    const videoFrame = document.getElementById('videoFrame');
-
-    function updateVideoPreview() {
-        const url = videoUrlInput.value.trim();
-
-        if (url) {
-            let embedUrl = '';
-
-            // YouTube
-            if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                const videoId = url.includes('youtu.be')
-                    ? url.split('youtu.be/')[1]?.split('?')[0]
-                    : url.split('v=')[1]?.split('&')[0];
-
-                if (videoId) {
-                    embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                // Vimeo
+                else if (url.includes('vimeo.com')) {
+                    const videoId = url.split('vimeo.com/')[1]?.split('/')[0];
+                    if (videoId) {
+                        embedUrl = `https://player.vimeo.com/video/${videoId}`;
+                    }
                 }
-            }
-            // Vimeo
-            else if (url.includes('vimeo.com')) {
-                const videoId = url.split('vimeo.com/')[1]?.split('/')[0];
-                if (videoId) {
-                    embedUrl = `https://player.vimeo.com/video/${videoId}`;
-                }
-            }
 
-            if (embedUrl) {
-                videoFrame.src = embedUrl;
-                videoPreview.style.display = 'block';
+                if (embedUrl) {
+                    videoFrame.src = embedUrl;
+                    videoPreview.style.display = 'block';
+                } else {
+                    videoPreview.style.display = 'none';
+                }
             } else {
                 videoPreview.style.display = 'none';
+                videoFrame.src = '';
             }
-        } else {
-            videoPreview.style.display = 'none';
-            videoFrame.src = '';
         }
-    }
 
-    videoUrlInput.addEventListener('input', updateVideoPreview);
-    videoUrlInput.addEventListener('blur', updateVideoPreview);
+        videoUrlInput.addEventListener('input', updateVideoPreview);
+        videoUrlInput.addEventListener('blur', updateVideoPreview);
 
-    // Initial check
-    updateVideoPreview();
-});
+        // Initial check
+        updateVideoPreview();
+    });
 </script>
 
 </body>

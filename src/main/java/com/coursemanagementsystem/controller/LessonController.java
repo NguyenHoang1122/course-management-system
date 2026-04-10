@@ -28,18 +28,38 @@ public class LessonController {
     }
 
     @GetMapping("/lesson/{id}")
-    public String viewLesson(@PathVariable Long id, Model model) {
+    public String viewLesson(@PathVariable Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
         String username = auth.getName();
-
         User user = userService.findByUsername(username);
 
-        Lesson lesson = lessonService.getLessonForUser(id, user.getId());
+        // Lấy Lesson gốc không qua kiểm tra quyền tĩnh
+        Lesson lesson = lessonService.findById(id);
 
-        model.addAttribute("lesson", lesson);
+        if (lesson == null) {
+            return "redirect:/courses";
+        }
 
-        return "lesson/detail";
+        // Kiểm tra quyền truy cập bài học
+        boolean isStudent = user.getRole().getName().equals("STUDENT");
+        boolean isAdmin = user.getRole().getName().equals("ADMIN");
+
+        if (isStudent) {
+            boolean isEnrolled = enrollmentService.isUserEnrolled(user.getId(), lesson.getCourse().getId());
+            if (!isEnrolled) {
+                // Return to course detailing page and show a friendly bootstrap alert
+                redirectAttributes.addFlashAttribute("error", "Bạn cần đăng ký khóa học để xem nội dung bài học này!");
+                return "redirect:/courses/" + lesson.getCourse().getId();
+            }
+        }
+
+        if (lesson.getVideoUrl() != null && !lesson.getVideoUrl().isEmpty()) {
+            return "redirect:" + lesson.getVideoUrl();
+        }
+
+        // Return to course detailing page if no video available
+        redirectAttributes.addFlashAttribute("error", "Bài học này chưa có video!");
+        return "redirect:/courses/" + lesson.getCourse().getId();
     }
 }

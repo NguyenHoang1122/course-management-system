@@ -67,10 +67,13 @@ public class LessonService {
             return null;
         }
 
+        // Kiểm tra quyền (Nếu controller không truyền vào thì có thể báo lỗi hoặc check ở đây)
+        // Thay vì throw Exception để tung trang trắng, ta trả về null hoặc xử lý tại Controller.
+        // Để linh hoạt cho cả ADMIN, tốt nhất chỉ nên trả về null báo không lấy được nội dung (do chưa đăng ký).
         boolean isEnrolled = enrollmentRepository.existsByUserIdAndCourseId(userId, lesson.getCourse().getId());
 
         if (!isEnrolled) {
-            throw new RuntimeException("Bạn chưa đăng ký khóa học này");
+            return null; // Return null so Controller knows user cannot access it
         }
 
         return lesson;
