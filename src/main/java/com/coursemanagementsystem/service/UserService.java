@@ -1,6 +1,7 @@
 package com.coursemanagementsystem.service;
 
 import com.coursemanagementsystem.dto.UserDTO;
+import com.coursemanagementsystem.dto.UserRegisterDTO;
 import com.coursemanagementsystem.model.Role;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.RoleRepository;
@@ -21,7 +22,11 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -56,19 +61,38 @@ public class UserService {
         return result;
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElse(null);
+    public UserDTO save(UserDTO userDTO) {
+        User user = modelMapper.map(userDTO, User.class);
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser, UserDTO.class);
     }
 
-    public void register(String username, String password) {
-        User user = new User();
-        user.setUserName(username);
-        user.setPassword(passwordEncoder.encode(password));
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
-        // mặc định là STUDENT
-        Role role = new Role();
-        role.setName("STUDENT");
+    public void register(UserRegisterDTO dto) {
+        if (userRepository.findByUserName(dto.getUserName()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Password confirmation does not match");
+        }
+
+        User user = new User();
+        user.setUserName(dto.getUserName());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+
+        Role role = roleRepository.findByName("STUDENT")
+                .orElseThrow(() -> new RuntimeException("Default role STUDENT not found"));
         user.setRole(role);
 
         userRepository.save(user);
@@ -76,12 +100,7 @@ public class UserService {
 
     public User findByUsername(String username) {
         Optional<User> user = userRepository.findByUserName(username);
-
-        if (user.isPresent()) {
-            return user.get();
-        }
-
-        return null;
+        return user.orElse(null);
     }
 
     public void updateProfile(String username, User userForm) {
@@ -90,10 +109,46 @@ public class UserService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            user.setFullName(userForm.getFullName());
-            user.setEmail(userForm.getEmail());
+            String email = userForm.getEmail() == null ? "" : userForm.getEmail().trim();
+            if (!email.isEmpty() && userRepository.existsByEmailAndUserNameNot(email, username)) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+
+            user.setFullName(userForm.getFullName() == null ? null : userForm.getFullName().trim());
+            user.setEmail(email);
+            user.setAvatar(userForm.getAvatar());
+            user.setPhone(userForm.getPhone() == null ? null : userForm.getPhone().trim());
+            user.setAddress(userForm.getAddress() == null ? null : userForm.getAddress().trim());
 
             userRepository.save(user);
         }
+    }
+
+    public void changePassword(String username, String currentPassword, String newPassword, String confirmPassword) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new IllegalArgumentException("Current password is required");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new IllegalArgumentException("New password must be at least 6 characters");
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("Password confirmation does not match");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("New password must be different from current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

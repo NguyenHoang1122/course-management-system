@@ -1,11 +1,14 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="layout.html" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title th:text="${pageTitle} ?: 'About Us | Course Management System'">About Us | Course Management System</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 
 <body>
-<div th:fragment="content">
+<div th:replace="~{layout :: siteHeader}"></div>
+
     <!-- About Area Start -->
     <section class="about-area section-padding">
         <div class="container">
@@ -86,7 +89,8 @@
     </section>
     <!-- Mission Area End -->
 
-    <!-- ...existing footer from layout... -->
-</div>
+<div th:replace="~{layout :: siteFooter}"></div>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 </body>
 </html>

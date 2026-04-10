@@ -18,20 +18,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
 
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new CustomUserDetails(user, getAuthorities(user));
+    }
 
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    private List<GrantedAuthority> getAuthorities(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
 
-        // Role phải có dạng ROLE_ADMIN / ROLE_STUDENT
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+        if (user.getRole() != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+        }
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUserName(),
-                user.getPassword(),
-                authorities
-        );
+        return authorities;
     }
 }

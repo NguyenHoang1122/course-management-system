@@ -6,6 +6,7 @@ import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,17 +42,16 @@ public class LessonController {
             return "redirect:/courses";
         }
 
-        // Kiểm tra quyền truy cập bài học
-        boolean isStudent = user.getRole().getName().equals("STUDENT");
-        boolean isAdmin = user.getRole().getName().equals("ADMIN");
+        Long courseId = lesson.getCourse().getId();
 
-        if (isStudent) {
-            boolean isEnrolled = enrollmentService.isUserEnrolled(user.getId(), lesson.getCourse().getId());
-            if (!isEnrolled) {
-                // Return to course detailing page and show a friendly bootstrap alert
-                redirectAttributes.addFlashAttribute("error", "Bạn cần đăng ký khóa học để xem nội dung bài học này!");
-                return "redirect:/courses/" + lesson.getCourse().getId();
-            }
+        boolean canViewWithoutEnrollment = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority) || "ROLE_INSTRUCTOR".equals(authority));
+
+        boolean enrolled = canViewWithoutEnrollment || enrollmentService.isEnrolled(user.getId(), courseId);
+
+        if (!enrolled) {
+            return "redirect:/courses";
         }
 
         if (lesson.getVideoUrl() != null && !lesson.getVideoUrl().isEmpty()) {

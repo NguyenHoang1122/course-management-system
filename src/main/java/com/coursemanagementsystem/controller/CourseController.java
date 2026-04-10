@@ -30,6 +30,7 @@ public class CourseController {
     @GetMapping("")
     public String findAllCourse(Model model) {
         model.addAttribute("courses", courseService.findAll());
+        model.addAttribute("pageTitle", "Course List");
         return "course/list";
     }
 

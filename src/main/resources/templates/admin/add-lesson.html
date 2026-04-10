@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Thêm Bài Học - Course Management System</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 
@@ -20,15 +17,15 @@
         <p th:if="${lessonDTO.id != null}">Chỉnh sửa thông tin bài học</p>
     </div>
 
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/courses}">Khóa Học</a></li>
-            <li class="breadcrumb-item"><a th:href="@{'/courses/' + ${courseId}}">Chi Tiết</a></li>
-            <li class="breadcrumb-item active" aria-current="page" th:text="${lessonDTO.id == null ? 'Thêm Bài Học' : 'Chỉnh Sửa Bài Học'}">Thêm Bài Học</li>
-        </ol>
-    </nav>
+<!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
+<!--    <nav aria-label="breadcrumb">-->
+<!--        <ol class="breadcrumb">-->
+<!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
+<!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
+<!--            <li class="breadcrumb-item"><a th:href="@{'/admin/' + ${courseId}}">Chi Tiết</a></li>-->
+<!--            <li class="breadcrumb-item active" aria-current="page" th:text="${lessonDTO.id == null ? 'Thêm Bài Học' : 'Chỉnh Sửa Bài Học'}">Thêm Bài Học</li>-->
+<!--        </ol>-->
+<!--    </nav>-->
 
     <!-- Course Info -->
     <div class="admin-content">
@@ -152,10 +149,10 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Lưu Bài Học
                         </button>
-                        <a th:href="@{'/courses/' + ${courseId}}" class="btn btn-secondary">
+                        <a th:href="@{'/admin/' + ${courseId}}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay Lại
                         </a>
-                        <a th:href="@{/courses}" class="btn btn-outline-secondary">
+                        <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary">
                             <i class="fas fa-times"></i> Hủy
                         </a>
                     </div>
@@ -318,6 +315,8 @@
         updateVideoPreview();
     });
 </script>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>
 </html>

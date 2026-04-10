@@ -2,6 +2,7 @@ package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.dto.CourseDTO;
 import com.coursemanagementsystem.dto.LessonDTO;
+import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.LessonService;
@@ -21,8 +22,8 @@ public class AdminController {
     @Autowired
     private LessonService lessonService;
 
-    @GetMapping("/course-list.html")
-    public String courseList(Model model) {
+    @GetMapping("/course-list")
+    public String  findALlCourseList(Model model){
         model.addAttribute("courses", courseService.findAll());
         return "admin/course-list";
     }
@@ -109,4 +110,39 @@ public class AdminController {
         return "redirect:/courses";
     }
 
+    @GetMapping("/{id}")
+    public String viewCourse(@PathVariable("id") Long id, Model model) {
+        Course course = courseService.findByIdWithLessons(id);
+        model.addAttribute("course", course);
+        return "admin/admin-detail";
+    }
+
+    // ===== FRAGMENTS FOR MODAL =====
+
+    @GetMapping("/course-form")
+    public String courseForm(@RequestParam(value = "id", required = false) Long id, Model model) {
+        model.addAttribute("courseDTO", id == null ? new CourseDTO() : courseService.findDTOById(id));
+        model.addAttribute("instructors", userService.findAllInstructor());
+        return "admin/fragments/course-form :: courseForm";
+    }
+
+    @GetMapping("/course-detail/{id}")
+    public String courseDetail(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("course", courseService.findByIdWithLessons(id));
+        return "admin/fragments/course-detail :: courseDetail";
+    }
+
+    @PostMapping("/save-course-ajax")
+    public String saveCourseAjax(@ModelAttribute("courseDTO") CourseDTO courseDTO, Model model) {
+        courseService.saveFromDTO(courseDTO);
+        model.addAttribute("success", true);
+        return "admin/fragments/ajax-response :: success";
+    }
+
+    @PostMapping("/delete-course-ajax/{id}")
+    public String deleteCourseAjax(@PathVariable("id") Long id, Model model) {
+        courseService.deleteById(id);
+        model.addAttribute("success", true);
+        return "admin/fragments/ajax-response :: success";
+    }
 }

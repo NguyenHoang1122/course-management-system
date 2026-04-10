@@ -1,12 +1,14 @@
 package com.coursemanagementsystem.controller;
 
-import com.coursemanagementsystem.dto.UserDTO;
+import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
@@ -15,10 +17,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/profile")
-    public String profile(Model model) {
-        UserDTO userDTO = userService.getProfile(1L); // tạm hardcode
+    public String profile(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
 
-        model.addAttribute("user", userDTO);
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
 
         return "user/profile";
     }

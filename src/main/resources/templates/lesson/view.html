@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Lesson Detail</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 <body>
+
+<div th:replace="~{layout :: siteHeader}"></div>
 
 <h1>Lesson Detail</h1>
 
@@ -11,6 +15,9 @@
     <h2 th:text="${lesson.title}"></h2>
     <p th:text="${lesson.content}"></p>
 </div>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>
 </html>

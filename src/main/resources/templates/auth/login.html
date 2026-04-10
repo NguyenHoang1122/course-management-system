@@ -1,17 +1,16 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Login - Course Management System</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/fontawesome-all.min.css}">
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
     <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 
-<body>
+<body class="auth-page">
+
+<div th:replace="~{layout :: siteHeader}"></div>
 
 <div class="login-container">
     <form class="login-wrapper" th:action="@{/auth/login}" method="post">
@@ -36,6 +35,11 @@
         </div>
 
         <!-- Success Message -->
+        <div th:if="${param.register}" class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i>
+            Đăng ký thành công! Vui lòng đăng nhập.
+        </div>
+
         <div th:if="${param.logout}" class="alert alert-success" role="alert">
             <i class="fas fa-check-circle"></i>
             Đăng xuất thành công!
@@ -44,7 +48,7 @@
         <!-- Username -->
         <div class="form-group">
             <label for="username">
-                <i class="fas fa-envelope"></i> Email
+                <i class="fas fa-user"></i> Tên đăng nhập
             </label>
             <input
                     type="text"
@@ -102,6 +106,10 @@
 
     </form>
 </div>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 <script>
     function togglePassword() {

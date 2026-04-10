@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+  <th:block th:replace="~{layout :: headMeta}"></th:block>
   <title>Profile</title>
+  <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 <body>
 
+<div th:replace="~{layout :: siteHeader}"></div>
+
 <h2>Profile</h2>
 
+<p th:if="${param.updated}" style="color: green;">Cập nhật thông tin thành công!</p>
+
+<img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" width="120"/>
+<p th:if="${!user.avatar}">Chưa có ảnh đại diện.</p>
+
 <p>Username: <span th:text="${user.userName}"></span></p>
+<p>Full name: <span th:text="${user.fullName}"></span></p>
 <p>Email: <span th:text="${user.email}"></span></p>
+<p>Phone: <span th:text="${user.phone}"></span></p>
+<p>Address: <span th:text="${user.address}"></span></p>
 
 <a th:href="@{/profile/edit}">Edit Profile</a>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>
 </html>

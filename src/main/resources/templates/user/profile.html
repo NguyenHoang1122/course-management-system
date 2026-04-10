@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Profile</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 <body>
+
+<div th:replace="~{layout :: siteHeader}"></div>
 
 <h2>Profile</h2>
 
@@ -17,5 +20,8 @@
 <p>Role: <span th:text="${user.roleName}"></span></p>
 
 <img th:src="${user.avatar}" width="150"/>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 </body>
 </html>
