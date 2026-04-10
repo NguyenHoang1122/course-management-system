@@ -1,32 +1,92 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>List Course</title>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Danh Sách Khóa Học - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
-<h1>List Course</h1>
-<table>
-    <thead>
-    <tr>
-        <th>STT</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Create Date</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="course,stt : ${courses}">
-        <td th:text="${stt.index + 1}"></td>
-        <td th:text="${course.title}"></td>
-        <td th:text="${course.description}"></td>
-        <td th:text="${course.createdAt}"></td>
-        <td>
-            <a th:href="@{'/courses/' + ${course.id}}">View</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-graduation-cap"></i> Quản Lý Khóa Học</h1>
+        <p>Quản lý tất cả các khóa học trong hệ thống</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 th:text="${courses != null ? courses.size() : 0}">0</h3>
+            <p><i class="fas fa-book"></i> Tổng Khóa Học</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p><i class="fas fa-dollar-sign"></i> Tổng Giá Trị</p>
+        </div>
+        <div class="stat-card">
+            <h3>0</h3>
+            <p><i class="fas fa-play-circle"></i> Tổng Bài Học</p>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="color: var(--secondary-color); margin: 0;">
+                <i class="fas fa-list"></i> Danh Sách Khóa Học
+            </h3>
+        </div>
+
+        <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
+            <div th:each="course : ${courses}" class="course-card">
+                <div class="course-card-header">
+                    <h3 th:text="${course.title}"></h3>
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                </div>
+
+                <div class="course-card-body">
+                    <p th:text="${course.description}"
+                       style="-webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;"></p>
+
+                    <div class="course-meta-small">
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-user-tie"></i>
+                            <span th:text="${course.instructor != null ? course.instructor.fullName : 'Unknown'}"></span>
+                        </small>
+                        <br>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'dd/MM/yyyy') : '-'}"></span>
+                        </small>
+                        <br>
+                        <small style="color: var(--text-muted);">
+                            <i class="fas fa-play-circle"></i>
+                            <span th:text="${course.lessons != null ? course.lessons.size() : 0}"></span> bài học
+                        </small>
+                    </div>
+                </div>
+
+                <div class="course-card-footer">
+                    <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye">Xem</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
+            <i class="fas fa-graduation-cap"
+               style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+            <h4 style="color: var(--text-muted);">Chưa có khóa học nào</h4>
+            <p style="color: var(--text-muted);">Hãy tạo khóa học đầu tiên cho hệ thống.</p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 </body>
 </html>

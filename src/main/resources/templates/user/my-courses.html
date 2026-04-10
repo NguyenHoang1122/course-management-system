@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Title</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+</head>
+<body>
+
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+</body>
+</html>

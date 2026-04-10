@@ -1,0 +1,186 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Courses | Education Management System</title>
+
+    <!-- CSS -->
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/owl.carousel.min.css}">
+    <link rel="stylesheet" th:href="@{/css/slicknav.css}">
+    <link rel="stylesheet" th:href="@{/css/flaticon.css}">
+    <link rel="stylesheet" th:href="@{/css/progressbar_barfiller.css}">
+    <link rel="stylesheet" th:href="@{/css/gijgo.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}">
+    <link rel="stylesheet" th:href="@{/css/animated-headline.css}">
+    <link rel="stylesheet" th:href="@{/css/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/css/themify-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/slick.css}">
+    <link rel="stylesheet" th:href="@{/css/nice-select.css}">
+</head>
+
+<body>
+
+<!-- Header Area Start -->
+<div th:replace="~{layout :: siteHeader}"></div>
+<!-- Header Area End -->
+
+<!-- Slider Area Start -->
+<div class="slider-area slider-height"
+     th:style="|background-image: url(@{/img/hero/h1_hero.png})|">
+
+    <div class="single-slider">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-8 col-lg-9 col-sm-10">
+
+                    <div class="hero__caption">
+                        <span class="wow fadeInUp" data-wow-delay="0.2s">
+                            Welcome to Our Platform
+                        </span>
+
+                        <h1 class="wow fadeInUp" data-wow-delay="0.4s">
+                            Discover Your Learning Journey
+                        </h1>
+
+                        <p class="wow fadeInUp" data-wow-delay="0.6s">
+                            Learn from industry experts and master new skills
+                            with our comprehensive online courses.
+                        </p>
+
+                        <div class="hero__btn">
+                            <a sec:authorize="hasRole('ADMIN')"
+                               class="btn hero-btn wow fadeInUp"
+                               data-wow-delay="0.8s"
+                               th:href="@{/admin/course-list}">
+                                Explore Courses
+                            </a>
+                            <a sec:authorize="!hasRole('ADMIN')"
+                               class="btn hero-btn wow fadeInUp"
+                               data-wow-delay="0.8s"
+                               th:href="@{/courses}">
+                                Explore Courses
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- Slider Area End -->
+
+<!-- About Area Start -->
+<section class="about-area about-area1 section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-5 col-lg-6 col-md-9">
+                <div class="about-caption mb-50">
+                    <div class="section-tittle mb-35 pt-3">
+                        <span>Why Choose Us?</span>
+                        <h2>Discover Quality Learning</h2>
+                    </div>
+                    <div class="about-pera">
+                        <p class="wow fadeInUp" data-wow-delay="0.2s">We offer comprehensive courses designed by industry experts to help you advance your career and skills.</p>
+                        <p class="wow fadeInUp" data-wow-delay="0.4s">Our platform provides interactive learning experiences, certificates, and lifetime access to course materials.</p>
+                    </div>
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/course-list}" class="border-btn border-btn2 mt-40">All Courses</a>
+                    <a sec:authorize="!hasRole('ADMIN')" th:href="@{/courses}" class="border-btn border-btn2 mt-40">All Courses</a>
+                </div>
+            </div>
+            <div class="col-xl-7 col-lg-6">
+                <div class="about-img">
+                    <img th:src="@{/img/gallery/featured1.png}" alt="Featured" class="wow fadeInRight" data-wow-delay="0.3s">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- About Area End -->
+
+<!-- Services Area Start -->
+<section class="services-area gray-bg section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="section-tittle text-center mb-80">
+                    <span>Our Services</span>
+                    <h2>Why we are different</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="features-icon">
+                        <i class="flaticon-book"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Comprehensive Curriculum</h3>
+                        <p>Our courses cover everything from basics to advanced topics with structured learning paths.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="features-icon">
+                        <i class="flaticon-certificate"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Verified Certificates</h3>
+                        <p>Earn recognized certificates upon course completion to boost your professional profile.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-30">
+                <div class="single-services wow fadeInUp" data-wow-delay="0.6s">
+                    <div class="features-icon">
+                        <i class="flaticon-customer-service"></i>
+                    </div>
+                    <div class="features-caption">
+                        <h3>Expert Support</h3>
+                        <p>Get help from our dedicated support team and experienced instructors anytime you need it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Services Area End -->
+
+<!-- Footer Area Start -->
+<div th:replace="~{layout :: siteFooter}"></div>
+<!-- Footer Area End -->
+<!-- JS -->
+<script th:src="@{/js/vendor/modernizr-3.5.0.min.js}"></script>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<script th:src="@{/js/popper.min.js}"></script>
+<script th:src="@{/js/jquery.slicknav.min.js}"></script>
+<script th:src="@{/js/owl.carousel.min.js}"></script>
+<script th:src="@{/js/slick.min.js}"></script>
+<script th:src="@{/js/wow.min.js}"></script>
+<script th:src="@{/js/animated.headline.js}"></script>
+<script th:src="@{/js/jquery.magnific-popup.js}"></script>
+<script th:src="@{/js/gijgo.min.js}"></script>
+<script th:src="@{/js/jquery.nice-select.min.js}"></script>
+<script th:src="@{/js/jquery.sticky.js}"></script>
+<script th:src="@{/js/jquery.barfiller.js}"></script>
+<script th:src="@{/js/jquery.counterup.min.js}"></script>
+<script th:src="@{/js/waypoints.min.js}"></script>
+<script th:src="@{/js/jquery.countdown.min.js}"></script>
+<script th:src="@{/js/hover-direction-snake.min.js}"></script>
+<script th:src="@{/js/contact.js}"></script>
+<script th:src="@{/js/jquery.form.js}"></script>
+<script th:src="@{/js/jquery.validate.min.js}"></script>
+<script th:src="@{/js/mail-script.js}"></script>
+<script th:src="@{/js/jquery.ajaxchimp.min.js}"></script>
+<script th:src="@{/js/plugins.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>

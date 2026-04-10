@@ -2,6 +2,7 @@ package com.coursemanagementsystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class Enrollment {
     private Long id;
 
     @ManyToOne
+    @ToString.Exclude
     private User user;
 
     @ManyToOne

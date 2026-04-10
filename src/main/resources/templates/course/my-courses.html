@@ -1,10 +1,82 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <th:block th:replace="~{layout :: headMeta}"></th:block>
+  <title>Khóa Học Của Tôi</title>
+
+  <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 <body>
+
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1" style="color: var(--secondary-color);">
+        <i class="fas fa-book-reader"></i> Khóa Học Của Tôi
+      </h2>
+      <p class="mb-0" style="color: var(--text-muted);">Các khóa học bạn đã đăng ký</p>
+    </div>
+    <a th:href="@{/courses}" class="btn btn-outline-primary">
+      <i class="fas fa-list"></i> Xem tất cả khóa học
+    </a>
+  </div>
+
+  <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid-user">
+    <div th:each="course : ${courses}" class="course-user-card">
+      <div class="course-user-card-body">
+        <h5 class="course-user-title" th:text="${course.title}">Course title</h5>
+
+        <p class="course-user-desc" th:text="${course.description}">
+          Course description
+        </p>
+
+        <div class="course-user-meta">
+          <div class="course-user-meta-item">
+            <i class="fas fa-user-tie"></i>
+            <span th:text="${course.instructor != null ? course.instructor.getFullName() : 'N/A'}">Instructor</span>
+          </div>
+
+          <div class="course-user-meta-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'dd/MM/yyyy') : 'N/A'}">Date</span>
+          </div>
+
+          <div class="course-user-meta-item">
+            <i class="fas fa-play-circle"></i>
+            <span th:text="${course.lessons != null ? course.lessons.size() : 0}">0</span>
+            <span> bài học</span>
+          </div>
+        </div>
+
+        <div class="course-user-price">
+                    <span th:text="${course.price != null ? #numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                        0 VND
+                    </span>
+        </div>
+      </div>
+
+      <div class="course-user-card-footer">
+        <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary btn-sm w-100">
+          <i class="fas fa-eye"></i> Xem chi tiết
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
+    <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+    <h4 style="color: var(--text-muted);">Bạn chưa đăng ký khóa học nào</h4>
+    <p style="color: var(--text-muted);">Hãy khám phá và đăng ký một khóa học phù hợp.</p>
+    <a th:href="@{/courses}" class="btn btn-primary">
+      <i class="fas fa-search"></i> Tìm khóa học
+    </a>
+  </div>
+</div>
+
+<div th:replace="~{layout :: siteFooter}"></div>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>
 </html>
