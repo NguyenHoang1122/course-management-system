@@ -4,7 +4,6 @@ import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.repository.CourseRepository;
-import com.coursemanagementsystem.repository.EnrollmentRepository;
 import com.coursemanagementsystem.repository.LessonRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,47 +11,39 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LessonService {
+    @Autowired
+    private LessonRepository lessonRepository;
 
-    private final LessonRepository lessonRepository;
-    private final EnrollmentRepository enrollmentRepository;
-    private final CourseRepository courseRepository;
+    @Autowired
+    private CourseRepository courseRepository;
 
-    public LessonService(LessonRepository lessonRepository, EnrollmentRepository enrollmentRepository,
-                         CourseRepository courseRepository){
-        this.lessonRepository = lessonRepository;
-        this.enrollmentRepository = enrollmentRepository;
-        this.courseRepository = courseRepository;
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
+    @Autowired
+    private EnrollmentService enrollmentService;
 
     public void saveFromDTO(LessonDTO dto) {
 
         Lesson lesson;
 
-        // UPDATE
         if (dto.getId() != null) {
             lesson = lessonRepository.findById(dto.getId())
-                    .orElse(new Lesson());
+                    .orElseThrow(() -> new RuntimeException("Lesson not found"));
+            modelMapper.map(dto, lesson);
+        } else {
+            // create
+            lesson = modelMapper.map(dto, Lesson.class);
         }
-        // CREATE
-        else {
-            lesson = new Lesson();
-        }
 
-        lesson.setTitle(dto.getTitle());
-        lesson.setVideoUrl(dto.getVideoUrl());
-
-        Course course = courseRepository.findById(dto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course not found"));
-
+        Course course = courseRepository.findById(dto.getCourseId()).orElse(null);
         lesson.setCourse(course);
 
         lessonRepository.save(lesson);
     }
 
     public Lesson findById(Long id) {
-        return lessonRepository.findById(id)
-                .orElse(null);
+        return lessonRepository.findById(id).orElse(null);
     }
 
     public void deleteById(Long id) {
@@ -66,14 +57,14 @@ public class LessonService {
         if (lesson == null) {
             return null;
         }
+        if (lesson.getCourse() == null) {
+            return null;
+        }
 
-        // Kiểm tra quyền (Nếu controller không truyền vào thì có thể báo lỗi hoặc check ở đây)
-        // Thay vì throw Exception để tung trang trắng, ta trả về null hoặc xử lý tại Controller.
-        // Để linh hoạt cho cả ADMIN, tốt nhất chỉ nên trả về null báo không lấy được nội dung (do chưa đăng ký).
-        boolean isEnrolled = enrollmentRepository.existsByUserIdAndCourseId(userId, lesson.getCourse().getId());
+        boolean enrolled = enrollmentService.isEnrolled(userId, lesson.getCourse().getId());
 
-        if (!isEnrolled) {
-            return null; // Return null so Controller knows user cannot access it
+        if (!enrolled) {
+            return null;
         }
 
         return lesson;

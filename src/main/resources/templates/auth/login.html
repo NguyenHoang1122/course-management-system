@@ -15,7 +15,8 @@
 <div class="login-container">
     <form class="login-wrapper" th:action="@{/auth/login}" method="post">
 
-        <!-- CSRF disabled in config, removing hidden input to prevent errors -->
+        <!-- CSRF (BẮT BUỘC) -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
         <!-- Logo -->
         <div class="logo-login">

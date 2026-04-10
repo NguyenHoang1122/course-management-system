@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +27,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     private UserDTO convertToDTO(User user) {
         UserDTO dto = modelMapper.map(user, UserDTO.class);
@@ -49,17 +46,8 @@ public class UserService {
     }
 
     public List<User> findAllInstructor() {
-        List<User> users = userRepository.findAll();
-        List<User> result = new ArrayList<>();
-
-        for (User user : users) {
-            if (user.getRole() != null && user.getRole().getName().equals("INSTRUCTOR")) {
-                result.add(user);
-            }
+        return userRepository.findAll();
         }
-
-        return result;
-    }
 
     public UserDTO save(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
