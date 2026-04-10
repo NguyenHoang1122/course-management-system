@@ -49,7 +49,7 @@
   <label>Current avatar</label>
   <div>
     <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" width="120"/>
-    <span th:if="${!user.avatar}">No avatar</span>
+    <span th:if="${#strings.isEmpty(user.avatar)}">No avatar</span>
   </div>
 
   <br/>

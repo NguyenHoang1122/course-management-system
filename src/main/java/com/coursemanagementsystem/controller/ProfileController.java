@@ -1,6 +1,8 @@
 package com.coursemanagementsystem.controller;
 
+import com.coursemanagementsystem.model.Enrollment;
 import com.coursemanagementsystem.model.User;
+import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -12,16 +14,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class ProfileController {
 
     private final UserService userService;
     private final FileService fileService;
+    private final EnrollmentService enrollmentService;
 
-    public ProfileController(UserService userService, FileService fileService) {
+    public ProfileController(UserService userService, FileService fileService, EnrollmentService enrollmentService) {
         this.userService = userService;
         this.fileService = fileService;
+        this.enrollmentService = enrollmentService;
     }
 
     @GetMapping("/profile")
@@ -33,7 +38,10 @@ public class ProfileController {
         String username = principal.getName();
         User user = userService.findByUsername(username);
 
+        List<Enrollment> enrollments = enrollmentService.findByUserId(user.getId());
+
         model.addAttribute("user", user);
+        model.addAttribute("enrollments", enrollments);
 
         return "profile/view";
     }
