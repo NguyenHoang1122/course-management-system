@@ -12,41 +12,40 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .userDetailsService(userDetailsService)
+                .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth/login", "/auth/register").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**").permitAll()
 
+                        // ADMIN only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/courses/**").hasAnyRole("ADMIN", "STUDENT")
 
-                        // Lesson bắt buộc login (logic kiểm tra enroll sẽ nằm trong controller)
+                        // COURSE + LESSON
+                        .requestMatchers("/courses/**").hasAnyRole("ADMIN", "STUDENT")
                         .requestMatchers("/lessons/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/auth/login")
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/", true)
-                        .failureUrl("/auth/login?error=true")
+                        .failureUrl("/auth/login?error")
                         .permitAll()
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login?logout=true")
+                        .logoutSuccessUrl("/auth/login?logout")
+                        .permitAll()
                 );
 
         return http.build();

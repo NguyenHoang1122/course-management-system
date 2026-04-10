@@ -1,21 +1,30 @@
 package com.coursemanagementsystem.service;
 
 import com.coursemanagementsystem.dto.UserDTO;
+import com.coursemanagementsystem.model.Role;
 import com.coursemanagementsystem.model.User;
+import com.coursemanagementsystem.repository.RoleRepository;
 import com.coursemanagementsystem.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private UserDTO convertToDTO(User user) {
         UserDTO dto = modelMapper.map(user, UserDTO.class);
@@ -35,16 +44,35 @@ public class UserService {
     }
 
     public List<User> findAllInstructor() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        List<User> result = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getRole() != null && user.getRole().getName().equals("INSTRUCTOR")) {
+                result.add(user);
+            }
+        }
+
+        return result;
     }
 
     public User findById(Long id) {
-        return null;
+        return userRepository.findById(id)
+                .orElse(null);
     }
 
     public void register(String username, String password) {
-    }
+        User user = new User();
+        user.setUserName(username);
+        user.setPassword(passwordEncoder.encode(password));
 
+        // mặc định là STUDENT
+        Role role = new Role();
+        role.setName("STUDENT");
+        user.setRole(role);
+
+        userRepository.save(user);
+    }
 
     public User findByUsername(String username) {
         Optional<User> user = userRepository.findByUserName(username);
@@ -55,7 +83,6 @@ public class UserService {
 
         return null;
     }
-
 
     public void updateProfile(String username, User userForm) {
         Optional<User> optionalUser = userRepository.findByUserName(username);

@@ -27,39 +27,19 @@ public class LessonController {
         this.enrollmentService = enrollmentService;
     }
 
-    @GetMapping("/lessons/{id}")
+    @GetMapping("/lesson/{id}")
     public String viewLesson(@PathVariable Long id, Model model) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
-            return "redirect:/auth/login";
-        }
 
         String username = auth.getName();
 
         User user = userService.findByUsername(username);
 
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-
-        Lesson lesson = lessonService.findById(id);
-
-        if (lesson == null) {
-            return "redirect:/courses";
-        }
-
-        Long courseId = lesson.getCourse().getId();
-
-        boolean enrolled = enrollmentService.isEnrolled(user.getId(), courseId);
-
-        if (!enrolled) {
-            return "redirect:/courses";
-        }
+        Lesson lesson = lessonService.getLessonForUser(id, user.getId());
 
         model.addAttribute("lesson", lesson);
 
-        return "lesson/view";
+        return "lesson/detail";
     }
 }
