@@ -8,9 +8,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -19,15 +24,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/auth/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 
                         // ADMIN only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // COURSE + LESSON
                         .requestMatchers("/courses/**").hasAnyRole("ADMIN", "STUDENT")
-                        .requestMatchers("/lessons/**").authenticated()
+                        .requestMatchers("/lesson/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
@@ -37,7 +42,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/auth/login")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler(customAuthenticationSuccessHandler)
                         .failureUrl("/auth/login?error")
                         .permitAll()
                 )

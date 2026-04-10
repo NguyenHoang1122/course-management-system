@@ -32,21 +32,21 @@ public class ProfileController {
 
         return "profile/view";
     }
-//form edit
-@GetMapping("/profile/edit")
-public String editProfile(Model model, Principal principal) {
+    //form edit
+    @GetMapping("/profile/edit")
+    public String editProfile(Model model, Principal principal) {
 
-    if (principal == null) {
-        return "redirect:/auth/login";
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+
+        String username = principal.getName();
+        User user = userService.findByUsername(username);
+
+        model.addAttribute("user", user);
+
+        return "profile/edit";
     }
-
-    String username = principal.getName();
-    User user = userService.findByUsername(username);
-
-    model.addAttribute("user", user);
-
-    return "profile/edit";
-}
 
     //update profile
     @PostMapping("/profile/edit")

@@ -21,6 +21,12 @@ public class AdminController {
     @Autowired
     private LessonService lessonService;
 
+    @GetMapping("/course-list.html")
+    public String courseList(Model model) {
+        model.addAttribute("courses", courseService.findAll());
+        return "admin/course-list";
+    }
+
     @GetMapping("/create-course")
     public String createCourse(Model model) {
         model.addAttribute("courseDTO", new CourseDTO());
