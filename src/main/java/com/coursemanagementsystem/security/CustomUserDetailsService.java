@@ -2,11 +2,10 @@ package com.coursemanagementsystem.security;
 
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,32 +14,24 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
 
-        User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found" + userName));
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        // Role phải có dạng ROLE_ADMIN / ROLE_STUDENT
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),
                 user.getPassword(),
-                getAuthorities(user)
+                authorities
         );
-    }
-
-    private List<GrantedAuthority> getAuthorities(User user) {
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        if (user.getRole() != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));        }
-
-        return authorities;
     }
 }
