@@ -1,21 +1,16 @@
 package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.dto.UserProfileDTO;
-import com.coursemanagementsystem.model.Enrollment;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,38 +24,47 @@ public class ProfileController {
     private final UserService userService;
     private final FileService fileService;
     private final EnrollmentService enrollmentService;
-    private final UserDetailsService userDetailsService;
 
-    public ProfileController(UserService userService,
-                             FileService fileService,
-                             EnrollmentService enrollmentService,
-                             UserDetailsService userDetailsService) {
+    public ProfileController(UserService userService, FileService fileService, EnrollmentService enrollmentService) {
         this.userService = userService;
         this.fileService = fileService;
         this.enrollmentService = enrollmentService;
-        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping("/profile")
     public String viewProfile(Model model, Principal principal) {
-        if (principal == null) return "redirect:/auth/login";
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
 
-        User user = userService.findByUsername(principal.getName());
+        String username = principal.getName();
+        User user = userService.findByUsername(username);
+
         List<Enrollment> enrollments = enrollmentService.findByUserId(user.getId());
 
         model.addAttribute("user", user);
         model.addAttribute("enrollments", enrollments);
+
         return "profile/view";
     }
 
     @GetMapping("/profile/edit")
     public String editProfile(Model model, Principal principal) {
-        if (principal == null) return "redirect:/auth/login";
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
 
-        User user = userService.findByUsername(principal.getName());
+        String username = principal.getName();
+        User user = userService.findByUsername(username);
+
+        UserProfileDTO profileDTO = new UserProfileDTO();
+        profileDTO.setFullName(user.getFullName());
+        profileDTO.setEmail(user.getEmail());
+        profileDTO.setPhone(user.getPhone());
+        profileDTO.setAddress(user.getAddress());
 
         model.addAttribute("user", user);
-        model.addAttribute("userProfileDTO", buildProfileDTO(user));
+        model.addAttribute("userProfileDTO", profileDTO);
         return "profile/edit";
     }
 
@@ -70,13 +74,17 @@ public class ProfileController {
                                 @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
                                 Principal principal,
                                 Model model) {
-        if (principal == null) return "redirect:/auth/login";
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
 
         String username = principal.getName();
-        User currentUser = userService.findByUsername(username);
-        if (currentUser == null) return "redirect:/auth/login";
 
-        // Xử lý upload avatar
+        User currentUser = userService.findByUsername(username);
+        if (currentUser == null) {
+            return "redirect:/auth/login";
+        }
+
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
                 profileDTO.setAvatar(fileService.uploadFile(avatarFile));
@@ -96,9 +104,6 @@ public class ProfileController {
 
         try {
             userService.updateProfile(username, profileDTO);
-            // Làm mới SecurityContext ngay sau khi update
-            // để avatar/fullName trên header cập nhật luôn mà không cần logout
-            refreshSecurityContext(username);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("user", currentUser);
             model.addAttribute("updateError", ex.getMessage());
@@ -114,11 +119,15 @@ public class ProfileController {
                                  @RequestParam("confirmPassword") String confirmPassword,
                                  Principal principal,
                                  Model model) {
-        if (principal == null) return "redirect:/auth/login";
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
 
         String username = principal.getName();
         User currentUser = userService.findByUsername(username);
-        if (currentUser == null) return "redirect:/auth/login";
+        if (currentUser == null) {
+            return "redirect:/auth/login";
+        }
 
         try {
             userService.changePassword(username, currentPassword, newPassword, confirmPassword);
@@ -131,19 +140,6 @@ public class ProfileController {
         }
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
-
-    /** Tải lại UserDetails từ DB và cập nhật Authentication trong SecurityContext của session hiện tại */
-    private void refreshSecurityContext(String username) {
-        UserDetails updatedDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken newAuth =
-                new UsernamePasswordAuthenticationToken(
-                        updatedDetails,
-                        updatedDetails.getPassword(),
-                        updatedDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-    }
-
     private UserProfileDTO buildProfileDTO(User user) {
         UserProfileDTO dto = new UserProfileDTO();
         dto.setFullName(user.getFullName());
@@ -153,4 +149,3 @@ public class ProfileController {
         return dto;
     }
 }
-
