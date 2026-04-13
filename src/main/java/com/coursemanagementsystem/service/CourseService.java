@@ -36,7 +36,7 @@ public class CourseService {
             course = courseRepository.findById(dto.getId())
                     .orElseThrow(() -> new RuntimeException("Course not found"));
 
-            //  Map vào object cũ (đúng cách)
+            //  Map vào object cũ
             modelMapper.map(dto, course);
 
         } else {
