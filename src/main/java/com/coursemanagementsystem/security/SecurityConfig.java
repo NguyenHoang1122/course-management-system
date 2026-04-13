@@ -35,16 +35,21 @@ public class SecurityConfig {
                 .userDetailsService(userDetailsService)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/", "/about", "/contact", "/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
 
                         .requestMatchers("/courses/my-courses").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/courses", "/courses/", "/courses/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/courses", "/courses/", "/courses/*", "/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/courses/*/reviews", "/enrollments/**", "/lessons/*/complete").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/courses/**", "/lessons/**").hasRole("ADMIN")
+                        .requestMatchers("/lessons/**").authenticated()
                         .requestMatchers("/profile/**").authenticated()
                         .anyRequest().authenticated()
+                )
+
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/auth/login?expired=true")
                 )
 
                 .formLogin(form -> form
@@ -60,6 +65,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/auth/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 

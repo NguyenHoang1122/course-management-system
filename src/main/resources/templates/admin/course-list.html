@@ -10,6 +10,11 @@
 </head>
 
 <body>
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+<div class="admin-shell-main">
 <div class="admin-container">
     <div class="admin-header">
         <h1><i class="fas fa-graduation-cap"></i> Quản Lý Khóa Học</h1>
@@ -18,27 +23,53 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <h3 th:text="${courses != null ? courses.size() : 0}">0</h3>
+            <h3 th:text="${totalItems != null ? totalItems : 0}">0</h3>
             <p><i class="fas fa-book"></i> Tổng Khóa Học</p>
         </div>
         <div class="stat-card">
-            <h3>0</h3>
+            <h3 th:text="${#numbers.formatDecimal(totalValue / 1000000.0, 1, 'COMMA', 0, 'POINT')} + ' Triệu'">0</h3>
             <p><i class="fas fa-dollar-sign"></i> Tổng Giá Trị</p>
         </div>
         <div class="stat-card">
-            <h3>0</h3>
+            <h3 th:text="${totalLessons != null ? totalLessons : 0}">0</h3>
             <p><i class="fas fa-play-circle"></i> Tổng Bài Học</p>
         </div>
     </div>
 
     <div class="admin-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="mb-3 d-flex align-items-center justify-content-between">
             <h3 style="color: var(--secondary-color); margin: 0;">
                 <i class="fas fa-list"></i> Danh Sách Khóa Học
             </h3>
-            <button type="button" class="btn btn-primary" onclick="openCourseModal('/admin/course-form', 'Thêm Khóa Học Mới')">
+            <a th:href="@{/admin/create-course}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Thêm Khóa Học Mới
-            </button>
+            </a>
+        </div>
+
+        <div class="list-toolbar-row mb-4">
+            <form th:action="@{/admin/course-list}" method="get" class="d-flex list-toolbar-form list-size-form">
+                <label for="adminPageSize" class="mb-0 toolbar-size-label"></label>
+                <input type="hidden" name="keyword" th:value="${keyword}">
+                <input type="hidden" name="page" value="1">
+                <select id="adminPageSize" name="size" class="form-control toolbar-control toolbar-size-select" onchange="this.form.submit()">
+                    <option value="10" th:selected="${size == 10}">10</option>
+                    <option value="20" th:selected="${size == 20}">20</option>
+                    <option value="50" th:selected="${size == 50}">50</option>
+                </select>
+            </form>
+
+            <div class="d-flex list-toolbar-form list-search-side">
+                <form th:action="@{/admin/course-list}" method="get" class="d-flex list-toolbar-form list-search-form">
+                    <label for="adminCourseKeyword" style="display:none;">Tìm khóa học</label>
+                    <input id="adminCourseKeyword" type="text" name="keyword" class="form-control toolbar-keyword"
+                           placeholder="Tìm theo tên, mô tả, giảng viên" th:value="${keyword}">
+                    <input type="hidden" name="size" th:value="${size}">
+                    <button type="submit" class="btn btn-outline-primary btn-sm toolbar-control toolbar-search-btn">
+                        <i class="fas fa-search"></i>
+                        <span>Tìm</span>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
@@ -72,21 +103,19 @@
                 </div>
 
                 <div class="course-card-footer">
-                    <button type="button" class="btn btn-outline-primary btn-sm"
-                            th:onclick="'openCourseModal(\'/admin/course-detail/' + ${course.id} + '\', \'Chi Tiết Khóa Học\')'">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button type="button" class="btn btn-outline-success btn-sm"
-                            th:onclick="'openCourseModal(\'/admin/course-form?id=' + ${course.id} + '\', \'Chỉnh Sửa Khóa Học\')'">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button type="button"
-                            th:attr="onclick='showDeleteConfirm(' + ${course.id} + ', &quot;' + ${course.title} + '&quot;)'"
-                            class="btn btn-outline-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <a th:href="@{/admin/{id}(id=${course.id})}" class="btn btn-outline-primary btn-sm btn-action">
+                        <i class="fas fa-eye"></i> Chi tiết
+                    </a>
+                    <a th:href="@{/admin/edit/{id}(id=${course.id})}" class="btn btn-outline-success btn-sm btn-action">
+                        <i class="fas fa-edit"></i> Sửa
+                    </a>
+                    <form method="post" th:action="@{/admin/delete/{id}(id=${course.id})}"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?')"
+                          style="flex-basis: 100%;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm btn-action" style="width: 100%;">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -94,137 +123,44 @@
         <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
             <i class="fas fa-graduation-cap"
                style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h4 style="color: var(--text-muted);">Chưa có khóa học nào</h4>
-            <p style="color: var(--text-muted);">Hãy tạo khóa học đầu tiên cho hệ thống.</p>
-            <button type="button" class="btn btn-primary" onclick="openCourseModal('/admin/course-form', 'Thêm Khóa Học Mới')">
+            <h4 style="color: var(--text-muted);">Không tìm thấy khóa học phù hợp</h4>
+            <p style="color: var(--text-muted);">Thử từ khóa khác hoặc xóa bộ lọc tìm kiếm.</p>
+            <a th:href="@{/admin/create-course}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Tạo Khóa Học Đầu Tiên
-            </button>
+            </a>
         </div>
+
+        <nav th:if="${totalPages != null and totalPages gt 1}" aria-label="Admin course pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{'/admin/course-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Previous</a>
+                </li>
+
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(1, totalPages)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{'/admin/course-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}"
+                       th:text="${i}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{'/admin/course-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
-
-<div id="courseModal" class="modal-overlay-custom" onclick="closeIfOverlay(event)">
-    <div class="modal-box-custom">
-        <div class="modal-header-custom">
-            <h5 id="courseModalTitle">Modal</h5>
-            <button type="button" class="btn-close-custom" onclick="closeCourseModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div id="courseModalBody" class="modal-body-custom">
-            <div class="text-center py-5">Đang tải...</div>
-        </div>
-    </div>
 </div>
-
-<div id="deleteConfirmModal" class="modal-overlay-custom" style="z-index: 10000;">
-    <div class="modal-box-custom" style="width: min(480px, 95vw); max-height: none;">
-        <div class="modal-header-custom">
-            <h5><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa</h5>
-            <button type="button" class="btn-close-custom" onclick="hideDeleteConfirm()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body-custom">
-            <p>Bạn có chắc chắn muốn xóa khóa học "<strong id="courseTitle"></strong>" không?</p>
-            <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
-            <div class="d-flex gap-2 justify-content-end mt-4">
-                <button type="button" class="btn btn-secondary" onclick="hideDeleteConfirm()">Hủy</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
-            </div>
-        </div>
-    </div>
 </div>
-
-<script>
-    let currentDeleteId = null;
-
-    async function openCourseModal(url, title) {
-        document.getElementById('courseModalTitle').textContent = title;
-        document.getElementById('courseModal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-
-        const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const html = await res.text();
-        document.getElementById('courseModalBody').innerHTML = html;
-
-        bindModalForm();
-    }
-
-    function closeCourseModal() {
-        document.getElementById('courseModal').style.display = 'none';
-        document.getElementById('courseModalBody').innerHTML = '<div class="text-center py-5">Đang tải...</div>';
-        document.body.style.overflow = '';
-    }
-
-    function closeIfOverlay(event) {
-        if (event.target === document.getElementById('courseModal')) {
-            closeCourseModal();
-        }
-    }
-
-    function showDeleteConfirm(courseId, courseTitle) {
-        currentDeleteId = courseId;
-        document.getElementById('courseTitle').textContent = courseTitle;
-        document.getElementById('deleteConfirmModal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hideDeleteConfirm() {
-        document.getElementById('deleteConfirmModal').style.display = 'none';
-        document.body.style.overflow = '';
-        currentDeleteId = null;
-    }
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
-        if (!currentDeleteId) return;
-
-        await fetch('/admin/delete-course-ajax/' + currentDeleteId, {
-            method: 'POST',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        hideDeleteConfirm();
-        window.location.reload();
-    });
-
-    async function bindModalForm() {
-        const form = document.getElementById('courseForm');
-        if (!form) return;
-
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            const isEdit = form.querySelector('input[name="id"]')?.value;
-
-            const url = isEdit ? '/admin/save-course-ajax' : '/admin/save-course-ajax';
-
-            const res = await fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            if (res.ok) {
-                closeCourseModal();
-                window.location.reload();
-            } else {
-                alert('Có lỗi xảy ra khi lưu khóa học.');
-            }
-        }, { once: true });
-    }
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeCourseModal();
-            hideDeleteConfirm();
-        }
-    });
-</script>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+<div th:replace="~{layout :: siteFooter}"></div>
 
 </body>
 
 </html>
+

@@ -52,7 +52,7 @@
                                           class="header-avatar header-avatar-fallback">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <span>Profile</span>
+                                    <span th:text="${#authentication.principal.fullName}">Profile</span>
                                 </a>
                             </li>
                             <li sec:authorize="isAuthenticated()">
@@ -95,7 +95,7 @@
                     <div class="header-right-btn">
                         <a sec:authorize="isAnonymous()" th:href="@{/auth/login}" class="btn theme-bg">Sign In</a>
                         <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/course-list}" class="btn theme-bg">Admin</a>
-                        <a sec:authorize="isAuthenticated() and !hasRole('ADMIN')" th:href="@{/profile}" class="btn theme-bg">Profile</a>
+                        <a sec:authorize="isAuthenticated() and !hasRole('ADMIN')" th:href="@{/profile}" class="btn theme-bg" th:text="${#authentication.principal.fullName}">Profile</a>
                     </div>
                 </div>
                 <div class="col-12">
@@ -127,7 +127,16 @@
                         <div class="single-footer-caption footer-tittle">
                             <h4>Learning</h4>
                             <ul>
-                                <li><a th:href="@{/courses}">Courses</a></li>
+                                <li>
+                                    <a sec:authorize="hasRole('ADMIN')"
+                                       th:href="@{/admin/course-list}">
+                                       Courses
+                                    </a>
+                                    <a sec:authorize="!hasRole('ADMIN')"
+                                       th:href="@{/courses}">
+                                       Courses
+                                    </a>
+                                </li>
                                 <li><a href="#">Tutorials</a></li>
                                 <li><a href="#">Resources</a></li>
                             </ul>

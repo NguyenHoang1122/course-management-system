@@ -7,6 +7,7 @@ import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.EnrollmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -27,8 +28,10 @@ public class EnrollmentController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/enroll/{courseId}")
-    public String enroll(@PathVariable long courseId, Principal principal) {
+    @PostMapping("/enroll/{courseId}")
+    public String enroll(@PathVariable long courseId,
+                         Principal principal,
+                         RedirectAttributes redirectAttributes) {
 
         if (principal == null) {
             return "redirect:/auth/login";
@@ -38,7 +41,7 @@ public class EnrollmentController {
 
         // xử lý Optional<User>
         Optional<User> optionalUser = userRepository.findByUserName(username);
-        if (!optionalUser.isPresent()) {
+        if (optionalUser.isEmpty()) {
             return "redirect:/auth/login";
         }
         User user = optionalUser.get();
@@ -46,11 +49,18 @@ public class EnrollmentController {
         // Course bạn đang dùng kiểu thường
         Course course = courseService.findById(courseId);
         if (course == null) {
-            return "redirect:/auth/courses";
+            return "redirect:/courses";
         }
 
         enrollmentService.enroll(user, course);
+        redirectAttributes.addFlashAttribute("enrolledSuccess", "Dang ky khoa hoc thanh cong.");
+        return "redirect:/courses/" + courseId;
+    }
 
-        return "redirect:/courses";
+    @GetMapping("/enroll/{courseId}")
+    public String enrollByGet(@PathVariable long courseId,
+                              Principal principal,
+                              RedirectAttributes redirectAttributes) {
+        return enroll(courseId, principal, redirectAttributes);
     }
 }

@@ -1,10 +1,23 @@
 package com.coursemanagementsystem.repository;
 
 import com.coursemanagementsystem.model.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByTitleContaining(String keyword);
+
+    @Query("""
+            select c from Course c
+            left join c.instructor i
+            where lower(c.title) like lower(concat('%', :keyword, '%'))
+               or lower(c.description) like lower(concat('%', :keyword, '%'))
+               or lower(i.fullName) like lower(concat('%', :keyword, '%'))
+            """)
+    Page<Course> searchCourses(@Param("keyword") String keyword, Pageable pageable);
 }

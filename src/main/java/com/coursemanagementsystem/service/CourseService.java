@@ -7,6 +7,9 @@ import com.coursemanagementsystem.repository.CourseRepository;
 import com.coursemanagementsystem.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -53,6 +56,25 @@ public class CourseService {
 
     public List<Course> findAll() {
         return courseRepository.findAll();
+    }
+
+    public Page<Course> findCoursesPaged(String keyword, int page, int size) {
+        int normalizedPage = Math.max(page - 1, 0);
+        int normalizedSize = normalizePageSize(size);
+        Pageable pageable = PageRequest.of(normalizedPage, normalizedSize);
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return courseRepository.findAll(pageable);
+        }
+
+        return courseRepository.searchCourses(keyword.trim(), pageable);
+    }
+
+    private int normalizePageSize(int size) {
+        if (size == 20 || size == 50) {
+            return size;
+        }
+        return 10;
     }
 
     public Course findById(Long id) {

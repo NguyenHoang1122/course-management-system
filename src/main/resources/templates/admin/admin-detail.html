@@ -9,6 +9,10 @@
 </head>
 
 <body>
+<div th:replace="~{layout :: siteHeader}"></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
 <div class="admin-container">
     <div class="admin-header">
         <h1><i class="fas fa-book-open"></i> Chi Tiết Khóa Học</h1>
@@ -27,7 +31,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="course-info">
-                    <h2 th:text="${course.title}" style="color: var(--secondary-color); margin-bottom: 15px;"></h2>
+                        <h2 th:text="${course.title}" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;"></h2>
                     <p class="course-description" th:text="${course.description}" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;"></p>
 
                     <div class="course-meta">
@@ -97,9 +101,9 @@
                         <a th:if="${lesson.videoUrl}" th:href="${lesson.videoUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-play"></i> Xem
                         </a>
-                        <a th:unless="${lesson.videoUrl}" class="btn btn-outline-secondary btn-sm" disabled>
+                        <span th:unless="${lesson.videoUrl}" class="btn btn-outline-secondary btn-sm disabled">
                             <i class="fas fa-play"></i> Xem
-                        </a>
+                        </span>
                         <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit"></i> Sửa
                         </a>
@@ -125,6 +129,8 @@
             </a>
         </div>
     </div>
+</div>
+</div>
 </div>
 
 <div id="confirmBox" class="modal-overlay">
@@ -209,6 +215,8 @@
 </script>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+<div th:replace="~{layout :: siteFooter}"></div>
 
 </body>
 </html>
