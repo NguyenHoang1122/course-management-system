@@ -9,10 +9,6 @@
 </head>
 
 <body>
-<div th:replace="~{layout :: siteHeader}"></div>
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-    <div class="admin-shell-main">
 <div class="admin-container">
     <!-- Header -->
     <div class="admin-header">
@@ -32,8 +28,7 @@
 <!--    </nav>-->
 
     <!-- Course Info -->
-    <!-- Course info card: only when adding from course detail page -->
-    <div class="admin-content" th:if="${courseTitle != null}">
+    <div class="admin-content">
         <div class="course-info-card">
             <div class="d-flex align-items-center">
                 <div class="course-icon">
@@ -53,23 +48,8 @@
             <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" th:object="${lessonDTO}" method="post" class="needs-validation" novalidate>
 
                 <input type="hidden" th:field="*{id}" />
-                <!-- Course select when creating from sidebar (no pre-selected course) -->
-                <div th:if="${courses != null}" class="form-group">
-                    <label for="courseSelect">
-                        <i class="fas fa-book-open"></i> Khóa Học <span style="color: var(--danger-color);">*</span>
-                    </label>
-                    <select id="courseSelect" name="courseId" class="form-control" required>
-                        <option value="">-- Chọn Khóa Học --</option>
-                        <option th:each="c : ${courses}"
-                                th:value="${c.id}"
-                                th:text="${c.title}"
-                                th:selected="${lessonDTO.courseId != null and lessonDTO.courseId == c.id}">
-                        </option>
-                    </select>
-                    <div class="invalid-feedback">Vui lòng chọn khóa học.</div>
-                </div>
-                <!-- Hidden Course ID when coming from course detail page -->
-                <input th:unless="${courses != null}" type="hidden" th:field="*{courseId}" th:value="${courseId}">
+                <!-- Hidden Course ID -->
+                <input type="hidden" th:field="*{courseId}" th:value="${courseId}">
 
                 <!-- Title -->
                 <div class="form-group">
@@ -167,16 +147,14 @@
 
                 <!-- Actions -->
                 <div class="form-group" style="margin-top: 40px;">
-                    <div class="form-actions">
+                    <div class="d-flex gap-3 justify-content-center">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Lưu Bài Học
                         </button>
-                        <a th:href="${courseId != null ? '/admin/' + courseId : '/admin/lesson-list'}"
-                           class="btn btn-secondary">
+                        <a th:href="@{'/admin/' + ${courseId}}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay Lại
                         </a>
-                        <a th:href="${courseId != null ? '/admin/course-list' : '/admin/lesson-list'}"
-                           class="btn btn-outline-secondary">
+                        <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary">
                             <i class="fas fa-times"></i> Hủy
                         </a>
                     </div>
@@ -186,9 +164,91 @@
     </div>
 </div>
 
-</div>
-</div>
+<style>
+    .course-info-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 0;
+    }
 
+    .course-icon {
+        font-size: 2rem;
+        margin-right: 15px;
+        opacity: 0.9;
+    }
+
+    .video-preview-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background: var(--white);
+        padding: 10px;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .tip-card {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .tip-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .tip-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .tip-card h5 {
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .tip-card p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Fix cho phần select bị che chữ */
+    .form-control {
+        padding: 12px 16px;
+        line-height: 1.5;
+        min-height: 44px;
+    }
+
+    @media (max-width: 768px) {
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .course-info-card .d-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .course-icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+</style>
 
 <script>
     // Form validation
@@ -259,8 +319,6 @@
 </script>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
-<div th:replace="~{layout :: siteFooter}"></div>
 
 </body>
 </html>

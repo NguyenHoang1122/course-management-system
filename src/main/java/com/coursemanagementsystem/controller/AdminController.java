@@ -9,7 +9,6 @@ import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,32 +25,8 @@ public class AdminController {
     private LessonService lessonService;
 
     @GetMapping("/course-list")
-    public String findALlCourseList(@RequestParam(value = "page", defaultValue = "1") int page,
-                                    @RequestParam(value = "size", defaultValue = "10") int size,
-                                    @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                    Model model) {
-        Page<Course> coursePage = courseService.findCoursesPaged(keyword, page, size);
-
-        // Calculate total value
-        long totalValue = coursePage.getContent().stream()
-                .mapToLong(course -> course.getPrice() != null ? course.getPrice().longValue() : 0)
-                .sum();
-
-        // Calculate total lessons
-        long totalLessons = coursePage.getContent().stream()
-                .mapToLong(course -> course.getLessons() != null ? course.getLessons().size() : 0)
-                .sum();
-
-        model.addAttribute("coursePage", coursePage);
-        model.addAttribute("courses", coursePage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", coursePage.getTotalPages());
-        model.addAttribute("totalItems", coursePage.getTotalElements());
-        model.addAttribute("totalValue", totalValue);
-        model.addAttribute("totalLessons", totalLessons);
-        model.addAttribute("size", size);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("activeMenu", "courses");
+    public String  findALlCourseList(Model model){
+        model.addAttribute("courses", courseService.findAll());
         return "admin/course-list";
     }
 
@@ -59,7 +34,6 @@ public class AdminController {
     public String createCourse(Model model) {
         model.addAttribute("courseDTO", new CourseDTO());
         model.addAttribute("instructors", userService.findAllInstructor());
-        model.addAttribute("activeMenu", "courses");
         return "admin/create-course";
     }
 
@@ -69,11 +43,10 @@ public class AdminController {
                              Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("instructors", userService.findAllInstructor());
-            model.addAttribute("activeMenu", "courses");
             return "admin/create-course";
         }
         courseService.saveFromDTO(courseDTO);
-        return "redirect:/admin/course-list";
+        return "redirect:/courses";
     }
 
     @GetMapping("course/{courseId}/add-lesson")
@@ -83,7 +56,6 @@ public class AdminController {
         model.addAttribute("lessonDTO", dto);
         model.addAttribute("courseId", courseId);
         model.addAttribute("courseTitle", courseService.findById(courseId).getTitle());
-        model.addAttribute("activeMenu", "lessons");
         return "admin/add-lesson";
     }
 
@@ -93,26 +65,17 @@ public class AdminController {
                              Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("courseId", dto.getCourseId());
-            if (dto.getCourseId() != null) {
-                model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
-            } else {
-                model.addAttribute("courses", courseService.findAll());
-            }
-            model.addAttribute("activeMenu", "lessons");
+            model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
             return "admin/add-lesson";
         }
         lessonService.saveFromDTO(dto);
-        if (dto.getCourseId() != null) {
-            return "redirect:/admin/" + dto.getCourseId();
-        }
-        return "redirect:/admin/lesson-list";
+        return "redirect:/courses/" + dto.getCourseId();
     }
 
     @GetMapping("/edit/{id}")
     public String editCourse(@PathVariable("id") Long id, Model model) {
         model.addAttribute("courseDTO", courseService.findDTOById(id));
         model.addAttribute("instructors", userService.findAllInstructor());
-        model.addAttribute("activeMenu", "courses");
         return "admin/edit-course";
     }
 
@@ -122,24 +85,23 @@ public class AdminController {
                                Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("instructors", userService.findAllInstructor());
-            model.addAttribute("activeMenu", "courses");
             return "admin/edit-course";
         }
         courseService.saveFromDTO(courseDTO);
-        return "redirect:/admin/course-list";
+        return "redirect:/courses";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteCourse(@PathVariable("id") Long id) {
         courseService.deleteById(id);
-        return "redirect:/admin/course-list";
+        return "redirect:/courses";
     }
 
     @GetMapping("/edit-lesson/{id}")
     public String editLesson(@PathVariable("id") Long id, Model model) {
         Lesson lesson = lessonService.findById(id);
         if (lesson == null) {
-            return "redirect:/admin/lesson-list";
+            return "redirect:/courses";
         }
         LessonDTO dto = new LessonDTO();
         dto.setId(lesson.getId());
@@ -149,7 +111,6 @@ public class AdminController {
         model.addAttribute("lessonDTO", dto);
         model.addAttribute("courseId", lesson.getCourse().getId());
         model.addAttribute("courseTitle", lesson.getCourse().getTitle());
-        model.addAttribute("activeMenu", "lessons");
         return "admin/add-lesson"; // reuse the same template
     }
 
@@ -160,11 +121,10 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("courseId", dto.getCourseId());
             model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
-            model.addAttribute("activeMenu", "lessons");
             return "admin/add-lesson";
         }
         lessonService.saveFromDTO(dto);
-        return "redirect:/admin/" + dto.getCourseId();
+        return "redirect:/courses/" + dto.getCourseId();
     }
 
     @PostMapping("/delete-lesson/{id}")
@@ -173,48 +133,44 @@ public class AdminController {
         if (lesson != null) {
             Long courseId = lesson.getCourse().getId();
             lessonService.deleteById(id);
-            return "redirect:/admin/" + courseId;
+            return "redirect:/courses/" + courseId;
         }
-        return "redirect:/admin/course-list";
-    }
-
-    @PostMapping("/delete-lesson-from-list/{id}")
-    public String deleteLessonFromList(@PathVariable("id") Long id) {
-        lessonService.deleteById(id);
-        return "redirect:/admin/lesson-list";
+        return "redirect:/courses";
     }
 
     @GetMapping("/{id}")
     public String viewCourse(@PathVariable("id") Long id, Model model) {
         Course course = courseService.findByIdWithLessons(id);
         model.addAttribute("course", course);
-        model.addAttribute("activeMenu", "courses");
         return "admin/admin-detail";
     }
 
-    @GetMapping("/lesson-list")
-    public String lessonList(Model model) {
-        model.addAttribute("lessons", lessonService.findAll());
-        model.addAttribute("activeMenu", "lessons");
-        return "admin/lesson-list";
+    // ===== FRAGMENTS FOR MODAL =====
+
+    @GetMapping("/course-form")
+    public String courseForm(@RequestParam(value = "id", required = false) Long id, Model model) {
+        model.addAttribute("courseDTO", id == null ? new CourseDTO() : courseService.findDTOById(id));
+        model.addAttribute("instructors", userService.findAllInstructor());
+        return "admin/fragments/course-form :: courseForm";
     }
 
-    @GetMapping("/lesson-detail/{id}")
-    public String lessonDetail(@PathVariable("id") Long id, Model model) {
-        Lesson lesson = lessonService.findById(id);
-        if (lesson == null) {
-            return "redirect:/admin/lesson-list";
-        }
-        model.addAttribute("lesson", lesson);
-        model.addAttribute("activeMenu", "lessons");
-        return "admin/lesson-detail";
+    @GetMapping("/course-detail/{id}")
+    public String courseDetail(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("course", courseService.findByIdWithLessons(id));
+        return "admin/fragments/course-detail :: courseDetail";
     }
 
-    @GetMapping("/create-lesson")
-    public String createLesson(Model model) {
-        model.addAttribute("lessonDTO", new LessonDTO());
-        model.addAttribute("courses", courseService.findAll());
-        model.addAttribute("activeMenu", "lessons");
-        return "admin/add-lesson";
+    @PostMapping("/save-course-ajax")
+    public String saveCourseAjax(@ModelAttribute("courseDTO") CourseDTO courseDTO, Model model) {
+        courseService.saveFromDTO(courseDTO);
+        model.addAttribute("success", true);
+        return "admin/fragments/ajax-response :: success";
+    }
+
+    @PostMapping("/delete-course-ajax/{id}")
+    public String deleteCourseAjax(@PathVariable("id") Long id, Model model) {
+        courseService.deleteById(id);
+        model.addAttribute("success", true);
+        return "admin/fragments/ajax-response :: success";
     }
 }

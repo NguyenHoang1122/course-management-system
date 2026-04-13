@@ -7,7 +7,6 @@ import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.EnrollmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -28,10 +27,8 @@ public class EnrollmentController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/enroll/{courseId}")
-    public String enroll(@PathVariable long courseId,
-                         Principal principal,
-                         RedirectAttributes redirectAttributes) {
+    @GetMapping("/enroll/{courseId}")
+    public String enroll(@PathVariable long courseId, Principal principal) {
 
         if (principal == null) {
             return "redirect:/auth/login";
@@ -41,7 +38,7 @@ public class EnrollmentController {
 
         // xử lý Optional<User>
         Optional<User> optionalUser = userRepository.findByUserName(username);
-        if (optionalUser.isEmpty()) {
+        if (!optionalUser.isPresent()) {
             return "redirect:/auth/login";
         }
         User user = optionalUser.get();
@@ -49,18 +46,11 @@ public class EnrollmentController {
         // Course bạn đang dùng kiểu thường
         Course course = courseService.findById(courseId);
         if (course == null) {
-            return "redirect:/courses";
+            return "redirect:/auth/courses";
         }
 
         enrollmentService.enroll(user, course);
-        redirectAttributes.addFlashAttribute("enrolledSuccess", "Dang ky khoa hoc thanh cong.");
-        return "redirect:/courses/" + courseId;
-    }
 
-    @GetMapping("/enroll/{courseId}")
-    public String enrollByGet(@PathVariable long courseId,
-                              Principal principal,
-                              RedirectAttributes redirectAttributes) {
-        return enroll(courseId, principal, redirectAttributes);
+        return "redirect:/courses";
     }
 }
