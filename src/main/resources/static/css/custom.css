@@ -648,7 +648,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 12px;
     padding: 16px 18px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: #f8f9fa;
 }
 
 .lesson-index {
@@ -658,7 +658,7 @@ h1, h2, h3, h4, h5, h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--secondary-color);
     color: #fff;
     font-weight: 700;
     flex: 0 0 auto;
@@ -668,9 +668,8 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
     font-size: 1rem;
     line-height: 1.4;
-    color: #ffffff;
+    color: var(--secondary-color);
     word-break: break-word;
-    font-weight: 600;
 }
 
 .lesson-card-body {

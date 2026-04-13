@@ -19,50 +19,24 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <h3 th:text="${totalItems != null ? totalItems : 0}">0</h3>
+            <h3 th:text="${courses != null ? courses.size() : 0}">0</h3>
             <p><i class="fas fa-book"></i> Tổng Khóa Học</p>
         </div>
         <div class="stat-card">
-            <h3 th:text="${#numbers.formatDecimal(totalValue / 1000000.0, 1, 'COMMA', 0, 'POINT')} + ' Triệu'">0</h3>
+            <h3>0</h3>
             <p><i class="fas fa-dollar-sign"></i> Tổng Giá Trị</p>
         </div>
         <div class="stat-card">
-            <h3 th:text="${totalLessons != null ? totalLessons : 0}">0</h3>
+            <h3>0</h3>
             <p><i class="fas fa-play-circle"></i> Tổng Bài Học</p>
         </div>
     </div>
 
     <div class="admin-content">
-        <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 style="color: var(--secondary-color); margin: 0;">
                 <i class="fas fa-list"></i> Danh Sách Khóa Học
             </h3>
-        </div>
-
-        <div class="list-toolbar-row mb-4">
-            <form th:action="@{/courses}" method="get" class="d-flex list-toolbar-form list-size-form">
-                <label for="coursePageSize" class="mb-0 toolbar-size-label"></label>
-                <input type="hidden" name="keyword" th:value="${keyword}">
-                <input type="hidden" name="page" value="1">
-                <select id="coursePageSize" name="size" class="form-control toolbar-control toolbar-size-select" onchange="this.form.submit()">
-                    <option value="10" th:selected="${size == 10}">10</option>
-                    <option value="20" th:selected="${size == 20}">20</option>
-                    <option value="50" th:selected="${size == 50}">50</option>
-                </select>
-            </form>
-
-            <div class="d-flex list-toolbar-form list-search-side">
-                <form th:action="@{/courses}" method="get" class="d-flex list-toolbar-form list-search-form">
-                    <label for="courseKeyword" style="display:none;">Tìm khóa học</label>
-                    <input id="courseKeyword" type="text" name="keyword" class="form-control toolbar-keyword"
-                           placeholder="Tìm theo tên, mô tả, giảng viên" th:value="${keyword}">
-                    <input type="hidden" name="size" th:value="${size}">
-                    <button type="submit" class="btn btn-outline-primary btn-sm toolbar-control toolbar-search-btn">
-                        <i class="fas fa-search"></i>
-                        <span>Tìm</span>
-                    </button>
-                </form>
-            </div>
         </div>
 
         <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
@@ -106,37 +80,13 @@
         <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
             <i class="fas fa-graduation-cap"
                style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h4 style="color: var(--text-muted);">Không tìm thấy khóa học phù hợp</h4>
-            <p style="color: var(--text-muted);">Thử từ khóa khác hoặc xóa bộ lọc tìm kiếm.</p>
+            <h4 style="color: var(--text-muted);">Chưa có khóa học nào</h4>
+            <p style="color: var(--text-muted);">Hãy tạo khóa học đầu tiên cho hệ thống.</p>
         </div>
-
-        <nav th:if="${totalPages != null and totalPages gt 1}" aria-label="Course pagination" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Previous</a>
-                </li>
-
-                <li class="page-item"
-                    th:each="i : ${#numbers.sequence(1, totalPages)}"
-                    th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}"
-                       th:text="${i}">1</a>
-                </li>
-
-                <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'" th:with="nextPage=${currentPage + 1}">
-                    <a class="page-link"
-                       th:href="@{'/courses?page=' + ${nextPage} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Next</a>
-                </li>
-
-            </ul>
-        </nav>
     </div>
 </div>
 
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 </body>
-
 </html>

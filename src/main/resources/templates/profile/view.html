@@ -52,27 +52,16 @@
                                     <th>Khóa học</th>
                                     <th>Giảng viên</th>
                                     <th>Ngày đăng ký</th>
-                                    <th>Tiến độ</th>
-                                    <th>Trạng thái</th>
                                     <th>Link</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="item : ${enrollmentProgress}">
-                                    <td th:text="${item.enrollment.course.title}"></td>
-                                    <td th:text="${item.enrollment.course.instructor != null ? item.enrollment.course.instructor.fullName : 'Unknown'}"></td>
-                                    <td th:text="${item.enrollment.enrolledAt != null ? #temporals.format(item.enrollment.enrolledAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                                <tr th:each="enrollment : ${enrollments}">
+                                    <td th:text="${enrollment.course.title}"></td>
+                                    <td th:text="${enrollment.course.instructor != null ? enrollment.course.instructor.fullName : 'Unknown'}"></td>
+                                    <td th:text="${enrollment.enrolledAt != null ? #temporals.format(enrollment.enrolledAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
                                     <td>
-                                        <span th:text="${item.completedLessons} + '/' + ${item.totalLessons}"></span>
-                                        <small th:text="' (' + ${item.progressPercent} + '%)'" class="text-muted"></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge"
-                                              th:classappend="${item.progressPercent == 100} ? ' bg-success' : (${item.progressPercent > 0} ? ' bg-warning' : ' bg-secondary')"
-                                              th:text="${item.learningStatus}"></span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{'/courses/' + ${item.enrollment.course.id}}" class="btn btn-sm btn-outline-primary">Vào học</a>
+                                        <a th:href="@{'/courses/' + ${enrollment.course.id}}" class="btn btn-sm btn-outline-primary">Vào học</a>
                                     </td>
                                 </tr>
                             </tbody>

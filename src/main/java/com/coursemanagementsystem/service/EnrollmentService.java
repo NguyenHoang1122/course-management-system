@@ -8,7 +8,6 @@ import com.coursemanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +32,6 @@ public class EnrollmentService {
         enrollment.setUser(user);
         enrollment.setCourse(course);
         enrollment.setStatus("ENROLLED");
-        enrollment.setEnrolledAt(LocalDateTime.now());
 
         enrollmentRepository.save(enrollment);
 
@@ -79,12 +77,22 @@ public class EnrollmentService {
     }*/
 
     public boolean isEnrolled(String username, Long courseId) {
+
         Optional<User> optionalUser = userRepository.findByUserName(username);
-        if (optionalUser.isEmpty()) {
+
+        if (!optionalUser.isPresent()) {
             return false;
         }
 
-        return isEnrolled(optionalUser.get().getId(), courseId);
+        User user = optionalUser.get();
+
+        Enrollment e = enrollmentRepository.findByUserIdAndCourseId(user.getId(), courseId);
+
+        if (e == null) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isUserEnrolled(Long userId, Long courseId) {
