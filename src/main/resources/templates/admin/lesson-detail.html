@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Chi Tiết Bài Học - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-play-circle"></i> Chi Tiết Bài Học</h1>
+                <p>Thông tin chi tiết của bài học</p>
+            </div>
+
+            <div class="admin-content" th:if="${lesson != null}">
+                <h2 style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 18px; border-radius: 8px; margin-bottom: 18px;" th:text="${lesson.title}">Tên bài học</h2>
+
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-book-open"></i>
+                        <span>
+                            <strong>Khóa học:</strong>
+                            <span th:text="${lesson.course != null ? lesson.course.title : '-'}">Khóa học</span>
+                        </span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-video"></i>
+                        <span>
+                            <strong>Video:</strong>
+                            <span th:text="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl) ? lesson.videoUrl : 'Chưa có video'}">Video URL</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="admin-content lesson-video-player-wrap"
+                     th:if="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}"
+                     th:data-video-url="${lesson.videoUrl}"
+                     style="margin-top: 20px;">
+                    <h4 style="color: var(--secondary-color); margin-bottom: 14px;">
+                        <i class="fas fa-video"></i> Xem video trực tiếp
+                    </h4>
+                    <div class="video-preview-container">
+                        <iframe id="lessonYoutubeFrame" width="100%" height="420" allowfullscreen></iframe>
+                    </div>
+                    <small id="lessonYoutubeNotice" style="color: var(--text-muted); display: none;">
+                        Một số nền tảng có thể chặn nhúng video. Nếu không hiển thị, hãy mở trực tiếp bằng liên kết bên dưới.
+                    </small>
+                    <div style="margin-top: 10px;">
+                        <a id="lessonVideoOpenLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt"></i> Mở video ở tab mới
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex" style="gap: 10px; flex-wrap: wrap;">
+                    <a th:href="@{/admin/edit-lesson/{id}(id=${lesson.id})}" class="btn btn-success">
+                        <i class="fas fa-edit"></i> Sửa bài học
+                    </a>
+                    <form method="post" th:action="@{/admin/delete-lesson/{id}(id=${lesson.id})}"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài học này không?')">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa bài học
+                        </button>
+                    </form>
+                    <a th:href="@{/admin/lesson-list}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var playerWrap = document.querySelector('.lesson-video-player-wrap');
+        if (!playerWrap) {
+            return;
+        }
+
+        var rawUrl = playerWrap.getAttribute('data-video-url') || '';
+        var frame = document.getElementById('lessonYoutubeFrame');
+        var notice = document.getElementById('lessonYoutubeNotice');
+        var openLink = document.getElementById('lessonVideoOpenLink');
+
+        function getYouTubeEmbedUrl(url) {
+            if (!url) {
+                return '';
+            }
+
+            var value = url.trim();
+            var videoId = '';
+
+            if (value.indexOf('youtu.be/') !== -1) {
+                videoId = value.split('youtu.be/')[1].split('?')[0];
+            } else if (value.indexOf('youtube.com/watch') !== -1 && value.indexOf('v=') !== -1) {
+                videoId = value.split('v=')[1].split('&')[0];
+            } else if (value.indexOf('youtube.com/embed/') !== -1) {
+                videoId = value.split('youtube.com/embed/')[1].split('?')[0];
+            } else if (value.indexOf('youtube.com/shorts/') !== -1) {
+                videoId = value.split('youtube.com/shorts/')[1].split('?')[0];
+            }
+
+            return videoId ? 'https://www.youtube.com/embed/' + videoId : '';
+        }
+
+        function getVimeoEmbedUrl(url) {
+            if (!url || url.indexOf('vimeo.com/') === -1) {
+                return '';
+            }
+
+            var id = url.split('vimeo.com/')[1];
+            if (!id) {
+                return '';
+            }
+
+            id = id.split('?')[0].split('/')[0];
+            return id ? 'https://player.vimeo.com/video/' + id : '';
+        }
+
+        function getEmbedUrl(url) {
+            if (!url) {
+                return '';
+            }
+
+            var value = url.trim();
+            var youtubeUrl = getYouTubeEmbedUrl(value);
+            if (youtubeUrl) {
+                return youtubeUrl;
+            }
+
+            var vimeoUrl = getVimeoEmbedUrl(value);
+            if (vimeoUrl) {
+                return vimeoUrl;
+            }
+
+            if (value.indexOf('http://') === 0 || value.indexOf('https://') === 0) {
+                return value;
+            }
+
+            return '';
+        }
+
+        var embedUrl = getEmbedUrl(rawUrl);
+        if (openLink) {
+            openLink.href = rawUrl;
+        }
+
+        if (embedUrl) {
+            frame.src = embedUrl;
+            var isYoutubeOrVimeo = embedUrl.indexOf('youtube.com/embed/') !== -1 || embedUrl.indexOf('player.vimeo.com/video/') !== -1;
+            notice.style.display = isYoutubeOrVimeo ? 'none' : 'inline-block';
+        } else {
+            frame.style.display = 'none';
+            notice.style.display = 'inline-block';
+        }
+    });
+</script>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<div th:replace="~{layout :: siteFooter}"></div>
+</body>
+</html>
+

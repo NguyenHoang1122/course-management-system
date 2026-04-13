@@ -3,6 +3,7 @@ package com.coursemanagementsystem.controller;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.EnrollmentService;
+import com.coursemanagementsystem.service.LessonProgressService;
 import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class LessonController {
@@ -19,13 +22,16 @@ public class LessonController {
     private final UserService userService;
     private final LessonService lessonService;
     private final EnrollmentService enrollmentService;
+    private final LessonProgressService lessonProgressService;
 
     public LessonController(UserService userService,
                             LessonService lessonService,
-                            EnrollmentService enrollmentService) {
+                            EnrollmentService enrollmentService,
+                            LessonProgressService lessonProgressService) {
         this.userService = userService;
         this.lessonService = lessonService;
         this.enrollmentService = enrollmentService;
+        this.lessonProgressService = lessonProgressService;
     }
 
     @GetMapping("/lessons/{id}")
@@ -65,7 +71,37 @@ public class LessonController {
         }
 
         model.addAttribute("lesson", lesson);
+        model.addAttribute("isCompleted", lessonProgressService.isCompleted(user.getId(), lesson.getId()));
 
         return "lesson/view";
+    }
+
+    @PostMapping("/lessons/{id}/complete")
+    public String markLessonCompleted(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+            return "redirect:/auth/login";
+        }
+
+        User user = userService.findByUsername(auth.getName());
+        Lesson lesson = lessonService.findById(id);
+
+        if (user == null || lesson == null) {
+            return "redirect:/courses";
+        }
+
+        Long courseId = lesson.getCourse().getId();
+        boolean canViewWithoutEnrollment = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority) || "ROLE_INSTRUCTOR".equals(authority));
+
+        if (!canViewWithoutEnrollment && !enrollmentService.isEnrolled(user.getId(), courseId)) {
+            return "redirect:/courses";
+        }
+
+        lessonProgressService.markCompleted(user, lesson);
+        redirectAttributes.addFlashAttribute("lessonSuccess", "Da danh dau bai hoc la da hoc.");
+        return "redirect:/lessons/" + id;
     }
 }
