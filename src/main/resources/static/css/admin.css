@@ -41,9 +41,25 @@ body {
     position: sticky;
     top: 0;
     height: 100vh;
-    overflow: visible;
-    transition: width 0.25s ease, padding 0.25s ease;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
 }
+
+.admin-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.admin-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
 
 .admin-sidebar-header {
     display: flex;
@@ -51,7 +67,9 @@ body {
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 22px;
+    min-height: 40px;
 }
+
 
 .admin-sidebar-header a {
     color: var(--white);
@@ -64,13 +82,80 @@ body {
 
 .sidebar-toggle {
     border: 0;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--white);
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
 }
+
+.sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* User Profile Section */
+.admin-sidebar-user {
+    padding: 15px 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s;
+}
+
+.user-avatar-wrap {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    overflow: hidden;
+    transition: opacity 0.3s;
+}
+
+.user-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Navigation Groups */
+.sidebar-group-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 15px 12px 5px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
 
 .admin-sidebar-nav {
     display: flex;
@@ -108,11 +193,26 @@ body {
 
 .sidebar-submenu {
     display: none;
-    margin-top: 6px;
-    margin-left: 8px;
-    padding-left: 12px;
-    border-left: 2px solid rgba(255, 255, 255, 0.3);
+    margin-top: 4px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
 }
+
+.sidebar-dropdown.open .sidebar-submenu {
+    display: block;
+    animation: slideDownCustom 0.3s ease;
+}
+
+.sidebar-dropdown.open .sidebar-caret {
+    transform: rotate(180deg);
+}
+
+@keyframes slideDownCustom {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 
 .sidebar-dropdown:hover .sidebar-submenu,
 .sidebar-dropdown:focus-within .sidebar-submenu {
@@ -132,25 +232,67 @@ body {
     color: #ffffff;
 }
 
-.sidebar-caret {
+.sidebar-dropdown .sidebar-caret {
     margin-left: auto;
     font-size: 0.86rem;
     opacity: 0.9;
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
 }
 
-.sidebar-dropdown:hover .sidebar-caret,
-.sidebar-dropdown:focus-within .sidebar-caret {
-    transform: rotate(180deg);
-}
 
 body.admin-sidebar-collapsed .admin-sidebar {
-    width: 78px;
+    width: 80px;
+    padding: 16px 10px;
 }
 
-body.admin-sidebar-collapsed .admin-sidebar-text {
+body.admin-sidebar-collapsed .admin-sidebar-text,
+body.admin-sidebar-collapsed .user-info,
+body.admin-sidebar-collapsed .sidebar-group-label,
+body.admin-sidebar-collapsed .sidebar-caret {
     display: none;
 }
+
+body.admin-sidebar-collapsed .admin-sidebar-header {
+    justify-content: center;
+}
+
+body.admin-sidebar-collapsed .admin-sidebar-brand {
+    display: none;
+}
+
+body.admin-sidebar-collapsed .admin-sidebar-user {
+    justify-content: center;
+    padding: 15px 0;
+}
+
+
+body.admin-sidebar-collapsed .admin-sidebar-link {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+body.admin-sidebar-collapsed .sidebar-icon-wrap {
+    margin: 0;
+}
+
+/* Sidebar Footer */
+.admin-sidebar-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.logout-link {
+    color: #ff7675 !important;
+}
+
+.logout-link:hover {
+    background: rgba(255, 118, 117, 0.2) !important;
+}
+
 
 /* Admin Layout */
 .admin-container {
