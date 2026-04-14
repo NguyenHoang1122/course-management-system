@@ -17,9 +17,17 @@
 <div class="admin-container">
     <!-- Header -->
     <div class="admin-header">
-        <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
-        <p>Cập nhật thông tin khóa học</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; text-align: left;">
+            <div>
+                <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
+                <p>Cập nhật thông tin khóa học</p>
+            </div>
+            <a th:href="@{'/admin/' + ${courseDTO.id}}" class="btn btn-outline-secondary btn-sm" style="text-transform: none; padding: 10px 18px; font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Quay Lại
+            </a>
+        </div>
     </div>
+
 
 <!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
 <!--    <nav aria-label="breadcrumb">-->
@@ -139,19 +147,17 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="form-group" style="margin-top: 40px;">
-                    <div class="d-flex gap-3 justify-content-center">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Cập Nhật Khóa Học
-                        </button>
-                        <a th:href="@{'/admin/' + ${courseDTO.id}}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay Lại
-                        </a>
+                <div class="form-group" style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+                    <div class="form-actions-end">
                         <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i> Hủy
+                            Hủy Bỏ
                         </a>
+                        <button type="submit" class="btn btn-success" style="min-width: 200px;">
+                            <i class="fas fa-check-circle"></i> Cập Nhật Khóa Học
+                        </button>
                     </div>
                 </div>
+
             </form>
         </div>
     </div>
