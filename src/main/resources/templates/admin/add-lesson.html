@@ -50,7 +50,8 @@
     <!-- Form -->
     <div class="admin-content">
         <div class="form-container">
-            <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" th:object="${lessonDTO}" method="post" class="needs-validation" novalidate>
+            <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" 
+                  th:object="${lessonDTO}" method="post" id="lessonForm" novalidate>
 
                 <input type="hidden" th:field="*{id}" />
                 <!-- Course select when creating from sidebar (no pre-selected course) -->
@@ -58,18 +59,20 @@
                     <label for="courseSelect">
                         <i class="fas fa-book-open"></i> Khóa Học <span style="color: var(--danger-color);">*</span>
                     </label>
-                    <select id="courseSelect" name="courseId" class="form-control" required>
+                    <select id="courseSelect" th:field="*{courseId}" class="form-control" 
+                            th:classappend="${#fields.hasErrors('courseId')} ? 'is-invalid' : ''"
+                            required>
                         <option value="">-- Chọn Khóa Học --</option>
                         <option th:each="c : ${courses}"
                                 th:value="${c.id}"
-                                th:text="${c.title}"
-                                th:selected="${lessonDTO.courseId != null and lessonDTO.courseId == c.id}">
+                                th:text="${c.title}">
                         </option>
                     </select>
+                    <div th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}" class="invalid-feedback d-block"></div>
                     <div class="invalid-feedback">Vui lòng chọn khóa học.</div>
                 </div>
                 <!-- Hidden Course ID when coming from course detail page -->
-                <input th:unless="${courses != null}" type="hidden" th:field="*{courseId}" th:value="${courseId}">
+                <input th:unless="${courses != null}" type="hidden" th:field="*{courseId}">
 
                 <!-- Title -->
                 <div class="form-group">
@@ -81,14 +84,15 @@
                             id="title"
                             th:field="*{title}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
                             placeholder="Nhập tên bài học"
                             required
                             minlength="3"
-                            maxlength="255">
+                            maxlength="200">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback d-block"></div>
                     <div class="invalid-feedback">
-                        Vui lòng nhập tên bài học (tối thiểu 3 ký tự).
+                        Vui lòng nhập tên bài học (từ 3 đến 200 ký tự).
                     </div>
-                    <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Tên bài học nên mô tả rõ nội dung chính của bài học.
                     </small>
@@ -104,11 +108,12 @@
                             id="videoUrl"
                             th:field="*{videoUrl}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('videoUrl')} ? 'is-invalid' : ''"
                             placeholder="https://www.youtube.com/watch?v=... hoặc https://vimeo.com/...">
+                    <div th:if="${#fields.hasErrors('videoUrl')}" th:errors="*{videoUrl}" class="invalid-feedback d-block"></div>
                     <div class="invalid-feedback">
-                        Vui lòng nhập link video hợp lệ.
+                        Vui lòng nhập link video hợp lệ (bắt đầu bằng http:// hoặc https://).
                     </div>
-                    <small th:if="${#fields.hasErrors('videoUrl')}" th:errors="*{videoUrl}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Hỗ trợ YouTube và Vimeo. Để trống nếu chưa có video.
                     </small>
@@ -191,22 +196,51 @@
 
 
 <script>
-    // Form validation
-    (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-            var forms = document.getElementsByClassName('needs-validation');
-            Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
+    // Form validation and Real-time feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('lessonForm');
+        const inputs = form.querySelectorAll('input, select');
+
+        function validateField(input) {
+            const isValid = input.checkValidity();
+            if (isValid) {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            } else {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+            }
+            return isValid;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => {
+                if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
+                    validateField(input);
+                }
             });
+        });
+
+        form.addEventListener('submit', function(event) {
+            let formValid = true;
+            inputs.forEach(input => {
+                if (!validateField(input)) {
+                    formValid = false;
+                }
+            });
+
+            if (!formValid) {
+                event.preventDefault();
+                event.stopPropagation();
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
         }, false);
-    })();
+    });
 
     // Video preview functionality
     document.addEventListener('DOMContentLoaded', function() {

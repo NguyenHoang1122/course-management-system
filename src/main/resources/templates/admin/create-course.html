@@ -30,11 +30,9 @@
 <!--        </ol>-->
 <!--    </nav>-->
 
-    <!-- Form -->
     <div class="admin-content">
         <div class="form-container">
-            <form th:action="@{/admin/save-course}" th:object="${courseDTO}" method="post" class="needs-validation"
-                  novalidate>
+            <form th:action="@{/admin/save-course}" th:object="${courseDTO}" method="post" id="courseForm" novalidate>
 
                 <!-- Hidden ID -->
                 <input type="hidden" th:field="*{id}">
@@ -49,14 +47,15 @@
                             id="title"
                             th:field="*{title}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
                             placeholder="Nhập tên khóa học"
                             required
                             minlength="3"
-                            maxlength="255">
-                    <div class="invalid-feedback">
-                        Vui lòng nhập tên khóa học (tối thiểu 3 ký tự).
+                            maxlength="200">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback d-block"></div>
+                    <div class="invalid-feedback" id="title-client-error">
+                        Vui lòng nhập tên khóa học (từ 3 đến 200 ký tự).
                     </div>
-                    <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger"></small>
                 </div>
 
                 <!-- Description -->
@@ -68,14 +67,16 @@
                             id="description"
                             th:field="*{description}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
                             placeholder="Nhập mô tả chi tiết về khóa học"
                             rows="5"
                             required
-                            minlength="10"></textarea>
-                    <div class="invalid-feedback">
-                        Vui lòng nhập mô tả khóa học (tối thiểu 10 ký tự).
+                            minlength="10"
+                            maxlength="2000"></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback d-block"></div>
+                    <div class="invalid-feedback" id="description-client-error">
+                        Vui lòng nhập mô tả khóa học (từ 10 đến 2000 ký tự).
                     </div>
-                    <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></small>
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Mô tả nên bao gồm mục tiêu học tập và nội dung chính của khóa học.
                     </small>
@@ -92,15 +93,16 @@
                             id="price"
                             th:field="*{price}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
                             placeholder="Nhập giá khóa học"
                             required
                             min="0"
                             step="1000">
 
-                    <div class="invalid-feedback">
-                        Vui lòng nhập giá khóa học hợp lệ.
+                    <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="invalid-feedback d-block"></div>
+                    <div class="invalid-feedback" id="price-client-error">
+                        Vui lòng nhập giá khóa học hợp lệ (tối thiểu 0).
                     </div>
-                    <small th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger"></small>
 
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.
@@ -115,6 +117,7 @@
                             id="instructorId"
                             th:field="*{instructorId}"
                             class="form-control"
+                            th:classappend="${#fields.hasErrors('instructorId')} ? 'is-invalid' : ''"
                             required>
                         <option value="">-- Chọn Giảng Viên --</option>
                         <option th:each="user : ${instructors}"
@@ -122,6 +125,7 @@
                                 th:text="${user.fullName}">
                         </option>
                     </select>
+                    <div th:if="${#fields.hasErrors('instructorId')}" th:errors="*{instructorId}" class="invalid-feedback d-block"></div>
                     <div class="invalid-feedback">
                         Vui lòng chọn giảng viên cho khóa học.
                     </div>
@@ -157,7 +161,7 @@
                 <!-- Actions -->
                 <div class="form-group" style="margin-top: 40px;">
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
                             <i class="fas fa-save"></i> Tạo Khóa Học
                         </button>
                         <a th:href="@{/admin/course-list}" class="btn btn-secondary">
@@ -173,22 +177,53 @@
 </div>
 
 <script>
-    // Form validation
-    (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-            var forms = document.getElementsByClassName('needs-validation');
-            Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
+    // Form validation and Real-time feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('courseForm');
+        const inputs = form.querySelectorAll('input, textarea, select');
+
+        function validateField(input) {
+            if (input.id === 'preview-date') return true;
+            
+            const isValid = input.checkValidity();
+            if (isValid) {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            } else {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+            }
+            return isValid;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => {
+                if (input.classList.contains('is-invalid') || input.classList.contains('is-valid')) {
+                    validateField(input);
+                }
             });
+        });
+
+        form.addEventListener('submit', function(event) {
+            let formValid = true;
+            inputs.forEach(input => {
+                if (!validateField(input)) {
+                    formValid = false;
+                }
+            });
+
+            if (!formValid) {
+                event.preventDefault();
+                event.stopPropagation();
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
         }, false);
-    })();
+    });
 
     // Live preview
     document.addEventListener('DOMContentLoaded', function() {
