@@ -125,7 +125,9 @@
 </head>
 <body>
 
-<div th:replace="~{layout :: siteHeader}"></div>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
 
 <div class="admin-container">
   <div class="admin-header">
@@ -158,8 +160,8 @@
       <div class="col-lg-3 mb-4">
         <div class="profile-avatar-card">
           <div class="avatar-wrapper">
-            <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" class="avatar-image" id="currentAvatarImg"/>
-            <img th:if="${#strings.isEmpty(user.avatar)}" src="https://via.placeholder.com/200?text=No+Avatar" alt="Avatar" class="avatar-image" id="currentAvatarImg"/>
+            <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" class="avatar-image"/>
+            <img th:if="${#strings.isEmpty(user.avatar)}" src="https://via.placeholder.com/200?text=No+Avatar" alt="Avatar" class="avatar-image"/>
           </div>
           <p class="text-center mt-3"><strong th:text="${user.fullName}"></strong></p>
           <p class="text-center text-muted" th:text="${user.userName}"></p>
@@ -408,7 +410,9 @@
   </div><!-- /admin-content -->
 </div><!-- /admin-container -->
 
-<div th:replace="~{layout :: siteFooter}"></div>
+    </div>
+</div>
+
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 <script>

@@ -9,7 +9,6 @@
 </head>
 
 <body>
-<div th:replace="~{layout :: siteHeader}"></div>
 
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
@@ -97,7 +96,6 @@
 </div>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-<div th:replace="~{layout :: siteFooter}"></div>
 </body>
 </html>
 
