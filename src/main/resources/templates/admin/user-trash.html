@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Thùng rác User - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-trash-alt"></i> Thùng rác user</h1>
+                <p>User trong thùng rác sẽ bị xóa vĩnh viễn sau 10 ngày nếu không được khôi phục.</p>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <div class="admin-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 style="color: var(--secondary-color); margin: 0;"><i class="fas fa-box-open"></i> Danh sách user đã xóa</h3>
+                    <div class="d-flex align-items-center" style="gap: 10px;">
+                        <a class="btn btn-outline-secondary user-action-control" th:href="@{/admin/user-list}">
+                            <i class="fas fa-arrow-left"></i> Về user list
+                        </a>
+                        <span class="badge bg-danger" th:text="${deletedUsers != null ? deletedUsers.size() : 0}">0</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive" th:if="${deletedUsers != null and !deletedUsers.isEmpty()}">
+                    <table class="table table-hover align-middle admin-user-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Ngày xóa</th>
+                            <th>Thời gian xóa</th>
+                            <th class="action-col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${deletedUsers}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.userName}"></td>
+                            <td th:text="${user.fullName}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td class="role-cell">
+                                <span class="role-badge role-student" th:if="${user.role != null and (#strings.equalsIgnoreCase(user.role.name, 'STUDENT') or #strings.equalsIgnoreCase(user.role.name, 'ROLE_STUDENT'))}">STUDENT</span>
+                                <span class="role-badge role-teacher" th:if="${user.role != null and (#strings.equalsIgnoreCase(user.role.name, 'TEACHER') or #strings.equalsIgnoreCase(user.role.name, 'ROLE_TEACHER'))}">TEACHER</span>
+                                <span class="role-badge role-admin" th:if="${user.role != null and (#strings.equalsIgnoreCase(user.role.name, 'ADMIN') or #strings.equalsIgnoreCase(user.role.name, 'ROLE_ADMIN'))}">ADMIN</span>
+                                <span class="role-badge role-unknown" th:if="${user.role == null}">N/A</span>
+                            </td>
+                            <td th:text="${user.deletedAt != null ? #temporals.format(user.deletedAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                            <td>
+                                <span class="deleted-duration"
+                                      th:attr="data-deleted-at=${user.deletedAt != null ? #temporals.format(user.deletedAt, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">-</span>
+                            </td>
+                            <td class="action-cell">
+                                <form th:action="@{/admin/users/{id}/restore(id=${user.id})}" method="post">
+                                    <button type="submit" class="btn btn-outline-success user-action-control user-btn-restore">
+                                        <i class="fas fa-undo"></i> Khôi phục
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${deletedUsers == null or deletedUsers.isEmpty()}" class="text-center py-4">
+                    <i class="fas fa-trash-alt" style="font-size: 2rem; color: var(--text-muted);"></i>
+                    <p class="mt-2 mb-0" style="color: var(--text-muted);">Thùng rác trống.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        document.querySelectorAll('.deleted-duration').forEach(function (cell) {
+            const deletedAt = cell.getAttribute('data-deleted-at');
+            if (!deletedAt) {
+                cell.textContent = '-';
+                return;
+            }
+
+            const deletedDate = new Date(deletedAt);
+            const diffMs = now - deletedDate;
+            if (Number.isNaN(diffMs) || diffMs < 0) {
+                cell.textContent = '-';
+                return;
+            }
+
+            const totalMinutes = Math.floor(diffMs / 60000);
+            const days = Math.floor(totalMinutes / 1440);
+            const hours = Math.floor((totalMinutes % 1440) / 60);
+            const minutes = totalMinutes % 60;
+
+            if (days > 0) {
+                cell.textContent = days + ' ngày ' + hours + ' giờ';
+                return;
+            }
+
+            if (hours > 0) {
+                cell.textContent = hours + ' giờ ' + minutes + ' phút';
+                return;
+            }
+
+            cell.textContent = Math.max(minutes, 1) + ' phút';
+        });
+    });
+</script>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<div th:replace="~{layout :: siteFooter}"></div>
+</body>
+</html>
+

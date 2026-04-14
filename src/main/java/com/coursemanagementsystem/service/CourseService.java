@@ -47,7 +47,7 @@ public class CourseService {
 
         // 👉 xử lý relation riêng
         if (dto.getInstructorId() != null) {
-            User instructor = userRepository.findById(dto.getInstructorId()).orElse(null);
+            User instructor = userRepository.findByIdAndDeletedFalse(dto.getInstructorId()).orElse(null);
             course.setInstructor(instructor);
         }
 
