@@ -4,12 +4,14 @@
   <th:block th:replace="~{layout :: headMeta}"></th:block>
   <title>Profile</title>
   <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
 
-<div th:replace="~{layout :: siteHeader}"></div>
-
-<div class="container mt-5 mb-5">
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
+        <div class="container mt-5 mb-5">
     <h2>Profile</h2>
 
     <p th:if="${param.updated}" class="text-success">Cập nhật thông tin thành công!</p>
@@ -39,7 +41,8 @@
                 </div>
             </div>
 
-            <div class="card">
+            <!-- Only show enrolled courses section for non-admin users -->
+            <div class="card" th:if="${user.role == null or user.role.name != 'ADMIN'}">
                 <div class="card-header border-bottom-0">
                     <h4 class="mb-0">Danh sách khóa học đã đăng ký</h4>
                 </div>
@@ -87,8 +90,7 @@
         </div>
     </div>
 </div>
-
-<div th:replace="~{layout :: siteFooter}"></div>
+</div>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
