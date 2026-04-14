@@ -30,7 +30,7 @@ public class UserService {
 
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_STUDENT = "STUDENT";
-    public static final String ROLE_TEACHER = "TEACHER";
+    public static final String ROLE_INSTRUCTOR = "INSTRUCTOR";
     private static final String ROLE_PREFIX = "ROLE_";
 
     @Autowired
@@ -75,7 +75,7 @@ public class UserService {
 
     public List<User> findAllInstructor() {
         return userRepository.findByRole_NameInAndDeletedFalseOrderByFullNameAsc(
-                Arrays.asList(ROLE_TEACHER, ROLE_PREFIX + ROLE_TEACHER)
+                Arrays.asList(ROLE_INSTRUCTOR, ROLE_PREFIX + ROLE_INSTRUCTOR)
         );
     }
 
@@ -183,7 +183,7 @@ public class UserService {
     @Transactional
     public void updateUserRole(Long userId, String roleName) {
         String normalizedRoleName = normalizeRoleName(roleName);
-        if (!Arrays.asList(ROLE_STUDENT, ROLE_TEACHER).contains(normalizedRoleName)) {
+        if (!Arrays.asList(ROLE_STUDENT, ROLE_INSTRUCTOR).contains(normalizedRoleName)) {
             throw new IllegalArgumentException("Role is not supported");
         }
 
