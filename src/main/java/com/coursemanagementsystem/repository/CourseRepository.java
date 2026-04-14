@@ -4,6 +4,7 @@ import com.coursemanagementsystem.model.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +21,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                or lower(i.fullName) like lower(concat('%', :keyword, '%'))
             """)
     Page<Course> searchCourses(@Param("keyword") String keyword, Pageable pageable);
+
+    @Modifying
+    @Query("update Course c set c.instructor = null where c.instructor.id in :userIds")
+    int clearInstructorForUserIds(@Param("userIds") List<Long> userIds);
 }

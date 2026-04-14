@@ -2,6 +2,7 @@ package com.coursemanagementsystem.repository;
 
 import com.coursemanagementsystem.model.LessonProgress;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +16,10 @@ public interface LessonProgressRepository extends JpaRepository<LessonProgress, 
     @Query("select lp.lesson.id from LessonProgress lp where lp.user.id = :userId and lp.lesson.course.id = :courseId")
     List<Long> findCompletedLessonIdsByUserAndCourse(@Param("userId") Long userId,
                                                       @Param("courseId") Long courseId);
+
+    @Modifying
+    @Query("delete from LessonProgress lp where lp.user.id in :userIds")
+    int deleteByUserIds(@Param("userIds") List<Long> userIds);
 
     long countByUserIdAndLessonCourseId(Long userId, Long courseId);
 }

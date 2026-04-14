@@ -4,6 +4,7 @@ import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +26,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
+
+        if (user.isDeleted()) {
+            throw new DisabledException("User account has been deleted");
+        }
 
         return new CustomUserDetails(user, getAuthorities(user));
     }

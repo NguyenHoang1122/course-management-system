@@ -4,6 +4,7 @@ import com.coursemanagementsystem.dto.CourseDTO;
 import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Lesson;
+import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
@@ -13,7 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,6 +57,64 @@ public class AdminController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeMenu", "courses");
         return "admin/course-list";
+    }
+
+    @GetMapping("/user-list")
+    public String userList(Model model) {
+        model.addAttribute("users", userService.findAllActiveUsers());
+        model.addAttribute("activeMenu", "users");
+        return "admin/user-list";
+    }
+
+    @GetMapping("/user-trash")
+    public String userTrash(Model model) {
+        model.addAttribute("deletedUsers", userService.findAllDeletedUsers());
+        model.addAttribute("activeMenu", "user-trash");
+        return "admin/user-trash";
+    }
+
+    @PostMapping("/users/{id}/role")
+    public String updateUserRole(@PathVariable("id") Long id,
+                                 @RequestParam("roleName") String roleName,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            userService.updateUserRole(id, roleName);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật vai trò thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/user-list";
+    }
+
+    @PostMapping("/users/{id}/delete")
+    public String softDeleteUser(@PathVariable("id") Long id,
+                                 Principal principal,
+                                 RedirectAttributes redirectAttributes) {
+        User currentUser = principal == null ? null : userService.findByUsername(principal.getName());
+        if (currentUser != null && currentUser.getId().equals(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không thể tự xóa chính mình.");
+            return "redirect:/admin/user-list";
+        }
+
+        try {
+            userService.softDeleteUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã chuyển user vào thùng rác.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/user-list";
+    }
+
+    @PostMapping("/users/{id}/restore")
+    public String restoreUser(@PathVariable("id") Long id,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            userService.restoreUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Khôi phục user thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/user-trash";
     }
 
     @GetMapping("/create-course")

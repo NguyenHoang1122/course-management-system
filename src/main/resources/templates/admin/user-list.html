@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Quan Ly Nguoi Dung - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div th:replace="~{layout :: siteHeader}"></div>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-users"></i> Quản lý người dùng</h1>
+                <p>Cập nhật role STUDENT/TEACHER, xóa tạm và khôi phục tài khoản.</p>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <div class="admin-content">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 style="color: var(--secondary-color); margin: 0;"><i class="fas fa-user-check"></i> Danh sách người dùng</h3>
+                    <span class="badge bg-primary" th:text="${users != null ? users.size() : 0}">0</span>
+                </div>
+
+                <div class="table-responsive" th:if="${users != null and !users.isEmpty()}">
+                    <table class="table table-hover align-middle admin-user-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th class="action-col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.userName}"></td>
+                            <td th:text="${user.fullName}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td class="role-cell">
+                                <span class="role-badge role-student" th:if="${user.role != null and user.role.name == 'STUDENT'}">STUDENT</span>
+                                <span class="role-badge role-teacher" th:if="${user.role != null and user.role.name == 'INSTRUCTOR'}">TEACHER</span>
+                                <span class="role-badge role-admin" th:if="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</span>
+                                <span class="role-badge role-unknown" th:if="${user.role == null}">N/A</span>
+                            </td>
+                            <td class="action-cell">
+                                <div class="user-actions">
+                                    <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post" class="user-role-form"
+                                          th:if="${user.role == null or user.role.name != 'ADMIN'}">
+                                        <select name="roleName" class="form-control user-action-control user-role-select" th:id="${'roleSelect_' + user.id}" aria-label="Vai trò">
+                                            <option value="STUDENT" th:selected="${user.role != null and user.role.name == 'STUDENT'}">STUDENT</option>
+                                            <option value="TEACHER" th:selected="${user.role != null and user.role.name == 'INSTRUCTOR'}">TEACHER</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-primary user-action-control user-btn-save-role">
+                                            <i class="fas fa-save"></i> Lưu role
+                                        </button>
+                                    </form>
+
+                                    <span class="role-badge role-admin" th:if="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</span>
+
+                                    <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
+                                          th:if="${user.role == null or user.role.name != 'ADMIN'}"
+                                          onsubmit="return confirm('Chuyển user này vào thùng rác?')">
+                                        <button type="submit" class="btn btn-outline-danger user-action-control user-btn-delete-temp">
+                                            <i class="fas fa-trash"></i> Xóa tạm
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${users == null or users.isEmpty()}" class="text-center py-4">
+                    <i class="fas fa-user-slash" style="font-size: 2rem; color: var(--text-muted);"></i>
+                    <p class="mt-2 mb-0" style="color: var(--text-muted);">Không có người dùng nào.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<div th:replace="~{layout :: siteFooter}"></div>
+</body>
+</html>
+

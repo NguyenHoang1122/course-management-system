@@ -3,8 +3,8 @@
 <body>
 <aside class="admin-sidebar" th:fragment="sidebar(activeMenu)">
     <div class="admin-sidebar-header">
-        <a th:href="@{/admin/course-list}">
-            <i class="fas fa-layer-group"></i>
+        <a th:href="@{/admin/course-list}" class="admin-sidebar-brand">
+            <span class="sidebar-icon-wrap"><i class="fas fa-layer-group"></i></span>
             <span class="admin-sidebar-text">Admin Panel</span>
         </a>
         <button type="button" class="sidebar-toggle" onclick="document.body.classList.toggle('admin-sidebar-collapsed')">
@@ -12,57 +12,75 @@
         </button>
     </div>
 
+    <!-- ... existing code ... -->
     <nav class="admin-sidebar-nav">
-
-        <!-- Khóa học dropdown -->
-        <div class="sidebar-dropdown">
-            <button type="button"
-                    class="admin-sidebar-link sidebar-dropdown-btn"
-                    th:classappend="${activeMenu == 'courses'} ? ' active' : ''">
-                <i class="fas fa-book"></i>
+        <!-- Khóa học -->
+        <div class="sidebar-dropdown" data-label="Khóa học">
+            <button type="button" class="admin-sidebar-link sidebar-dropdown-btn" th:classappend="${activeMenu == 'courses'} ? ' active' : ''">
+                <span class="sidebar-icon-wrap"><i class="fas fa-book"></i></span>
                 <span class="admin-sidebar-text">Khóa học</span>
                 <i class="fas fa-chevron-down sidebar-caret admin-sidebar-text"></i>
             </button>
             <div class="sidebar-submenu">
+                <div class="sidebar-submenu-header">
+                    <strong>Quản lý Khóa học</strong>
+                </div>
                 <a th:href="@{/admin/course-list}" class="admin-sidebar-link admin-sidebar-sublink">
-                    <i class="fas fa-list"></i>
-                    <span class="admin-sidebar-text">Danh sách khóa học</span>
+                    <span class="sidebar-icon-wrap"><i class="fas fa-list"></i></span>
+                    <span class="admin-sidebar-subtext">Danh sách khóa học</span>
                 </a>
                 <a th:href="@{/admin/create-course}" class="admin-sidebar-link admin-sidebar-sublink">
-                    <i class="fas fa-plus-circle"></i>
-                    <span class="admin-sidebar-text">Thêm khóa học mới</span>
+                    <span class="sidebar-icon-wrap"><i class="fas fa-plus-circle"></i></span>
+                    <span class="admin-sidebar-subtext">Thêm khóa học mới</span>
                 </a>
             </div>
         </div>
 
-        <!-- Bài học dropdown -->
-        <div class="sidebar-dropdown">
-            <button type="button"
-                    class="admin-sidebar-link sidebar-dropdown-btn"
-                    th:classappend="${activeMenu == 'lessons'} ? ' active' : ''">
-                <i class="fas fa-play-circle"></i>
+        <!-- Bài học -->
+        <div class="sidebar-dropdown" data-label="Bài học">
+            <button type="button" class="admin-sidebar-link sidebar-dropdown-btn" th:classappend="${activeMenu == 'lessons'} ? ' active' : ''">
+                <span class="sidebar-icon-wrap"><i class="fas fa-play-circle"></i></span>
                 <span class="admin-sidebar-text">Bài học</span>
                 <i class="fas fa-chevron-down sidebar-caret admin-sidebar-text"></i>
             </button>
             <div class="sidebar-submenu">
+                <div class="sidebar-submenu-header">
+                    <strong>Quản lý Bài học</strong>
+                </div>
                 <a th:href="@{/admin/lesson-list}" class="admin-sidebar-link admin-sidebar-sublink">
-                    <i class="fas fa-list"></i>
-                    <span class="admin-sidebar-text">Danh sách bài học</span>
+                    <span class="sidebar-icon-wrap"><i class="fas fa-list"></i></span>
+                    <span class="admin-sidebar-subtext">Danh sách bài học</span>
                 </a>
                 <a th:href="@{/admin/create-lesson}" class="admin-sidebar-link admin-sidebar-sublink">
-                    <i class="fas fa-plus-circle"></i>
-                    <span class="admin-sidebar-text">Tạo bài học mới</span>
+                    <span class="sidebar-icon-wrap"><i class="fas fa-plus-circle"></i></span>
+                    <span class="admin-sidebar-subtext">Tạo bài học mới</span>
                 </a>
             </div>
         </div>
 
-        <!-- Về trang chủ -->
-        <a th:href="@{/}" class="admin-sidebar-link">
-            <i class="fas fa-home"></i>
-            <span class="admin-sidebar-text">Về trang chủ</span>
-        </a>
+        <!-- Các mục đơn lẻ: Thêm class sidebar-single-item và data-label -->
+        <div class="sidebar-single-item" data-label="Người dùng">
+            <a th:href="@{/admin/user-list}" class="admin-sidebar-link" th:classappend="${activeMenu == 'users'} ? ' active' : ''">
+                <span class="sidebar-icon-wrap"><i class="fas fa-users-cog"></i></span>
+                <span class="admin-sidebar-text">Quản lý người dùng</span>
+            </a>
+        </div>
+
+        <div class="sidebar-single-item" data-label="Thùng rác">
+            <a th:href="@{/admin/user-trash}" class="admin-sidebar-link" th:classappend="${activeMenu == 'user-trash'} ? ' active' : ''">
+                <span class="sidebar-icon-wrap"><i class="fas fa-trash-alt"></i></span>
+                <span class="admin-sidebar-text">Thùng rác user</span>
+            </a>
+        </div>
+
+        <div class="sidebar-single-item" data-label="Trang chủ">
+            <a th:href="@{/}" class="admin-sidebar-link">
+                <span class="sidebar-icon-wrap"><i class="fas fa-home"></i></span>
+                <span class="admin-sidebar-text">Về trang chủ</span>
+            </a>
+        </div>
     </nav>
+    <!-- ... existing code ... -->
 </aside>
 </body>
 </html>
-

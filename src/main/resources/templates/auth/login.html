@@ -35,6 +35,11 @@
             Sai tài khoản hoặc mật khẩu!
         </div>
 
+        <div th:if="${param.deleted}" class="alert alert-warning" role="alert">
+            <i class="fas fa-trash"></i>
+            Tài khoản của bạn đang ở thùng rác. Vui lòng liên hệ admin để khôi phục.
+        </div>
+
         <!-- Success Message -->
         <div th:if="${param.register}" class="alert alert-success" role="alert">
             <i class="fas fa-check-circle"></i>
