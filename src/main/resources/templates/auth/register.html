@@ -1,11 +1,175 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
-    <title>Register - Course Management System</title>
+    <title>Đăng Ký - Course Management System</title>
 
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
     <link rel="stylesheet" th:href="@{/css/auth.css}">
+
+    <style>
+        /* ===== VALIDATION STYLES ===== */
+        .form-group {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group input {
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Valid state */
+        .form-group input.is-valid {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
+        }
+
+        /* Invalid state */
+        .form-group input.is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+        }
+
+        /* Validation icons inside input */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .validation-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Push icon left if there's a password toggle */
+        .form-input .input-wrapper .validation-icon {
+            right: 44px;
+        }
+
+        .input-wrapper .validation-icon.icon-valid {
+            color: #10b981;
+        }
+
+        .input-wrapper .validation-icon.icon-invalid {
+            color: #ef4444;
+        }
+
+        /* Error message below field */
+        .field-error {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #ef4444;
+            font-size: 0.78rem;
+            margin-top: 5px;
+            animation: slideDown 0.2s ease;
+        }
+
+        .field-error i {
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Success hint */
+        .field-success {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #10b981;
+            font-size: 0.78rem;
+            margin-top: 5px;
+            animation: slideDown 0.2s ease;
+        }
+
+        /* Password strength bar */
+        .password-strength-bar {
+            margin-top: 8px;
+            height: 4px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+            display: none;
+        }
+
+        .password-strength-bar .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.35s ease, background 0.35s ease;
+            width: 0%;
+        }
+
+        .strength-label {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Password requirements checklist */
+        .password-requirements {
+            margin-top: 8px;
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .password-requirements ul li {
+            font-size: 0.78rem;
+            color: #9ca3af;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .password-requirements ul li i {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            transition: color 0.2s ease;
+        }
+
+        .password-requirements ul li.req-met {
+            color: #10b981;
+        }
+
+        .password-requirements ul li.req-met i {
+            color: #10b981;
+        }
+
+        /* Alert box */
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            color: #b91c1c;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        /* Keyframes */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Submit button disabled state */
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 
 <body class="auth-page">
@@ -13,7 +177,9 @@
 <div th:replace="~{layout :: siteHeader}"></div>
 
 <div class="register-container">
-    <form class="register-wrapper" th:action="@{/auth/register}" th:object="${userRegisterDTO}" method="post">
+    <form class="register-wrapper" id="registerForm"
+          th:action="@{/auth/register}" th:object="${userRegisterDTO}" method="post"
+          novalidate>
 
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -28,100 +194,177 @@
         <h2 class="register-form">Đăng Ký Tài Khoản</h2>
         <p class="subtitle">Tạo tài khoản mới để bắt đầu hành trình học tập</p>
 
-        <div th:if="${registerError}" class="alert alert-danger" role="alert" th:text="${registerError}"></div>
+        <!-- Global error -->
+        <div th:if="${registerError}" class="alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${registerError}"></span>
+        </div>
 
-        <!-- User Name -->
-        <div class="form-group">
+        <!-- ===== USERNAME ===== -->
+        <div class="form-group" id="group-userName">
             <label for="username">
-                <i class="fas fa-user"></i> Tên đăng nhập
+                <i class="fas fa-user"></i> Tên Đăng Nhập
             </label>
-            <input
+            <div class="input-wrapper">
+                <input
                     type="text"
                     id="username"
                     th:field="*{userName}"
-                    placeholder="Nhập tên đăng nhập của bạn"
-                    required>
-            <small th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" class="text-danger"></small>
+                    th:classappend="${#fields.hasErrors('userName')} ? 'is-invalid' : ''"
+                    placeholder="Ví dụ: hoangnguyen123"
+                    autocomplete="username">
+                <span class="validation-icon icon-valid"><i class="fas fa-check-circle"></i></span>
+                <span class="validation-icon icon-invalid"><i class="fas fa-times-circle"></i></span>
+            </div>
+            <!-- Server-side error -->
+            <div th:if="${#fields.hasErrors('userName')}" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:errors="*{userName}"></span>
+            </div>
+            <!-- Client-side error placeholder -->
+            <div class="field-error" id="err-userName" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="err-userName-msg"></span>
+            </div>
         </div>
 
-        <div class="form-group">
+        <!-- ===== FULL NAME ===== -->
+        <div class="form-group" id="group-fullName">
             <label for="fullName">
-                <i class="fas fa-id-card"></i> Họ tên
+                <i class="fas fa-id-card"></i> Họ Tên
             </label>
-            <input
+            <div class="input-wrapper">
+                <input
                     type="text"
                     id="fullName"
                     th:field="*{fullName}"
-                    placeholder="Nhập họ tên của bạn"
-                    required>
-            <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="text-danger"></small>
+                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
+                    placeholder="Ví dụ: Nguyễn Văn Hoàng"
+                    autocomplete="name">
+                <span class="validation-icon icon-valid"><i class="fas fa-check-circle"></i></span>
+                <span class="validation-icon icon-invalid"><i class="fas fa-times-circle"></i></span>
+            </div>
+            <div th:if="${#fields.hasErrors('fullName')}" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:errors="*{fullName}"></span>
+            </div>
+            <div class="field-error" id="err-fullName" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="err-fullName-msg"></span>
+            </div>
         </div>
 
-        <!-- Email -->
-        <div class="form-group">
+        <!-- ===== EMAIL ===== -->
+        <div class="form-group" id="group-email">
             <label for="email">
                 <i class="fas fa-envelope"></i> Email
             </label>
-            <input
+            <div class="input-wrapper">
+                <input
                     type="email"
                     id="email"
                     th:field="*{email}"
-                    placeholder="Nhập email của bạn"
-                    required>
-            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></small>
+                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                    placeholder="Ví dụ: example@gmail.com"
+                    autocomplete="email">
+                <span class="validation-icon icon-valid"><i class="fas fa-check-circle"></i></span>
+                <span class="validation-icon icon-invalid"><i class="fas fa-times-circle"></i></span>
+            </div>
+            <div th:if="${#fields.hasErrors('email')}" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:errors="*{email}"></span>
+            </div>
+            <div class="field-error" id="err-email" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="err-email-msg"></span>
+            </div>
         </div>
 
-        <!-- Password -->
-        <div class="form-group form-input">
+        <!-- ===== PASSWORD ===== -->
+        <div class="form-group form-input" id="group-password">
             <label for="password">
-                <i class="fas fa-lock"></i> Mật khẩu
+                <i class="fas fa-lock"></i> Mật Khẩu
             </label>
-            <input
+            <div class="input-wrapper">
+                <input
                     type="password"
                     id="password"
                     th:field="*{password}"
-                    placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
-                    required
-                    minlength="6">
-            <span class="password-toggle" onclick="togglePasswordRegister('password')">
-                <i class="fas fa-eye"></i>
-            </span>
+                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                    placeholder="Tối thiểu 8 ký tự"
+                    autocomplete="new-password">
+                <span class="password-toggle" onclick="togglePasswordRegister('password')">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <span class="validation-icon icon-valid"><i class="fas fa-check-circle"></i></span>
+                <span class="validation-icon icon-invalid"><i class="fas fa-times-circle"></i></span>
+            </div>
+            <!-- Strength bar -->
+            <div class="password-strength-bar" id="strengthBar">
+                <div class="bar-fill" id="strengthFill"></div>
+            </div>
+            <div class="strength-label" id="strengthLabel"></div>
+            <!-- Requirements checklist -->
             <div class="password-requirements">
                 <ul>
-                    <li><i class="fas fa-check-circle"></i>Tối thiểu 6 ký tự</li>
-                    <li><i class="fas fa-check-circle"></i>Nên có chữ hoa và chữ thường</li>
-                    <li><i class="fas fa-check-circle"></i>Nên chứa số</li>
+                    <li id="req-length"><i class="fas fa-circle"></i>Ít nhất 8 ký tự</li>
+                    <li id="req-upper"><i class="fas fa-circle"></i>Có ít nhất 1 chữ HOA</li>
+                    <li id="req-lower"><i class="fas fa-circle"></i>Có ít nhất 1 chữ thường</li>
+                    <li id="req-digit"><i class="fas fa-circle"></i>Có ít nhất 1 chữ số</li>
                 </ul>
             </div>
-            <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger"></small>
+            <div th:if="${#fields.hasErrors('password')}" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:errors="*{password}"></span>
+            </div>
+            <div class="field-error" id="err-password" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="err-password-msg"></span>
+            </div>
         </div>
 
-        <!-- Confirm Password -->
-        <div class="form-group form-input">
+        <!-- ===== CONFIRM PASSWORD ===== -->
+        <div class="form-group form-input" id="group-confirmPassword">
             <label for="confirmPassword">
                 <i class="fas fa-lock"></i> Xác Nhận Mật Khẩu
             </label>
-            <input
+            <div class="input-wrapper">
+                <input
                     type="password"
                     id="confirmPassword"
                     th:field="*{confirmPassword}"
+                    th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
                     placeholder="Nhập lại mật khẩu"
-                    required>
-            <span class="password-toggle" onclick="togglePasswordRegister('confirmPassword')">
-                <i class="fas fa-eye"></i>
-            </span>
-            <small th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="text-danger"></small>
+                    autocomplete="new-password">
+                <span class="password-toggle" onclick="togglePasswordRegister('confirmPassword')">
+                    <i class="fas fa-eye"></i>
+                </span>
+                <span class="validation-icon icon-valid"><i class="fas fa-check-circle"></i></span>
+                <span class="validation-icon icon-invalid"><i class="fas fa-times-circle"></i></span>
+            </div>
+            <div th:if="${#fields.hasErrors('confirmPassword')}" class="field-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:errors="*{confirmPassword}"></span>
+            </div>
+            <div class="field-error" id="err-confirmPassword" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="err-confirmPassword-msg"></span>
+            </div>
         </div>
 
-        <!-- Terms & Conditions -->
-        <div class="terms-check">
-            <input type="checkbox" id="terms" name="terms" required>
+        <!-- ===== TERMS ===== -->
+        <div class="terms-check" id="group-terms">
+            <input type="checkbox" id="terms" name="terms">
             <label for="terms" style="margin: 0;">
                 Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a>
             </label>
         </div>
+        <div class="field-error" id="err-terms" style="display:none; margin-top:4px; margin-bottom:8px;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>Bạn phải đồng ý với điều khoản dịch vụ</span>
+        </div>
 
-        <!-- Register Button -->
+        <!-- ===== SUBMIT ===== -->
         <div class="register-btn-group">
             <button type="submit" class="btn-register" id="registerBtn">
                 <i class="fas fa-user-plus"></i> Đăng Ký
@@ -149,46 +392,297 @@
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 <script>
-    function togglePasswordRegister(fieldId) {
-        const input = document.getElementById(fieldId);
-        const toggleIcon = event.target.closest('.password-toggle').querySelector('i');
+// ===================================================
+//  REGISTER FORM - FULL VALIDATION MODULE
+// ===================================================
 
-        if (input.type === 'password') {
-            input.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
+const RULES = {
+    userName: {
+        required: true,
+        minLength: 4,
+        maxLength: 30,
+        pattern: /^[a-zA-Z0-9_]+$/,
+        messages: {
+            required:  'Tên đăng nhập không được để trống',
+            minLength: 'Tên đăng nhập phải có ít nhất 4 ký tự',
+            maxLength: 'Tên đăng nhập không được vượt quá 30 ký tự',
+            pattern:   'Chỉ được dùng chữ cái, số và dấu gạch dưới (_)'
+        }
+    },
+    fullName: {
+        required: true,
+        minLength: 2,
+        maxLength: 100,
+        pattern: /^[\p{L} ]+$/u,
+        messages: {
+            required:  'Họ tên không được để trống',
+            minLength: 'Họ tên phải có ít nhất 2 ký tự',
+            maxLength: 'Họ tên không được vượt quá 100 ký tự',
+            pattern:   'Họ tên không được chứa số hoặc ký tự đặc biệt'
+        }
+    },
+    email: {
+        required: true,
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        messages: {
+            required: 'Email không được để trống',
+            pattern:  'Email không đúng định dạng (ví dụ: name@gmail.com)'
+        }
+    },
+    password: {
+        required: true,
+        minLength: 8,
+        messages: {
+            required:  'Mật khẩu không được để trống',
+            minLength: 'Mật khẩu phải có ít nhất 8 ký tự',
+            weak:      'Mật khẩu phải chứa chữ hoa, chữ thường và chữ số'
+        }
+    },
+    confirmPassword: {
+        required: true,
+        messages: {
+            required: 'Vui lòng xác nhận mật khẩu',
+            mismatch: 'Mật khẩu xác nhận không khớp'
         }
     }
+};
 
-    // Validate password match on form submit
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+// ---- Helpers ----
 
-        if (password !== confirmPassword) {
-            e.preventDefault();
-            alert('Mật khẩu không khớp! Vui lòng kiểm tra lại.');
-            return false;
-        }
-    });
+function showError(fieldId, msg) {
+    const input   = document.getElementById(fieldId);
+    const errDiv  = document.getElementById('err-' + fieldId);
+    const errMsg  = document.getElementById('err-' + fieldId + '-msg');
+    const wrapper = input ? input.closest('.input-wrapper') : null;
 
-    // Real-time password match validation
-    document.getElementById('confirmPassword').addEventListener('input', function() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = this.value;
+    if (input)  { input.classList.add('is-invalid'); input.classList.remove('is-valid'); }
+    if (errDiv) { errDiv.style.display = 'flex'; }
+    if (errMsg) { errMsg.textContent   = msg; }
+    if (wrapper) {
+        wrapper.querySelector('.icon-valid')  && (wrapper.querySelector('.icon-valid').style.display   = 'none');
+        wrapper.querySelector('.icon-invalid') && (wrapper.querySelector('.icon-invalid').style.display = 'inline');
+    }
+}
 
-        if (confirmPassword && password !== confirmPassword) {
-            this.style.borderColor = '#FF4757';
-        } else if (confirmPassword && password === confirmPassword) {
-            this.style.borderColor = '#09cc7f';
+function showSuccess(fieldId) {
+    const input   = document.getElementById(fieldId);
+    const errDiv  = document.getElementById('err-' + fieldId);
+    const wrapper = input ? input.closest('.input-wrapper') : null;
+
+    if (input)  { input.classList.add('is-valid'); input.classList.remove('is-invalid'); }
+    if (errDiv) { errDiv.style.display = 'none'; }
+    if (wrapper) {
+        wrapper.querySelector('.icon-valid')  && (wrapper.querySelector('.icon-valid').style.display   = 'inline');
+        wrapper.querySelector('.icon-invalid') && (wrapper.querySelector('.icon-invalid').style.display = 'none');
+    }
+}
+
+function clearState(fieldId) {
+    const input   = document.getElementById(fieldId);
+    const errDiv  = document.getElementById('err-' + fieldId);
+    const wrapper = input ? input.closest('.input-wrapper') : null;
+
+    if (input)  { input.classList.remove('is-valid', 'is-invalid'); }
+    if (errDiv) { errDiv.style.display = 'none'; }
+    if (wrapper) {
+        wrapper.querySelector('.icon-valid')  && (wrapper.querySelector('.icon-valid').style.display   = 'none');
+        wrapper.querySelector('.icon-invalid') && (wrapper.querySelector('.icon-invalid').style.display = 'none');
+    }
+}
+
+// ---- Individual Validators ----
+
+function validateUserName() {
+    const val   = document.getElementById('username').value.trim();
+    const rules = RULES.userName;
+    if (!val)                          return showError('username', rules.messages.required),   false;
+    if (val.length < rules.minLength)  return showError('username', rules.messages.minLength),  false;
+    if (val.length > rules.maxLength)  return showError('username', rules.messages.maxLength),  false;
+    if (!rules.pattern.test(val))      return showError('username', rules.messages.pattern),    false;
+    showSuccess('username');
+    return true;
+}
+
+function validateFullName() {
+    const val   = document.getElementById('fullName').value.trim();
+    const rules = RULES.fullName;
+    if (!val)                          return showError('fullName', rules.messages.required),   false;
+    if (val.length < rules.minLength)  return showError('fullName', rules.messages.minLength),  false;
+    if (val.length > rules.maxLength)  return showError('fullName', rules.messages.maxLength),  false;
+    if (!rules.pattern.test(val))      return showError('fullName', rules.messages.pattern),    false;
+    showSuccess('fullName');
+    return true;
+}
+
+function validateEmail() {
+    const val   = document.getElementById('email').value.trim();
+    const rules = RULES.email;
+    if (!val)                      return showError('email', rules.messages.required), false;
+    if (!rules.pattern.test(val))  return showError('email', rules.messages.pattern),  false;
+    showSuccess('email');
+    return true;
+}
+
+function validatePassword() {
+    const val   = document.getElementById('password').value;
+    const rules = RULES.password;
+    if (!val)                         return showError('password', rules.messages.required),   false;
+    if (val.length < rules.minLength) return showError('password', rules.messages.minLength),  false;
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val))
+                                      return showError('password', rules.messages.weak), false;
+    showSuccess('password');
+    return true;
+}
+
+function validateConfirmPassword() {
+    const pass    = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    const rules   = RULES.confirmPassword;
+    if (!confirm)          return showError('confirmPassword', rules.messages.required),  false;
+    if (pass !== confirm)  return showError('confirmPassword', rules.messages.mismatch),  false;
+    showSuccess('confirmPassword');
+    return true;
+}
+
+// ---- Password Strength ----
+
+function getStrength(pwd) {
+    let score = 0;
+    if (pwd.length >= 8)  score++;
+    if (pwd.length >= 12) score++;
+    if (/[a-z]/.test(pwd)) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/\d/.test(pwd))    score++;
+    if (/[^a-zA-Z0-9]/.test(pwd)) score++;
+    return score;
+}
+
+function updateStrengthBar(pwd) {
+    const bar   = document.getElementById('strengthBar');
+    const fill  = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+
+    bar.style.display   = pwd ? 'block' : 'none';
+    label.style.display = pwd ? 'block' : 'none';
+
+    const score = getStrength(pwd);
+    let width, color, text;
+
+    if (score <= 2)      { width = '33%'; color = '#ef4444'; text = '🔴 Yếu'; }
+    else if (score <= 4) { width = '66%'; color = '#f59e0b'; text = '🟡 Trung bình'; }
+    else                 { width = '100%'; color = '#10b981'; text = '🟢 Mạnh'; }
+
+    fill.style.width      = width;
+    fill.style.background = color;
+    label.textContent     = `Độ mạnh mật khẩu: ${text}`;
+    label.style.color     = color;
+}
+
+function updateRequirements(pwd) {
+    const toggle = (id, test) => {
+        const li = document.getElementById(id);
+        const i  = li.querySelector('i');
+        if (test) {
+            li.classList.add('req-met');
+            i.className = 'fas fa-check-circle';
         } else {
-            this.style.borderColor = '#e5e5e5';
+            li.classList.remove('req-met');
+            i.className = 'fas fa-circle';
         }
-    });
+    };
+    toggle('req-length', pwd.length >= 8);
+    toggle('req-upper',  /[A-Z]/.test(pwd));
+    toggle('req-lower',  /[a-z]/.test(pwd));
+    toggle('req-digit',  /\d/.test(pwd));
+}
+
+// ---- Toggle Password Visibility ----
+
+function togglePasswordRegister(fieldId) {
+    const input      = document.getElementById(fieldId);
+    const toggleBtn  = event.target.closest('.password-toggle');
+    const icon       = toggleBtn.querySelector('i');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// ---- Event Listeners (real-time) ----
+
+document.getElementById('username').addEventListener('blur',  validateUserName);
+document.getElementById('username').addEventListener('input', function() {
+    if (this.value) validateUserName(); else clearState('username');
+});
+
+document.getElementById('fullName').addEventListener('blur',  validateFullName);
+document.getElementById('fullName').addEventListener('input', function() {
+    if (this.value) validateFullName(); else clearState('fullName');
+});
+
+document.getElementById('email').addEventListener('blur',  validateEmail);
+document.getElementById('email').addEventListener('input', function() {
+    if (this.value) validateEmail(); else clearState('email');
+});
+
+document.getElementById('password').addEventListener('input', function() {
+    const pwd = this.value;
+    updateStrengthBar(pwd);
+    updateRequirements(pwd);
+    if (pwd) validatePassword(); else clearState('password');
+    // Re-validate confirm if already typed
+    const confirmVal = document.getElementById('confirmPassword').value;
+    if (confirmVal) validateConfirmPassword();
+});
+
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    if (this.value) validateConfirmPassword(); else clearState('confirmPassword');
+});
+
+document.getElementById('confirmPassword').addEventListener('blur', validateConfirmPassword);
+
+// ---- Form Submit ----
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const v1 = validateUserName();
+    const v2 = validateFullName();
+    const v3 = validateEmail();
+    const v4 = validatePassword();
+    const v5 = validateConfirmPassword();
+
+    const terms = document.getElementById('terms');
+    const termsErr = document.getElementById('err-terms');
+    let   v6 = true;
+    if (!terms.checked) {
+        termsErr.style.display = 'flex';
+        v6 = false;
+    } else {
+        termsErr.style.display = 'none';
+    }
+
+    if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6) {
+        e.preventDefault();
+        // Scroll to first error
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus();
+        }
+    }
+});
+
+// ---- On page load: apply server-side errors visually ----
+document.querySelectorAll('input.is-invalid').forEach(function(input) {
+    const wrapper = input.closest('.input-wrapper');
+    if (wrapper) {
+        const icon = wrapper.querySelector('.icon-invalid');
+        if (icon) icon.style.display = 'inline';
+    }
+});
 </script>
 
 </body>
