@@ -1,15 +1,20 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <aside class="admin-sidebar" th:fragment="sidebar(activeMenu)">
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <div class="admin-sidebar-header">
         <a th:href="@{/admin/course-list}" class="admin-sidebar-brand">
             <span class="sidebar-icon-wrap"><i class="fas fa-layer-group"></i></span>
             <span class="admin-sidebar-text">Admin Panel</span>
         </a>
+        <!-- Nút toggle chính -->
         <button type="button" class="sidebar-toggle" id="sidebarToggle">
             <i class="fas fa-bars"></i>
         </button>
     </div>
+
 
     <!-- User Profile Section -->
     <div class="admin-sidebar-user">
@@ -117,20 +122,35 @@
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('.admin-sidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
             const dropdowns = document.querySelectorAll('.sidebar-dropdown');
             const currentMenu = /*[[${activeMenu}]]*/ '';
 
-            // 1. Khôi phục trạng thái Sidebar từ LocalStorage
-            const isCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
-            if (isCollapsed) {
-                document.body.classList.add('admin-sidebar-collapsed');
+            // 1. Khôi phục trạng thái Sidebar từ LocalStorage (chỉ cho Desktop)
+            if (window.innerWidth > 768) {
+                const isCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
+                if (isCollapsed) {
+                    document.body.classList.add('admin-sidebar-collapsed');
+                }
             }
 
-            // 2. Xử lý Toggle Sidebar
+            // 2. Xử lý Toggle Sidebar (Hỗ trợ cả Desktop thu gọn và Mobile Drawer)
             toggleBtn.addEventListener('click', function() {
-                const newState = document.body.classList.toggle('admin-sidebar-collapsed');
-                localStorage.setItem('admin-sidebar-collapsed', newState);
+                if (window.innerWidth <= 768) {
+                    // Mobile: Toggle Drawer
+                    document.body.classList.toggle('admin-sidebar-mobile-open');
+                } else {
+                    // Desktop: Toggle Collapsed
+                    const newState = document.body.classList.toggle('admin-sidebar-collapsed');
+                    localStorage.setItem('admin-sidebar-collapsed', newState);
+                }
             });
+
+            // Đóng sidebar khi click vào backdrop (chỉ trên mobile)
+            backdrop.addEventListener('click', function() {
+                document.body.classList.remove('admin-sidebar-mobile-open');
+            });
+
 
             // 3. Xử lý Dropdown Click
             dropdowns.forEach(dropdown => {
