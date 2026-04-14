@@ -727,8 +727,28 @@ body.admin-sidebar-collapsed .sidebar-icon-wrap {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 20px;
 }
+
+.form-actions-end {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+@media (max-width: 576px) {
+    .form-actions, .form-actions-end {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+    .form-actions-end {
+        flex-direction: column;
+    }
+}
+
+
 
 /* Tables */
 .table-container {
