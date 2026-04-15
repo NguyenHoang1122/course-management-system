@@ -67,9 +67,11 @@
                                     <span class="role-badge role-admin" th:if="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</span>
 
                                     <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
-                                          th:if="${user.role == null or user.role.name != 'ADMIN'}"
-                                          onsubmit="return confirm('Chuyển user này vào thùng rác?')">
-                                        <button type="submit" class="btn btn-outline-danger user-action-control user-btn-delete-temp">
+                                          th:if="${user.role == null or user.role.name != 'ADMIN'}">
+                                        <button type="button"
+                                                class="btn btn-outline-danger user-action-control btn-delete-user"
+                                                th:data-id="${user.id}"
+                                                th:data-name="${user.userName}">
                                             <i class="fas fa-trash"></i> Xóa tạm
                                         </button>
                                     </form>
@@ -86,10 +88,42 @@
                 </div>
             </div>
         </div>
+        <div id="userConfirmBox" class="modal-overlay">
+            <div class="modal-content">
+                <h3><i class="fas fa-exclamation-triangle"></i> Xác Nhận</h3>
+                <p>Xóa user "<strong id="userNameDisplay"></strong>" ?</p>
+
+                <div class="modal-actions">
+                    <form id="deleteUserForm" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </form>
+                    <button onclick="hideUserConfirm()" class="btn btn-secondary">Hủy</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+<script>
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.btn-delete-user')) {
+            const btn = e.target.closest('.btn-delete-user');
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+
+            document.getElementById("userNameDisplay").innerText = name;
+            document.getElementById("deleteUserForm").action = '/admin/users/' + id + '/delete';
+            document.getElementById("userConfirmBox").style.display = "flex";
+        }
+    });
+
+    function hideUserConfirm() {
+        document.getElementById("userConfirmBox").style.display = "none";
+    }
+</script>
 </body>
 </html>
 
