@@ -47,11 +47,26 @@ public class ProfileController {
         this.lessonProgressService = lessonProgressService;
     }
 
+    // ──────────────────────────────────────────────────────────────
+    // ─────── USER PROFILE ENDPOINTS ────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
+
     @GetMapping("/profile")
     public String viewProfile(Model model, Principal principal) {
         if (principal == null) return "redirect:/auth/login";
 
         User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (isAdmin) {
+            return "redirect:/admin/profile";
+        }
+        
         List<Enrollment> enrollments = enrollmentService.findByUserId(user.getId());
         List<EnrollmentCourseProgressDTO> enrollmentProgress = new ArrayList<>();
 
@@ -85,6 +100,16 @@ public class ProfileController {
         if (principal == null) return "redirect:/auth/login";
 
         User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (isAdmin) {
+            return "redirect:/admin/profile/edit";
+        }
 
         model.addAttribute("user", user);
         model.addAttribute("userProfileDTO", buildProfileDTO(user));
@@ -103,7 +128,7 @@ public class ProfileController {
         User currentUser = userService.findByUsername(username);
         if (currentUser == null) return "redirect:/auth/login";
 
-        // Xử lý upload avatar
+        // Handle avatar upload
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
                 profileDTO.setAvatar(fileService.uploadFile(avatarFile));
@@ -123,8 +148,6 @@ public class ProfileController {
 
         try {
             userService.updateProfile(username, profileDTO);
-            // Làm mới SecurityContext ngay sau khi update
-            // để avatar/fullName trên header cập nhật luôn mà không cần logout
             refreshSecurityContext(username);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("user", currentUser);
@@ -158,9 +181,144 @@ public class ProfileController {
         }
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
+    // ─────── ADMIN PROFILE ENDPOINTS ────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
 
-    /** Tải lại UserDetails từ DB và cập nhật Authentication trong SecurityContext của session hiện tại */
+    @GetMapping("/admin/profile")
+    public String adminViewProfile(Model model, Principal principal) {
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("activeMenu", "profile");
+        return "admin/admin-view";
+    }
+
+    @GetMapping("/admin/profile/edit")
+    public String adminEditProfile(Model model, Principal principal) {
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile/edit";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("userProfileDTO", buildProfileDTO(user));
+        model.addAttribute("activeMenu", "profile");
+        return "admin/admin-edit";
+    }
+
+    @PostMapping("/admin/profile/edit")
+    public String adminUpdateProfile(@Valid @ModelAttribute("userProfileDTO") UserProfileDTO profileDTO,
+                                     BindingResult bindingResult,
+                                     @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
+                                     Principal principal,
+                                     Model model) {
+        if (principal == null) return "redirect:/auth/login";
+
+        String username = principal.getName();
+        User currentUser = userService.findByUsername(username);
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        // Handle avatar upload
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            try {
+                profileDTO.setAvatar(fileService.uploadFile(avatarFile));
+            } catch (Exception ex) {
+                model.addAttribute("user", currentUser);
+                model.addAttribute("updateError", ex.getMessage());
+                model.addAttribute("activeMenu", "profile");
+                return "admin/admin-edit";
+            }
+        } else {
+            profileDTO.setAvatar(currentUser.getAvatar());
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("activeMenu", "profile");
+            return "admin/admin-edit";
+        }
+
+        try {
+            userService.updateProfile(username, profileDTO);
+            refreshSecurityContext(username);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("updateError", ex.getMessage());
+            model.addAttribute("activeMenu", "profile");
+            return "admin/admin-edit";
+        }
+
+        return "redirect:/admin/profile?updated=true";
+    }
+
+    @PostMapping("/admin/profile/change-password")
+    public String adminChangePassword(@RequestParam("currentPassword") String currentPassword,
+                                      @RequestParam("newPassword") String newPassword,
+                                      @RequestParam("confirmPassword") String confirmPassword,
+                                      Principal principal,
+                                      Model model) {
+        if (principal == null) return "redirect:/auth/login";
+
+        String username = principal.getName();
+        User currentUser = userService.findByUsername(username);
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        try {
+            userService.changePassword(username, currentPassword, newPassword, confirmPassword);
+            return "redirect:/admin/profile/edit?passwordUpdated=true";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("userProfileDTO", buildProfileDTO(currentUser));
+            model.addAttribute("changePasswordError", ex.getMessage());
+            model.addAttribute("activeMenu", "profile");
+            return "admin/admin-edit";
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // ─────── HELPER METHODS ────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
+
     private void refreshSecurityContext(String username) {
         UserDetails updatedDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken newAuth =
@@ -180,4 +338,3 @@ public class ProfileController {
         return dto;
     }
 }
-
