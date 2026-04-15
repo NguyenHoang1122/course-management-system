@@ -5,7 +5,6 @@ import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.CourseRepository;
 import com.coursemanagementsystem.repository.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,30 +23,40 @@ public class CourseService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     public void saveFromDTO(CourseDTO dto) {
 
         Course course;
 
         if (dto.getId() != null) {
-            // Lấy entity từ DB
-            course = courseRepository.findById(dto.getId())
-                    .orElseThrow(() -> new RuntimeException("Course not found"));
+            // UPDATE
+            course = courseRepository.findById(dto.getId()).orElse(null);
 
-            //  Map vào object cũ
-            modelMapper.map(dto, course);
+            if (course == null) {
+                throw new RuntimeException("Course not found");
+            }
+
+            // map thủ công (AN TOÀN - không đụng tới relation)
+            course.setTitle(dto.getTitle());
+            course.setDescription(dto.getDescription());
+            course.setPrice(dto.getPrice());
 
         } else {
             // CREATE
-            course = modelMapper.map(dto, Course.class);
+            course = new Course();
+            course.setTitle(dto.getTitle());
+            course.setDescription(dto.getDescription());
+            course.setPrice(dto.getPrice());
             course.setCreatedAt(LocalDate.now());
         }
 
-        // 👉 xử lý relation riêng
+        // xử lý instructor (QUAN TRỌNG)
         if (dto.getInstructorId() != null) {
             User instructor = userRepository.findByIdAndDeletedFalse(dto.getInstructorId()).orElse(null);
+
+            if (instructor == null) {
+                throw new RuntimeException("Instructor không tồn tại");
+            }
+
             course.setInstructor(instructor);
         }
 
@@ -96,7 +105,6 @@ public class CourseService {
             dto.setInstructorId(course.getInstructor().getId());
         }
 
-        // Set lessons để hiển thị số bài học trong preview
         dto.setLessons(course.getLessons());
 
         return dto;
@@ -113,7 +121,7 @@ public class CourseService {
     public Course findByIdWithLessons(Long id) {
         Course course = courseRepository.findById(id).orElse(null);
         if (course != null) {
-            course.getLessons().size(); // trigger loading
+            course.getLessons().size();
         }
         return course;
     }
