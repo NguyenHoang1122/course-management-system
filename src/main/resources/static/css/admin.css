@@ -1696,3 +1696,129 @@ body.admin-sidebar-collapsed .sidebar-dropdown:hover .sidebar-submenu {
 }
 
 /* ... existing code ... */
+
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* khoảng cách giữa các lesson */
+}
+
+.lesson-item {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.lesson-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.lesson-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.lesson-actions {
+    display: flex;
+    gap: 8px;
+}
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Base */
+.lesson-item {
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+/* Xen kẽ màu */
+.lesson-item:nth-child(odd) {
+    background: #f8fafc; /* xám rất nhẹ */
+}
+
+.lesson-item:nth-child(even) {
+    background: #eef6ff; /* xanh rất nhạt */
+}
+
+/* Hover */
+.lesson-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Nội dung */
+.lesson-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.lesson-actions {
+    display: flex;
+    gap: 8px;
+}
+/* Background toàn trang */
+body {
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe, #fdf4ff);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Layer hiệu ứng động */
+body::before {
+    content: "";
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.25), transparent 70%);
+    animation: float1 12s infinite ease-in-out;
+    z-index: 0;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    bottom: -120px;
+    right: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(196, 181, 253, 0.25), transparent 70%);
+    animation: float2 15s infinite ease-in-out;
+    z-index: 0;
+}
+
+/* Animation chuyển động nhẹ */
+@keyframes float1 {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(40px, 40px);
+    }
+}
+
+@keyframes float2 {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-50px, -30px);
+    }
+}
+
+/* Đảm bảo content nổi lên trên background */
+.admin-shell,
+.admin-container {
+    position: relative;
+    z-index: 1;
+}

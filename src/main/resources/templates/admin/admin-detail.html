@@ -91,10 +91,6 @@
                             <span th:text="${iterStat.index + 1}"></span>.
                             <span th:text="${lesson.title}"></span>
                         </h4>
-                        <p th:if="${lesson.videoUrl}" th:text="${lesson.videoUrl}"></p>
-                        <p th:unless="${lesson.videoUrl}" style="color: var(--text-muted); font-style: italic;">
-                            Chưa có video
-                        </p>
                     </div>
                     <div class="lesson-actions">
                         <a th:if="${lesson.videoUrl}" th:href="${lesson.videoUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
