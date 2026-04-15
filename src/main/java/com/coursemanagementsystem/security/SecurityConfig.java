@@ -16,6 +16,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 import java.io.IOException;
 
@@ -25,9 +29,11 @@ import java.io.IOException;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final DataSource dataSource;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, DataSource dataSource) {
         this.userDetailsService = userDetailsService;
+        this.dataSource = dataSource;
     }
 
     @Bean
@@ -70,6 +76,13 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
+                )
+                .rememberMe(remember -> remember
+                        .tokenRepository(persistentTokenRepository())
+                        .key("uniqueAndSecretKeyForCourseManagementSystem") // Khóa bảo mật để token không bị vô hiệu khi restart server
+                        .tokenValiditySeconds(60 * 60 * 24 * 30) // Ghi nhớ trong 30 ngày
+                        .userDetailsService(userDetailsService)
+                        .rememberMeParameter("remember-me") // Khớp với name trong HTML
                 );
 
         return http.build();
@@ -109,5 +122,12 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        return tokenRepository;
     }
 }
