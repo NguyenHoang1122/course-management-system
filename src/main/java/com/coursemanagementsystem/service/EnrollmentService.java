@@ -90,4 +90,8 @@ public class EnrollmentService {
     public boolean isUserEnrolled(Long userId, Long courseId) {
         return enrollmentRepository.existsByUserIdAndCourseId((userId), courseId);
     }
+
+    public long countEnrollmentsByCourseId(Long courseId) {
+        return enrollmentRepository.countByCourseId(courseId);
+    }
 }

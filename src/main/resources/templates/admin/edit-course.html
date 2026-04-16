@@ -95,6 +95,30 @@
                     </small>
                 </div>
 
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="category">
+                        <i class="fas fa-tags"></i> Danh Mục
+                    </label>
+                    <input type="text" id="category" th:field="*{category}" class="form-control"
+                           placeholder="Ví dụ: Web Development, Data Science, Design...">
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Nhập chủ đề chính của khóa học.
+                    </small>
+                </div>
+
+                <!-- Image URL -->
+                <div class="form-group">
+                    <label for="imageUrl">
+                        <i class="fas fa-image"></i> link ảnh khóa học
+                    </label>
+                    <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
+                           placeholder="Nhập link ảnh (URL)">
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Sử dụng link ảnh từ Unsplash hoặc các nguồn host ảnh khác.
+                    </small>
+                </div>
+
                 <!-- Instructor -->
                 <div class="form-group">
                     <label for="instructorId">
@@ -121,6 +145,14 @@
                     </h4>
 
                     <div class="course-card">
+                        <div class="course-card-img" style="height: 150px; background: #eee; overflow: hidden;">
+                            <img id="preview-img" th:src="${courseDTO.imageUrl}" alt="" 
+                                 th:style="${courseDTO.imageUrl != null && !courseDTO.imageUrl.empty ? 'width: 100%; height: 100%; object-fit: cover; display: block;' : 'display: none; width: 100%; height: 100%; object-fit: cover;'}">
+                            <div id="preview-img-placeholder" 
+                                 th:style="${courseDTO.imageUrl != null && !courseDTO.imageUrl.empty ? 'display: none;' : 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc;'}">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                        </div>
                         <div class="course-card-header">
                             <h3 id="preview-title" th:text="${courseDTO.title}">Tên Khóa Học</h3>
                             <div class="price" id="preview-price"
@@ -133,6 +165,10 @@
                             <p id="preview-description" th:text="${courseDTO.description}">Mô tả khóa học sẽ hiển thị ở
                                 đây...</p>
                             <div class="course-meta-small">
+                                <small style="color: var(--text-muted);">
+                                    <i class="fas fa-tag"></i> <span id="preview-category" th:text="${courseDTO.category != null && !courseDTO.category.empty ? courseDTO.category : 'Chưa có danh mục'}">Chưa có danh mục</span>
+                                </small>
+                                <br>
                                 <small style="color: var(--text-muted);">
                                     <i class="fas fa-user-tie"></i> <span id="preview-instructor">Chưa chọn giảng viên</span>
                                 </small>
@@ -218,11 +254,16 @@
         const descriptionInput = document.getElementById('description');
         const priceInput = document.getElementById('price');
         const instructorSelect = document.getElementById('instructorId');
+        const categoryInput = document.getElementById('category');
+        const imageUrlInput = document.getElementById('imageUrl');
 
         const previewTitle = document.getElementById('preview-title');
         const previewDescription = document.getElementById('preview-description');
         const previewPrice = document.getElementById('preview-price');
         const previewInstructor = document.getElementById('preview-instructor');
+        const previewCategory = document.getElementById('preview-category');
+        const previewImg = document.getElementById('preview-img');
+        const previewImgPlaceholder = document.getElementById('preview-img-placeholder');
 
         function updateInstructorPreview() {
             const selectedOption = instructorSelect.options[instructorSelect.selectedIndex];
@@ -244,6 +285,26 @@
 
         instructorSelect.addEventListener('change', updateInstructorPreview);
         
+        categoryInput.addEventListener('input', function() {
+            previewCategory.textContent = this.value || 'Chưa có danh mục';
+        });
+
+        imageUrlInput.addEventListener('input', function() {
+            if (this.value) {
+                let url = this.value;
+                // Nếu là đường dẫn tương đối (như 'uploads/abc.png'), thêm / vào đầu để preview đúng từ gốc context
+                if (!url.startsWith('http') && !url.startsWith('/')) {
+                    url = '/' + url;
+                }
+                previewImg.src = url;
+                previewImg.style.display = 'block';
+                previewImgPlaceholder.style.display = 'none';
+            } else {
+                previewImg.style.display = 'none';
+                previewImgPlaceholder.style.display = 'flex';
+            }
+        });
+
         // Initial preview state
         updateInstructorPreview();
     });

@@ -25,5 +25,8 @@ public class CourseDTO {
     @NotNull(message = "Vui lòng chọn giảng viên")
     private Long instructorId;
 
+    private String imageUrl;
+    private String category;
+
     private List<?> lessons;
 }

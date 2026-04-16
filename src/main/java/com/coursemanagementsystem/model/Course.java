@@ -32,6 +32,9 @@ public class Course {
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
+    private String imageUrl; //anh thu nho khoa hoc
+    private String category; //danh muc khoa hoc
+
     @OneToMany(mappedBy = "course",fetch = FetchType.LAZY)
     private List<Lesson> lessons;
 }

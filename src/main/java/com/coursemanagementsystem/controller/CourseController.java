@@ -53,12 +53,22 @@ public class CourseController {
                 .mapToLong(course -> course.getPrice() != null ? course.getPrice().longValue() : 0)
                 .sum();
 
-        // Calculate total lessons
         long totalLessons = coursePage.getContent().stream()
                 .mapToLong(course -> course.getLessons() != null ? course.getLessons().size() : 0)
                 .sum();
 
+        // Pass student counts and ratings
+        java.util.Map<Long, Long> studentCounts = new java.util.HashMap<>();
+        java.util.Map<Long, Double> averageRatings = new java.util.HashMap<>();
+
+        for (Course course : coursePage.getContent()) {
+            studentCounts.put(course.getId(), enrollmentService.countEnrollmentsByCourseId(course.getId()));
+            averageRatings.put(course.getId(), reviewService.getAverageRating(course.getId()));
+        }
+
         model.addAttribute("coursePage", coursePage);
+        model.addAttribute("studentCounts", studentCounts);
+        model.addAttribute("averageRatings", averageRatings);
         model.addAttribute("courses", coursePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
@@ -148,6 +158,7 @@ public class CourseController {
         List<Course> courses = enrollmentService.getCoursesByUserId(user.getId());
 
         model.addAttribute("courses", courses);
+        model.addAttribute("user", user);
 
         return "course/my-courses";
     }

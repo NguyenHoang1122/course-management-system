@@ -1,97 +1,103 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
 <head>
-  <th:block th:replace="~{layout :: headMeta}"></th:block>
-  <title>Profile</title>
-  <th:block th:replace="~{layout :: headCoreCss}"></th:block>
-  <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Student Dashboard | Courses</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-    <div class="admin-shell-main">
-        <div class="container mt-5 mb-5">
-    <h2>Profile</h2>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-    <p th:if="${param.updated}" class="text-success">Cập nhật thông tin thành công!</p>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;"/>
-                    <img th:if="${#strings.isEmpty(user.avatar)}" src="https://via.placeholder.com/150" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;"/>
-                    
-                    <h5 th:text="${user.fullName}"></h5>
-                    <p class="text-muted" th:text="${user.userName}"></p>
-                    <a th:href="@{/profile/edit}" class="btn btn-primary mt-2">Edit Profile</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Thông tin cá nhân</h4>
-                </div>
-                <div class="card-body">
-                    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-                    <p><strong>Phone:</strong> <span th:text="${user.phone}"></span></p>
-                    <p><strong>Address:</strong> <span th:text="${user.address}"></span></p>
-                </div>
-            </div>
-
-            <!-- Only show enrolled courses section for non-admin users -->
-            <div class="card" th:if="${user.role == null or user.role.name != 'ADMIN'}">
-                <div class="card-header border-bottom-0">
-                    <h4 class="mb-0">Danh sách khóa học đã đăng ký</h4>
-                </div>
-                
-                <div class="card-body p-0">
-                    <div th:if="${enrollments != null and !enrollments.isEmpty()}" class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Khóa học</th>
-                                    <th>Giảng viên</th>
-                                    <th>Ngày đăng ký</th>
-                                    <th>Tiến độ</th>
-                                    <th>Trạng thái</th>
-                                    <th>Link</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="item : ${enrollmentProgress}">
-                                    <td th:text="${item.enrollment.course.title}"></td>
-                                    <td th:text="${item.enrollment.course.instructor != null ? item.enrollment.course.instructor.fullName : 'Unknown'}"></td>
-                                    <td th:text="${item.enrollment.enrolledAt != null ? #temporals.format(item.enrollment.enrolledAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
-                                    <td>
-                                        <span th:text="${item.completedLessons} + '/' + ${item.totalLessons}"></span>
-                                        <small th:text="' (' + ${item.progressPercent} + '%)'" class="text-muted"></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge"
-                                              th:classappend="${item.progressPercent == 100} ? ' bg-success' : (${item.progressPercent > 0} ? ' bg-warning' : ' bg-secondary')"
-                                              th:text="${item.learningStatus}"></span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{'/courses/' + ${item.enrollment.course.id}}" class="btn btn-sm btn-outline-primary">Vào học</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div th:if="${enrollments == null or enrollments.isEmpty()}" class="p-4 text-center">
-                        <p class="text-muted mb-0">Bạn chưa đăng ký khóa học nào.</p>
-                        <a th:href="@{/courses}" class="btn btn-outline-primary mt-3">Khám phá khóa học ngay</a>
-                    </div>
-                </div>
-            </div>
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Background Area -->
+    <div class="profile-hero" th:style="'background-image: url(' + (${user.coverPhoto != null} ? (${user.coverPhoto.startsWith('http') ? user.coverPhoto : (user.coverPhoto.startsWith('/') ? user.coverPhoto : '/' + user.coverPhoto)}) : 'https://images.unsplash.com/photo-1510070112810-d4e9a46d9e91?auto=format&fit=crop&q=80&w=1600') + ')'">
+        <div class="profile-hero-content">
+            <h1 th:text="'Hello, ' + ${user.fullName}">Hello, User</h1>
+            <p th:text="${user.bio != null and !user.bio.isEmpty() ? user.bio : 'Welcome to your learning dashboard.'}"></p>
         </div>
     </div>
-</div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{profile/fragments/sidebar :: profileSidebar('dashboard')}"></div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-main-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon enrolled"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${enrolledCount}">0</h4>
+                        <p>Enrolled Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active"><i class="fas fa-play"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${activeCount}">0</h4>
+                        <p>Active Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon completed"><i class="fas fa-check-double"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${completedCount}">0</h4>
+                        <p>Completed Courses</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enrolled Courses Section -->
+            <div class="course-section-header">
+                <h3>Current Courses</h3>
+                <a th:href="@{/courses/my-courses}" class="btn btn-sm btn-outline-primary" style="border-radius:20px;">View All</a>
+            </div>
+
+            <div class="row" th:if="${enrollmentProgress != null and !enrollmentProgress.isEmpty()}">
+                <div class="col-md-6 col-lg-4 mb-4" th:each="item : ${enrollmentProgress}">
+                    <div class="dashboard-course-card">
+                        <div class="db-course-image" th:style="'background-image: url(' + (${item.enrollment.course.imageUrl != null and !item.enrollment.course.imageUrl.isEmpty()} ? (${item.enrollment.course.imageUrl.startsWith('http') ? item.enrollment.course.imageUrl : (item.enrollment.course.imageUrl.startsWith('/') ? item.enrollment.course.imageUrl : '/' + item.enrollment.course.imageUrl)}) : 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800') + ')'"></div>
+                        <div class="db-course-body">
+                            <span class="db-course-category" th:text="${item.enrollment.course.category != null ? item.enrollment.course.category : 'General'}">Category</span>
+                            <h4 class="db-course-title" th:text="${item.enrollment.course.title}">Course Title</h4>
+                            
+                            <div class="db-course-progress">
+                                <div class="progress-label">
+                                    <span th:text="${item.learningStatus}">Status</span>
+                                    <span th:text="${item.progressPercent} + '%'">0%</span>
+                                </div>
+                                <div class="custom-progress-bar">
+                                    <div class="progress-fill" th:style="'width: ' + ${item.progressPercent} + '%'"></div>
+                                </div>
+                            </div>
+
+                            <a th:href="@{'/courses/' + ${item.enrollment.course.id}}" class="btn-continue">
+                                <span th:text="${item.progressPercent == 0 ? 'Start Learning' : 'Continue Learning'}">Continue</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${enrollmentProgress == null or enrollmentProgress.isEmpty()}" class="text-center py-5 bg-white border-radius-20 shadow-sm" style="border-radius:20px;">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-2130356-1800917.png" style="width: 200px; opacity: 0.6;">
+                <h4 class="mt-4">You haven't enrolled in any courses yet.</h4>
+                <p class="text-muted">Start your learning journey today!</p>
+                <a th:href="@{/courses}" class="btn btn-primary mt-3 px-5 py-3 rounded-pill">Explore Courses</a>
+            </div>
+
+        </main>
+    </div>
 </div>
 
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
 </body>

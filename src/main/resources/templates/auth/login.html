@@ -10,7 +10,7 @@
 
 <body class="auth-page">
 
-<div th:replace="~{layout :: siteHeader}"></div>
+<div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
 <div class="login-container">
     <form class="login-wrapper" th:action="@{/auth/login}" method="post">
