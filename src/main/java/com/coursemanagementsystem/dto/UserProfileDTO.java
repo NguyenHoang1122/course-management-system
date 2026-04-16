@@ -28,5 +28,8 @@ public class UserProfileDTO {
     @Size(max = 255, message = "Địa chỉ không được vượt quá 255 ký tự")
     private String address;
 
+    @Size(max = 1000, message = "Giới thiệu bản thân không được vượt quá 1000 ký tự")
+    private String bio;
+
     private String avatar; // set by controller from uploaded file
 }

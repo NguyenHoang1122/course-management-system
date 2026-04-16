@@ -69,6 +69,9 @@ public class ProfileController {
         
         List<Enrollment> enrollments = enrollmentService.findByUserId(user.getId());
         List<EnrollmentCourseProgressDTO> enrollmentProgress = new ArrayList<>();
+        long enrolledCount = enrollments.size();
+        long activeCount = 0;
+        long completedCount = 0;
 
         for (Enrollment enrollment : enrollments) {
             long totalLessons = enrollment.getCourse() != null && enrollment.getCourse().getLessons() != null
@@ -79,6 +82,9 @@ public class ProfileController {
                     : lessonProgressService.countCompletedLessons(user.getId(), enrollment.getCourse().getId());
             int progressPercent = totalLessons == 0 ? 0 : (int) ((completedLessons * 100) / totalLessons);
             String learningStatus = progressPercent == 100 ? "Hoan thanh" : (progressPercent > 0 ? "Dang hoc" : "Chua bat dau");
+
+            if (progressPercent == 100) completedCount++;
+            else if (progressPercent > 0) activeCount++;
 
             enrollmentProgress.add(new EnrollmentCourseProgressDTO(
                     enrollment,
@@ -92,6 +98,9 @@ public class ProfileController {
         model.addAttribute("user", user);
         model.addAttribute("enrollments", enrollments);
         model.addAttribute("enrollmentProgress", enrollmentProgress);
+        model.addAttribute("enrolledCount", enrolledCount);
+        model.addAttribute("activeCount", activeCount);
+        model.addAttribute("completedCount", completedCount);
         return "profile/view";
     }
 
@@ -335,6 +344,7 @@ public class ProfileController {
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
+        dto.setBio(user.getBio());
         return dto;
     }
 }

@@ -39,6 +39,8 @@ public class CourseService {
             course.setTitle(dto.getTitle());
             course.setDescription(dto.getDescription());
             course.setPrice(dto.getPrice());
+            course.setImageUrl(dto.getImageUrl());
+            course.setCategory(dto.getCategory());
 
         } else {
             // CREATE
@@ -46,6 +48,8 @@ public class CourseService {
             course.setTitle(dto.getTitle());
             course.setDescription(dto.getDescription());
             course.setPrice(dto.getPrice());
+            course.setImageUrl(dto.getImageUrl());
+            course.setCategory(dto.getCategory());
             course.setCreatedAt(LocalDate.now());
         }
 
@@ -100,6 +104,8 @@ public class CourseService {
         dto.setTitle(course.getTitle());
         dto.setDescription(course.getDescription());
         dto.setPrice(course.getPrice());
+        dto.setImageUrl(course.getImageUrl());
+        dto.setCategory(course.getCategory());
 
         if (course.getInstructor() != null) {
             dto.setInstructorId(course.getInstructor().getId());

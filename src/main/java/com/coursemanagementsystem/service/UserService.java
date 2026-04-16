@@ -147,6 +147,7 @@ public class UserService {
             user.setAvatar(profileDTO.getAvatar());
             user.setPhone(profileDTO.getPhone() == null ? null : profileDTO.getPhone().trim());
             user.setAddress(profileDTO.getAddress() == null ? null : profileDTO.getAddress().trim());
+            user.setBio(profileDTO.getBio() == null ? null : profileDTO.getBio().trim());
 
             userRepository.save(user);
         }

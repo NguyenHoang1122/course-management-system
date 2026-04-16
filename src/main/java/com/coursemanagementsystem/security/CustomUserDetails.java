@@ -15,6 +15,8 @@ public class CustomUserDetails implements UserDetails {
     private final String password;
     private final String fullName;
     private final String avatar;
+    private final String bio;
+    private final String coverPhoto;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
@@ -23,6 +25,8 @@ public class CustomUserDetails implements UserDetails {
         this.password = user.getPassword();
         this.fullName = user.getFullName();
         this.avatar = user.getAvatar();
+        this.bio = user.getBio();
+        this.coverPhoto = user.getCoverPhoto();
         this.authorities = authorities;
     }
 

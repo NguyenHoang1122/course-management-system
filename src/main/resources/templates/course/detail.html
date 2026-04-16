@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<div th:replace="~{layout :: siteHeader}"></div>
+<div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
 <div class="admin-container">
     <div class="admin-header">
@@ -29,6 +29,10 @@
         <div th:if="${enrolledSuccess}" class="alert alert-success" th:text="${enrolledSuccess}"></div>
         <div class="row">
             <div class="col-lg-12">
+                <div class="course-detail-header-wrap mb-4" style="border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
+                         alt="Course Banner" style="width: 100%; height: 400px; object-fit: cover;">
+                </div>
                 <div class="course-info">
                         <h2 th:text="${course.title}" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;"></h2>
                     <p class="course-description"

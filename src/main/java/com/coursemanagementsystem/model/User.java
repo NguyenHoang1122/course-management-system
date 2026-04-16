@@ -46,6 +46,11 @@ public class User {
     @Size(max = 255, message = "Address must be less than 255 characters")
     private String address;
 
+    @Size(max = 1000, message = "Bio must be less than 1000 characters")
+    private String bio; // Giới thiệu ngắn
+
+    private String coverPhoto; // URL ảnh bìa hồ sơ
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
