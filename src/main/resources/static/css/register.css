@@ -1,0 +1,162 @@
+/* ===== REGISTER FORM VALIDATION STYLES ===== */
+.form-group {
+    position: relative;
+    margin-bottom: 1.2rem;
+}
+
+.form-group input {
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Valid state */
+.form-group input.is-valid {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
+}
+
+/* Invalid state */
+.form-group input.is-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+/* Validation icons inside input */
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper .validation-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    pointer-events: none;
+    display: none;
+}
+
+/* Push icon left if there's a password toggle */
+.form-input .input-wrapper .validation-icon {
+    right: 44px;
+}
+
+.input-wrapper .validation-icon.icon-valid {
+    color: #10b981;
+}
+
+.input-wrapper .validation-icon.icon-invalid {
+    color: #ef4444;
+}
+
+/* Error message below field */
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ef4444;
+    font-size: 0.78rem;
+    margin-top: 5px;
+    animation: slideDown 0.2s ease;
+}
+
+.field-error i {
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* Success hint */
+.field-success {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #10b981;
+    font-size: 0.78rem;
+    margin-top: 5px;
+    animation: slideDown 0.2s ease;
+}
+
+/* Password strength bar */
+.password-strength-bar {
+    margin-top: 8px;
+    height: 4px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    overflow: hidden;
+    display: none;
+}
+
+.password-strength-bar .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.35s ease, background 0.35s ease;
+    width: 0%;
+}
+
+.strength-label {
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: none;
+}
+
+/* Password requirements checklist */
+.password-requirements {
+    margin-top: 8px;
+}
+
+.password-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.password-requirements ul li {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+}
+
+.password-requirements ul li i {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+.password-requirements ul li.req-met {
+    color: #10b981;
+}
+
+.password-requirements ul li.req-met i {
+    color: #10b981;
+}
+
+/* Alert box */
+.alert-danger {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+/* Keyframes */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Submit button disabled state */
+.btn-register:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+

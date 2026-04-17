@@ -12,6 +12,7 @@
         <link rel="stylesheet" th:href="@{/css/style.css}">
         <link rel="stylesheet" th:href="@{/css/custom.css}">
     </th:block>
+    <!-- Custom style for app store/play buttons and footer color is now in custom.css -->
 </head>
 <body>
 
@@ -98,12 +99,6 @@
                         </div>
                     </div>
                 </th:block>
-
-                <!-- Circular Cart Box -->
-                <a href="#" class="unified-cart-box">
-                    <i class="fas fa-shopping-basket"></i>
-                    <div class="cart-badge-blue">0</div>
-                </a>
             </div>
         </div>
     </div>
@@ -159,19 +154,16 @@
                         <div class="footer-tittle">
                             <h4>Support</h4>
                             <div class="app-buttons mt-20">
-                                <a href="#" class="btn btn-outline-light mb-2 d-flex align-items-center" style="border-radius: 10px; padding: 10px 15px !important;">
-                                    <i class="fab fa-apple mr-2" style="font-size: 20px;"></i>
-                                    <div class="text-left" style="line-height: 1;">
-                                        <small style="font-size: 10px;">Download on the</small><br>
-                                        <strong>App Store</strong>
-                                    </div>
+                                <a href="#" class="btn custom-app-btn mb-3"
+                                   style="border-radius: 50px; height: 55px; width: 210px; text-decoration: none;">
+                                    <i class="fab fa-apple"></i>
+                                    <span style="font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">App Store</span>
                                 </a>
-                                <a href="#" class="btn btn-outline-light d-flex align-items-center" style="border-radius: 10px; padding: 10px 15px !important;">
-                                    <i class="fab fa-google-play mr-2" style="font-size: 20px;"></i>
-                                    <div class="text-left" style="line-height: 1;">
-                                        <small style="font-size: 10px;">GET IT ON</small><br>
-                                        <strong>Google Play</strong>
-                                    </div>
+
+                                <a href="#" class="btn custom-app-btn"
+                                   style="border-radius: 50px; height: 55px; width: 210px; text-decoration: none;">
+                                    <i class="fab fa-google-play"></i>
+                                    <span style="font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Google Play</span>
                                 </a>
                             </div>
                         </div>
@@ -186,7 +178,7 @@
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6">
                     <div class="footer-copy-right">
-                        <p style="margin:0; font-size: 14px; color: rgba(255,255,255,0.6);">
+                        <p style="margin:0; font-size: 14px;">
                             Copyright © 2026 Coursua WordPress Theme by Abbas.
                         </p>
                     </div>
