@@ -32,6 +32,7 @@
     <div class="admin-content">
         <div class="form-container">
             <form th:action="@{/admin/save-course}" th:object="${courseDTO}" method="post" id="courseForm" novalidate>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
                 <!-- Hidden ID -->
                 <input type="hidden" th:field="*{id}">

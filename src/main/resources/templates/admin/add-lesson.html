@@ -51,6 +51,7 @@
         <div class="form-container">
             <form th:action="${lessonDTO.id == null ? '/admin/save-lesson' : '/admin/update-lesson'}" 
                   th:object="${lessonDTO}" method="post" id="lessonForm" novalidate>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
                 <input type="hidden" th:field="*{id}" />
                 <!-- Course select when creating from sidebar (no pre-selected course) -->

@@ -76,8 +76,16 @@ public class AdminController {
     @PostMapping("/users/{id}/role")
     public String updateUserRole(@PathVariable("id") Long id,
                                  @RequestParam("roleName") String roleName,
+                                 Principal principal,
                                  RedirectAttributes redirectAttributes) {
         try {
+            // Check if current user is admin
+            User currentUser = principal == null ? null : userService.findByUsername(principal.getName());
+            if (currentUser == null || !isAdminRole(currentUser)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
+                return "redirect:/admin/user-list";
+            }
+
             userService.updateUserRole(id, roleName);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật vai trò thành công.");
         } catch (IllegalArgumentException ex) {
@@ -86,17 +94,29 @@ public class AdminController {
         return "redirect:/admin/user-list";
     }
 
+    private boolean isAdminRole(User user) {
+        return user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getName());
+    }
+
     @PostMapping("/users/{id}/delete")
     public String softDeleteUser(@PathVariable("id") Long id,
                                  Principal principal,
                                  RedirectAttributes redirectAttributes) {
-        User currentUser = principal == null ? null : userService.findByUsername(principal.getName());
-        if (currentUser != null && currentUser.getId().equals(id)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không thể tự xóa chính mình.");
-            return "redirect:/admin/user-list";
-        }
-
         try {
+            User currentUser = principal == null ? null : userService.findByUsername(principal.getName());
+
+            // Check if current user is admin
+            if (currentUser == null || !isAdminRole(currentUser)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
+                return "redirect:/admin/user-list";
+            }
+
+            // Check if trying to delete self
+            if (currentUser.getId().equals(id)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Bạn không thể tự xóa chính mình.");
+                return "redirect:/admin/user-list";
+            }
+
             userService.softDeleteUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "Đã chuyển user vào thùng rác.");
         } catch (IllegalArgumentException ex) {
@@ -107,8 +127,16 @@ public class AdminController {
 
     @PostMapping("/users/{id}/restore")
     public String restoreUser(@PathVariable("id") Long id,
+                              Principal principal,
                               RedirectAttributes redirectAttributes) {
         try {
+            // Check if current user is admin
+            User currentUser = principal == null ? null : userService.findByUsername(principal.getName());
+            if (currentUser == null || !isAdminRole(currentUser)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
+                return "redirect:/admin/user-trash";
+            }
+
             userService.restoreUser(id);
             redirectAttributes.addFlashAttribute("successMessage", "Khôi phục user thành công.");
         } catch (IllegalArgumentException ex) {

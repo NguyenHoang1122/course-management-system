@@ -54,10 +54,13 @@
                             <td class="action-cell">
                                 <div class="user-actions">
                                     <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post" class="user-role-form"
-                                          th:if="${user.role == null or user.role.name != 'ADMIN'}">
-                                        <select name="roleName" class="form-control user-action-control user-role-select" th:id="${'roleSelect_' + user.id}" aria-label="Vai trò">
+                                          th:if="${user.role == null or (user.role != null and user.role.name != 'ADMIN')}">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <select name="roleName" class="form-control user-action-control user-role-select"
+                                                th:id="${'roleSelect_' + user.id}" aria-label="Vai trò" required>
+                                            <option value="">-- Chọn vai trò --</option>
                                             <option value="STUDENT" th:selected="${user.role != null and user.role.name == 'STUDENT'}">STUDENT</option>
-                                            <option value="TEACHER" th:selected="${user.role != null and user.role.name == 'INSTRUCTOR'}">TEACHER</option>
+                                            <option value="INSTRUCTOR" th:selected="${user.role != null and user.role.name == 'INSTRUCTOR'}">TEACHER</option>
                                         </select>
                                         <button type="submit" class="btn btn-outline-primary user-action-control user-btn-save-role">
                                             <i class="fas fa-save"></i> Lưu role
@@ -67,7 +70,7 @@
                                     <span class="role-badge role-admin" th:if="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</span>
 
                                     <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post"
-                                          th:if="${user.role == null or user.role.name != 'ADMIN'}">
+                                          th:if="${user.role == null or (user.role != null and user.role.name != 'ADMIN')}">
                                         <button type="button"
                                                 class="btn btn-outline-danger user-action-control btn-delete-user"
                                                 th:data-id="${user.id}"
@@ -95,6 +98,7 @@
 
                 <div class="modal-actions">
                     <form id="deleteUserForm" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <button type="submit" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Xóa
                         </button>
