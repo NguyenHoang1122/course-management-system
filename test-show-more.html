@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SHOW MORE Button</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fb;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            padding: 28px;
+        }
+
+        h2 {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .about-text {
+            font-size: 14.5px;
+            color: #374151;
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+
+        .show-more-btn {
+            display: inline-block;
+            color: #6d28d9;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            padding: 8px 0;
+            margin: 8px 0 0 0;
+            font-family: inherit;
+            transition: color 0.2s ease;
+            outline: none;
+        }
+
+        .show-more-btn:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+
+        .show-more-btn:focus {
+            outline: 2px solid #6d28d9;
+            outline-offset: 2px;
+        }
+
+        .show-more-btn:active {
+            color: #6d28d9;
+        }
+
+        .show-more-btn i {
+            margin-right: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .about-text-clamp {
+            overflow: hidden;
+            max-height: 80px;
+            transition: max-height 0.4s ease;
+        }
+
+        .about-text-clamp.expanded {
+            max-height: 2000px;
+            overflow: visible;
+        }
+
+        .debug-info {
+            margin-top: 30px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            border-left: 4px solid #6d28d9;
+            font-size: 12px;
+            color: #374151;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Test SHOW MORE Button</h2>
+
+        <div class="about-text">
+            <div class="about-text-clamp" id="aboutText">
+                Spring Boot là một framework được xây dựng trên nền tảng của Spring Framework. Nó được thiết kế để đơn giản hóa việc phát triển các ứng dụng dựa trên Spring bằng cách cung cấp các giá trị mặc định hợp lý và tự động cấu hình. Spring Boot cho phép bạn tạo các ứng dụng Spring độc lập, ở mức production-ready mà chỉ cần tối thiểu các cấu hình.
+
+                Với Spring Boot, bạn có thể:
+                - Tạo các ứng dụng Spring độc lập và nhanh chóng
+                - Nhúng Tomcat, Jetty hoặc Undertow trực tiếp (không cần triển khai WAR)
+                - Cung cấp các "starter" POM đơn giản hóa cấu hình Maven của bạn
+                - Tự động cấu hình Spring bất cứ khi nào có thể
+                - Cung cấp các tính năng sẵn sàng cho sản xuất như số liệu thống kê và giám sát sức khỏe
+                - Hoàn toàn không có tạo mã và không yêu cầu cấu hình XML
+
+                Spring Boot là lựa chọn tốt nhất cho việc xây dựng các ứng dụng web hiện đại, microservices, và các ứng dụng doanh nghiệp.
+            </div>
+            <button type="button" class="show-more-btn" id="showMoreBtn">
+                <i class="fas fa-plus-circle"></i> SHOW MORE
+            </button>
+        </div>
+
+        <div class="debug-info">
+            <strong>Debug Console:</strong><br>
+            <div id="debugLog"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            var debugLog = document.getElementById('debugLog');
+            var timestamp = new Date().toLocaleTimeString();
+            debugLog.innerHTML += timestamp + ' - ' + message + '<br>';
+            console.log(message);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded');
+
+            var showMoreBtn = document.getElementById('showMoreBtn');
+            var aboutText = document.getElementById('aboutText');
+
+            log('showMoreBtn found: ' + (showMoreBtn ? 'YES' : 'NO'));
+            log('aboutText found: ' + (aboutText ? 'YES' : 'NO'));
+
+            if (showMoreBtn && aboutText) {
+                log('Scroll height: ' + aboutText.scrollHeight);
+                log('Client height: ' + aboutText.clientHeight);
+
+                showMoreBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    log('SHOW MORE button clicked!');
+
+                    if (aboutText.classList.contains('expanded')) {
+                        log('Collapsing text...');
+                        aboutText.classList.remove('expanded');
+                        showMoreBtn.innerHTML = '<i class="fas fa-plus-circle"></i> SHOW MORE';
+                    } else {
+                        log('Expanding text...');
+                        aboutText.classList.add('expanded');
+                        showMoreBtn.innerHTML = '<i class="fas fa-minus-circle"></i> SHOW LESS';
+                    }
+
+                    return false;
+                }, false);
+
+                log('Click handler attached successfully');
+            } else {
+                log('ERROR: Elements not found!');
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -108,6 +108,7 @@ public class CourseController {
         model.addAttribute("averageRating", reviewService.getAverageRating(id));
         model.addAttribute("reviews", reviewService.getReviewsByCourseId(id));
         model.addAttribute("userReview", userReview);
+        model.addAttribute("studentCount", enrollmentService.countEnrollmentsByCourseId(id));
         return "course/detail";
     }
 
