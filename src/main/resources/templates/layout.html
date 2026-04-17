@@ -12,12 +12,6 @@
         <link rel="stylesheet" th:href="@{/css/style.css}">
         <link rel="stylesheet" th:href="@{/css/custom.css}">
     </th:block>
-
-    <th:block th:fragment="coreScripts">
-        <script th:src="@{/js/vendor/jquery-1.12.4.min.js}"></script>
-        <script th:src="@{/js/bootstrap.min.js}"></script>
-        <script th:src="@{/js/main.js}"></script>
-    </th:block>
 </head>
 <body>
 
@@ -26,7 +20,7 @@
         id="mainHeader">
     <div class="container">
         <div class="header-container">
-            <!-- Branding (anh7.png style) -->
+            <!-- Branding -->
             <a th:href="@{/}" class="unified-logo">
                 <div class="logo-icon-box">
                     <div class="logo-line"></div>
@@ -36,7 +30,7 @@
                 <span>COURSIA</span>
             </a>
 
-            <!-- Navigation (Persistent & Intuitive) -->
+            <!-- Navigation -->
             <nav class="unified-navigation-bar">
                 <ul class="unified-nav">
                     <li><a th:href="@{/}">Home</a></li>
@@ -105,7 +99,7 @@
                     </div>
                 </th:block>
 
-                <!-- Circular Cart Box (anh7.png style) -->
+                <!-- Circular Cart Box -->
                 <a href="#" class="unified-cart-box">
                     <i class="fas fa-shopping-basket"></i>
                     <div class="cart-badge-blue">0</div>
@@ -115,7 +109,7 @@
     </div>
 </header>
 
-<<footer class="footer-area premium-footer" th:fragment="siteFooter">
+<footer class="footer-area premium-footer" th:fragment="siteFooter">
     <div class="footer-top footer-padding" style="padding-top: 150px; background: #2f3e83;">
         <div class="container">
             <div class="row">
@@ -209,32 +203,100 @@
         </div>
     </div>
 </footer>
+
+<th:block th:fragment="coreScripts">
+    <!-- Search Overlay (Universal) -->
+    <div id="search-overlay" class="search-overlay-unified">
+        <div class="search-overlay-close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="search-overlay-content">
+            <div class="search-container-inner">
+                <div class="search-header-text">
+                    <h2>Search Courses</h2>
+                    <p>Find your next learning adventure</p>
+                </div>
+                <form th:action="@{/courses}" method="get" class="unified-search-form">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon-main"></i>
+                        <input type="text" name="keyword" placeholder="What do you want to learn today?" class="unified-search-input" autocomplete="off">
+                        <button type="submit" class="search-submit-button">Search</button>
+                    </div>
+                    <div class="popular-searches">
+                        <span>Popular:</span>
+                        <a href="/courses?keyword=Java">Java</a>
+                        <a href="/courses?keyword=Python">Python</a>
+                        <a href="/courses?keyword=Web">Web Development</a>
+                        <a href="/courses?keyword=UI">UI/UX</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/vendor/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
     <script>
-        // Sticky Header & Scroll Effect Logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const header = document.getElementById('mainHeader');
-            // Check if we are on a page with a transparent header requirement (like Home)
-            const isTransparentInitial = header.classList.contains('header-transparent');
+        $(document).ready(function() {
+            // Re-bind events to the document to handle fragments loaded dynamically
+            $(document).on('click', '.search-trigger', function(e) {
+                e.preventDefault();
+                $('#search-overlay').addClass('active');
+                $('body').css('overflow', 'hidden'); 
+                setTimeout(function() {
+                    $('.unified-search-input').focus();
+                }, 400);
+            });
 
-            function handleScroll() {
-                if (window.scrollY > 50) {
-                    header.classList.add('header-sticky');
-                    if (isTransparentInitial) {
-                        header.classList.remove('header-transparent');
-                        header.classList.add('header-solid');
-                    }
-                } else {
-                    header.classList.remove('header-sticky');
-                    if (isTransparentInitial) {
-                        header.classList.add('header-transparent');
-                        header.classList.remove('header-solid');
-                    }
+            $(document).on('click', '.search-overlay-close-btn', function() {
+                $('#search-overlay').removeClass('active');
+                $('body').css('overflow', ''); 
+            });
+
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape' && $('#search-overlay').hasClass('active')) {
+                    $('#search-overlay').removeClass('active');
+                    $('body').css('overflow', ''); 
                 }
-            }
+            });
 
-            window.addEventListener('scroll', handleScroll);
-            handleScroll(); // Initial check on load
+            $(document).on('click', '#search-overlay', function(e) {
+                if ($(e.target).is('#search-overlay')) {
+                    $('#search-overlay').removeClass('active');
+                    $('body').css('overflow', ''); 
+                }
+            });
         });
     </script>
+</th:block>
+
+<script>
+    // Sticky Header & Scroll Effect Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.getElementById('mainHeader');
+        if (!header) return;
+        const isTransparentInitial = header.classList.contains('header-transparent');
+
+        function handleScroll() {
+            if (window.scrollY > 50) {
+                header.classList.add('header-sticky');
+                if (isTransparentInitial) {
+                    header.classList.remove('header-transparent');
+                    header.classList.add('header-solid');
+                }
+            } else {
+                header.classList.remove('header-sticky');
+                if (isTransparentInitial) {
+                    header.classList.add('header-transparent');
+                    header.classList.remove('header-solid');
+                }
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+    });
+</script>
 </body>
 </html>
