@@ -108,6 +108,7 @@
 
         <div class="modal-actions">
             <form id="deleteLessonForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash"></i> Xóa
                 </button>

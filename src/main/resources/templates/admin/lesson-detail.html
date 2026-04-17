@@ -65,6 +65,7 @@
                     </a>
                     <form method="post" th:action="@{/admin/delete-lesson/{id}(id=${lesson.id})}"
                           onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài học này không?')">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <button type="submit" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Xóa bài học
                         </button>
