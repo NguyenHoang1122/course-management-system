@@ -1,192 +1,905 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
-    <title>Chi Tiết Khóa Học - Course Management System</title>
-
+    <title th:text="${course.title} + ' - Coursia'">Chi Tiết Khóa Học</title>
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
-</head>
+    <style>
+        /* ========== COURSE DETAIL HERO ========== */
+        .course-detail-hero {
+            background: linear-gradient(135deg, #4a1fa8 0%, #6b35c9 40%, #8257e5 70%, #a78bfa 100%);
+            padding: 80px 0 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .course-detail-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .course-detail-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-breadcrumb a { color: rgba(255,255,255,0.75); text-decoration: none; transition: color .2s; }
+        .hero-breadcrumb a:hover { color: #fff; }
+        .hero-breadcrumb span { color: rgba(255,255,255,0.5); }
+        .hero-breadcrumb .current { color: #fff; }
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.3;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+        }
 
+        /* ========== PAGE LAYOUT ========== */
+        .course-detail-page {
+            background: #f8f9fb;
+            padding: 40px 0 80px;
+        }
+        .course-detail-main { flex: 1; min-width: 0; }
+        .course-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* ========== COURSE CARD SECTIONS ========== */
+        .cd-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .cd-card:last-child { margin-bottom: 0; }
+
+        /* ========== COURSE HEADER CARD ========== */
+        .course-stars { color: #f59e0b; font-size: 15px; margin-bottom: 8px; }
+        .course-stars span { color: #6b7280; font-size: 13px; margin-left: 6px; font-weight: 500; }
+        .course-title-main {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin: 8px 0 10px;
+            line-height: 1.3;
+        }
+        .course-category-badge {
+            display: inline-block;
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .3px;
+        }
+
+        /* ========== COURSE IMAGE / VIDEO ========== */
+        .course-media-wrap {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0a0a1a;
+            aspect-ratio: 16/9;
+        }
+        .course-media-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: .85;
+        }
+        .play-btn-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px;
+            height: 64px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform .25s, box-shadow .25s;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+        }
+        .play-btn-overlay:hover { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .play-btn-overlay i { color: #6d28d9; font-size: 24px; margin-left: 4px; }
+        .media-duration-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        /* ========== TABS ========== */
+        .cd-tabs {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            gap: 0;
+            margin-bottom: 24px;
+        }
+        .cd-tab-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color .2s, border-color .2s;
+        }
+        .cd-tab-btn.active {
+            color: #6d28d9;
+            border-bottom-color: #6d28d9;
+        }
+        .cd-tab-content { display: none; }
+        .cd-tab-content.active { display: block; }
+
+        /* ========== ABOUT SECTION ========== */
+        .about-text {
+            font-size: 14.5px;
+            color: #374151;
+            line-height: 1.75;
+        }
+        .show-more-btn {
+            display: inline-block;
+            align-items: center;
+            gap: 6px;
+            color: #6d28d9;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            padding: 8px 0;
+            margin: 8px 0 0 0;
+            font-family: inherit;
+            transition: color 0.2s ease;
+            outline: none;
+        }
+        .show-more-btn:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+        .show-more-btn:focus {
+            outline: 2px solid #6d28d9;
+            outline-offset: 2px;
+        }
+        .show-more-btn:active {
+            color: #6d28d9;
+        }
+        .show-more-btn i {
+            margin-right: 4px;
+            transition: transform 0.2s ease;
+        }
+        .about-text-clamp {
+            overflow: hidden;
+            max-height: 80px;
+            transition: max-height 0.4s ease;
+        }
+        .about-text-clamp.expanded {
+            max-height: 2000px;
+            overflow: visible;
+        }
+
+        /* ========== WHAT YOU LEARN ========== */
+        .section-title-sm {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+        }
+        .learn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+        }
+        .learn-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13.5px;
+            color: #374151;
+        }
+        .learn-item i { color: #6d28d9; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+        /* ========== ACCORDION (Lessons) ========== */
+        .cd-accordion { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .cd-acc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: #f3f4f6;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background .2s;
+            user-select: none;
+        }
+        .cd-acc-header:hover { background: #ede9fe; }
+        .cd-acc-header.open { background: #ede9fe; color: #6d28d9; }
+        .cd-acc-header .acc-chevron { transition: transform .25s; }
+        .cd-acc-header.open .acc-chevron { transform: rotate(180deg); }
+        .cd-acc-body { display: none; border-bottom: 1px solid #e5e7eb; }
+        .cd-acc-body:last-child { border-bottom: none; }
+        .cd-acc-body.open { display: block; }
+        .cd-lesson-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13.5px;
+            color: #374151;
+        }
+        .cd-lesson-row:last-child { border-bottom: none; }
+        .cd-lesson-row .lesson-left { display: flex; align-items: center; gap: 10px; }
+        .cd-lesson-row .lesson-left i { color: #6d28d9; font-size: 13px; }
+        .cd-lesson-row .lesson-duration { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+        .acc-section-meta { font-size: 12px; color: #9ca3af; font-weight: 400; }
+
+        /* ========== REVIEWS ========== */
+        .review-summary {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+        .review-big-score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #1a1a2e;
+            line-height: 1;
+        }
+        .review-stars-row { color: #f59e0b; font-size: 18px; margin-bottom: 4px; }
+        .review-count { font-size: 13px; color: #9ca3af; }
+        .review-item {
+            display: flex;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .review-item:last-child { border-bottom: none; }
+        .reviewer-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6d28d9, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 16px;
+            flex-shrink: 0;
+        }
+        .review-body { flex: 1; }
+        .reviewer-name { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
+        .reviewer-stars { color: #f59e0b; font-size: 12px; margin-bottom: 6px; }
+        .reviewer-text { font-size: 13.5px; color: #6b7280; line-height: 1.6; }
+
+        /* Review Form */
+        .review-form-section { margin-top: 24px; }
+        .star-picker { display: flex; gap: 8px; margin-bottom: 14px; }
+        .star-picker input[type="radio"] { display: none; }
+        .star-picker label { font-size: 26px; color: #d1d5db; cursor: pointer; transition: color .15s; }
+        .star-picker label:hover,
+        .star-picker label.selected { color: #f59e0b; }
+        .cd-textarea {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            resize: vertical;
+            color: #374151;
+            transition: border-color .2s;
+        }
+        .cd-textarea:focus { outline: none; border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(109,40,217,0.08); }
+        .btn-submit-review {
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .2s, transform .2s;
+            margin-top: 10px;
+        }
+        .btn-submit-review:hover { opacity: .9; transform: translateY(-1px); }
+
+        /* ========== SIDEBAR ========== */
+        .cd-sidebar { position: sticky; top: 100px; }
+        .price-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .price-card-body { padding: 24px; }
+        .price-main {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .price-original {
+            font-size: 14px;
+            color: #9ca3af;
+            text-decoration: line-through;
+            margin-bottom: 16px;
+        }
+        .btn-enroll {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .2s, transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 20px rgba(109,40,217,0.35);
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            letter-spacing: .3px;
+        }
+        .btn-enroll:hover { opacity: .92; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(109,40,217,0.4); color: #fff; }
+        .btn-enrolled {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            letter-spacing: .3px;
+        }
+        .course-meta-list { margin-top: 20px; }
+        .course-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13.5px;
+            color: #374151;
+        }
+        .course-meta-item:last-child { border-bottom: none; }
+        .course-meta-item i { color: #6d28d9; width: 16px; text-align: center; }
+        .course-meta-item span { color: #9ca3af; min-width: 80px; }
+
+        /* Instructor card */
+        .instructor-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .instructor-card h6 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .instructor-info { display: flex; align-items: center; gap: 12px; }
+        .instructor-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6d28d9, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 800; font-size: 18px;
+            flex-shrink: 0;
+        }
+        .instructor-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .instructor-name-text { font-weight: 700; font-size: 15px; color: #1a1a2e; }
+        .instructor-role { font-size: 12px; color: #9ca3af; }
+
+        /* Sidebar list cards */
+        .sidebar-list-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .sidebar-list-card h6 { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; }
+        .sidebar-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: #374151;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .sidebar-list-item:last-child { margin-bottom: 0; }
+        .sidebar-list-item i { color: #6d28d9; font-size: 12px; flex-shrink: 0; margin-top: 3px; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .course-detail-layout { grid-template-columns: 1fr; }
+            .cd-sidebar { position: static; }
+            .hero-title { font-size: 1.6rem; }
+            .learn-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
 <body>
+<!-- HEADER (solid on this page) -->
 <div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
-<div class="admin-container">
-    <div class="admin-header">
-        <h1><i class="fas fa-book-open"></i> Chi Tiết Khóa Học</h1>
-        <p>Thông tin chi tiết về khóa học và danh sách bài học</p>
+<!-- ===== HERO BANNER ===== -->
+<section class="course-detail-hero">
+    <div class="container">
+        <div class="hero-breadcrumb">
+            <a th:href="@{/}">Home</a>
+            <span>›</span>
+            <a th:href="@{/courses}">Courses</a>
+            <span>›</span>
+            <span class="current" th:text="${course.title}">Course</span>
+        </div>
+        <h1 class="hero-title" th:text="${course.title}">Course Title</h1>
     </div>
+</section>
 
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/courses}">Khóa Học</a></li>
-            <li class="breadcrumb-item active" aria-current="page" th:text="${course.title}">Chi Tiết</li>
-        </ol>
-    </nav>
+<!-- ===== MAIN CONTENT ===== -->
+<div class="course-detail-page">
+    <div class="container">
+        <!-- Flash messages -->
+        <div th:if="${enrolledSuccess}" class="alert alert-success mb-4" th:text="${enrolledSuccess}"></div>
+        <div th:if="${reviewSuccess}" class="alert alert-success mb-4" th:text="${reviewSuccess}"></div>
+        <div th:if="${reviewError}" class="alert alert-danger mb-4" th:text="${reviewError}"></div>
 
-    <div class="admin-content">
-        <div th:if="${enrolledSuccess}" class="alert alert-success" th:text="${enrolledSuccess}"></div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="course-detail-header-wrap mb-4" style="border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                    <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
-                         alt="Course Banner" style="width: 100%; height: 400px; object-fit: cover;">
+        <div class="course-detail-layout">
+            <!-- ===== LEFT COLUMN ===== -->
+            <div class="course-detail-main">
+
+                <!-- Course Header Card -->
+                <div class="cd-card">
+                    <div class="course-stars">
+                        <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                            <i th:class="${i <= averageRating} ? 'fas fa-star' : (${i - averageRating < 1 and i - averageRating > 0} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
+                        </th:block>
+                        <span th:text="'(' + ${#numbers.formatDecimal(averageRating,1,1)} + '/5 · ' + ${reviews.size()} + ' đánh giá)'"></span>
+                        &nbsp;·&nbsp;
+                        <span class="course-category-badge" th:text="${course.category != null ? course.category : 'Khóa học'}">Category</span>
+                    </div>
+                    <h2 class="course-title-main" th:text="${course.title}">Course Title</h2>
                 </div>
-                <div class="course-info">
-                        <h2 th:text="${course.title}" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;"></h2>
-                    <p class="course-description"
-                       th:text="${course.description}"
-                       style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;"></p>
 
-                    <div class="course-meta">
-                        <div class="meta-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>
-                                <strong>Ngày Tạo:</strong>
-                                <span th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy')}"></span>
-                            </span>
+                <!-- Course Image / Video Preview -->
+                <div class="cd-card" style="padding: 0; overflow: hidden;">
+                    <div class="course-media-wrap">
+                        <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty()
+                                        ? (course.imageUrl.startsWith('http') ? course.imageUrl
+                                            : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl))
+                                        : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop'}"
+                             alt="Course Preview">
+                        <div class="play-btn-overlay">
+                            <i class="fas fa-play"></i>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-user-tie"></i>
-                            <span>
-                                <strong>Giảng Viên:</strong>
-                                <span th:text="${course.instructor.getFullName()}"></span>
-                            </span>
+                        <div class="media-duration-badge" th:if="${course.duration != null}">
+                            <i class="far fa-clock" style="margin-right:4px;"></i>
+                            <span th:text="${course.duration}"></span>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>
-                                <strong>Giá:</strong>
-                                <span th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></span>
-                            </span>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="cd-card">
+                    <div class="cd-tabs">
+                        <button class="cd-tab-btn active" data-tab="tab-info">Course Info</button>
+                        <button class="cd-tab-btn" data-tab="tab-reviews">
+                            Reviews
+                            <span style="background:#ede9fe;color:#6d28d9;padding:1px 8px;border-radius:20px;font-size:11px;margin-left:6px;"
+                                  th:text="${reviews.size()}">0</span>
+                        </button>
+                    </div>
+
+                    <!-- TAB: COURSE INFO -->
+                    <div id="tab-info" class="cd-tab-content active">
+                        <!-- About -->
+                        <h3 class="section-title-sm">About Course</h3>
+                        <div class="about-text">
+                            <div class="about-text-clamp" id="aboutText"
+                                 th:text="${course.description != null ? course.description : 'Chưa có mô tả cho khóa học này.'}"></div>
+                            <button type="button" class="show-more-btn" id="showMoreBtn">
+                                <i class="fas fa-plus-circle"></i> SHOW MORE
+                            </button>
+                        </div>
+
+                        <!-- What You'll Learn -->
+                        <div th:if="${course.learningPoints != null and !course.learningPoints.isEmpty()}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm">What Will You Learn?</h3>
+                            <div class="learn-grid">
+                                <div th:each="point : ${#strings.arraySplit(course.learningPoints, '|')}"
+                                     class="learn-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span th:text="${point.trim()}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Placeholder nếu chưa có learning points -->
+                        <div th:unless="${course.learningPoints != null and !course.learningPoints.isEmpty()}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm">What Will You Learn?</h3>
+                            <div class="learn-grid">
+                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Nắm vững kiến thức nền tảng</span></div>
+                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Thực hành qua dự án thực tế</span></div>
+                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Xây dựng portfolio chuyên nghiệp</span></div>
+                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Tư duy giải quyết vấn đề</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Course Content (Accordion Lessons) -->
+                        <div th:if="${course.lessons != null and !course.lessons.isEmpty()}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm" style="margin-bottom: 12px;">Course Content
+                                <span style="font-size:13px;color:#9ca3af;font-weight:400;margin-left:8px;"
+                                      th:text="'(' + ${course.lessons.size()} + ' bài học)'"></span>
+                            </h3>
+                            <div class="cd-accordion">
+                                <!-- Nhóm tất cả lessons vào 1 section duy nhất nếu chưa có phân chương -->
+                                <div>
+                                    <div class="cd-acc-header open" data-acc-target="section-0">
+                                        <span><i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
+                                            Nội dung khóa học
+                                        </span>
+                                        <div style="display:flex;align-items:center;gap:12px;">
+                                            <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài'"></span>
+                                            <i class="fas fa-chevron-down acc-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="cd-acc-body open" id="section-0">
+                                        <div th:each="lesson, stat : ${course.lessons}" class="cd-lesson-row">
+                                            <div class="lesson-left">
+                                                <i class="fas fa-play-circle"></i>
+                                                <span th:text="${stat.index + 1} + '. ' + ${lesson.title}">Lesson</span>
+                                            </div>
+                                            <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="lesson-duration">
+                                                    <i class="far fa-clock"></i> --
+                                                </span>
+                                                <a th:if="${isEnrolled}"
+                                                   th:href="@{'/lessons/' + ${lesson.id}}"
+                                                   style="background:#ede9fe;color:#6d28d9;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">
+                                                    Vào học
+                                                </a>
+                                                <span th:unless="${isEnrolled}"
+                                                      style="color:#d1d5db;font-size:13px;">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty lessons state -->
+                        <div th:if="${course.lessons == null or course.lessons.isEmpty()}" style="margin-top:28px; text-align:center; padding: 40px 0; color: #9ca3af;">
+                            <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                            <p>Chưa có bài học nào. Hãy quay lại sau!</p>
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-between mt-4" style="gap: 12px; flex-wrap: wrap;">
-                        <div>
-                            <div style="font-size: 1.1rem; color: var(--secondary-color); font-weight: 700;">
-                                <span th:with="avg=${#numbers.formatDecimal(averageRating,1,1)}"
-                                      th:text="${avg} + ' / 5'"></span>
-                                <span style="color: #ffc107; margin-left: 6px;">
-                                    <i th:each="i : ${#numbers.sequence(1,5)}"
-                                       class="fas fa-star"
-                                       th:style="${i <= averageRating} ? 'opacity:1' : 'opacity:0.25'"></i>
-                                </span>
+                    <!-- TAB: REVIEWS -->
+                    <div id="tab-reviews" class="cd-tab-content">
+                        <!-- Rating Summary -->
+                        <div class="review-summary">
+                            <div class="review-big-score" th:text="${#numbers.formatDecimal(averageRating,1,1)}">4.8</div>
+                            <div>
+                                <div class="review-stars-row">
+                                    <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                                        <i th:class="${i <= averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                    </th:block>
+                                </div>
+                                <div class="review-count" th:text="${reviews.size()} + ' đánh giá'">0 đánh giá</div>
                             </div>
-                            <small style="color: var(--text-muted);" th:text="${reviews.size()} + ' danh gia'"></small>
                         </div>
 
-                        <div sec:authorize="isAuthenticated()">
-                            <form th:if="${!isEnrolled}" th:action="@{'/enrollments/enroll/' + ${course.id}}" method="post">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-user-plus"></i> Đăng ký khóa học
+                        <!-- Review List -->
+                        <div th:if="${reviews != null and !reviews.isEmpty()}">
+                            <div th:each="review : ${reviews}" class="review-item">
+                                <div class="reviewer-avatar"
+                                     th:text="${review.user != null ? #strings.substring(review.user.fullName, 0, 1).toUpperCase() : 'U'}">U</div>
+                                <div class="review-body">
+                                    <div class="reviewer-name" th:text="${review.user != null ? review.user.fullName : 'Học viên'}">Học viên</div>
+                                    <div class="reviewer-stars">
+                                        <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                                            <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                        </th:block>
+                                    </div>
+                                    <div class="reviewer-text" th:text="${review.comment}">Nhận xét...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${reviews == null or reviews.isEmpty()}"
+                             style="text-align:center;padding:40px 0;color:#9ca3af;">
+                            <i class="far fa-comment-alt" style="font-size:2.5rem;margin-bottom:10px;display:block;"></i>
+                            <p>Chưa có đánh giá. Hãy là người đầu tiên đánh giá!</p>
+                        </div>
+
+                        <!-- Review Form -->
+                        <div sec:authorize="isAuthenticated()" th:if="${isEnrolled}" class="review-form-section">
+                            <h4 style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;">
+                                <i class="fas fa-star" style="color:#f59e0b;margin-right:6px;"></i>
+                                <span th:text="${userReview != null ? 'Cập nhật đánh giá của bạn' : 'Viết đánh giá'}"></span>
+                            </h4>
+                            <form th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post">
+                                <div style="margin-bottom:14px;">
+                                    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Số sao</label>
+                                    <select name="rating" style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:14px;width:auto;color:#374151;">
+                                        <option value="">-- Chọn số sao --</option>
+                                        <option th:each="i : ${#numbers.sequence(1,5)}"
+                                                th:value="${i}"
+                                                th:text="${i} + ' sao'"
+                                                th:selected="${userReview != null and userReview.rating == i}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom:6px;">
+                                    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Nhận xét</label>
+                                    <textarea name="comment" class="cd-textarea" rows="4"
+                                              placeholder="Chia sẻ trải nghiệm học tập của bạn..."
+                                              th:text="${userReview != null ? userReview.comment : ''}"></textarea>
+                                </div>
+                                <button type="submit" class="btn-submit-review">
+                                    <i class="fas fa-paper-plane" style="margin-right:6px;"></i>
+                                    <span th:text="${userReview != null ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}"></span>
                                 </button>
                             </form>
-                            <a th:if="${isEnrolled}" th:href="@{/courses/my-courses}" class="btn btn-success btn-sm">
-                                <i class="fas fa-check"></i> Đã đăng ký
-                            </a>
+                        </div>
+                        <div sec:authorize="isAnonymous()" style="margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;text-align:center;font-size:14px;color:#6b7280;">
+                            <a th:href="@{/auth/login}" style="color:#6d28d9;font-weight:600;">Đăng nhập</a> để viết đánh giá khóa học.
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="admin-content" th:if="${course.lessons != null and !course.lessons.isEmpty()}">
-        <h3 style="color: var(--secondary-color); margin-bottom: 25px;">
-            <i class="fas fa-list-ul"></i> Danh Sách Bài Học
-        </h3>
+            <!-- ===== RIGHT SIDEBAR ===== -->
+            <div class="cd-sidebar">
+                <!-- Price & Enroll Card -->
+                <div class="price-card">
+                    <div class="price-card-body">
+                        <div class="price-main">
+                            <th:block th:if="${course.price != null and course.price > 0}"
+                                      th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></th:block>
+                            <th:block th:if="${course.price == null or course.price == 0}">Miễn phí</th:block>
+                        </div>
+                        <div class="price-original" th:if="${course.price != null and course.price > 0}"></div>
 
-        <div class="lesson-grid">
-            <div th:each="lesson, iterStat : ${course.lessons}" class="lesson-card">
-                <div class="lesson-card-header">
-                    <span class="lesson-index" th:text="${iterStat.index + 1}"></span>
-                    <h4 class="lesson-title" th:text="${lesson.title}"></h4>
+                        <!-- Enroll Button -->
+                        <div sec:authorize="isAnonymous()">
+                            <a th:href="@{/auth/login}" class="btn-enroll">
+                                <i class="fas fa-user-graduate" style="margin-right:8px;"></i> Đăng nhập để đăng ký
+                            </a>
+                        </div>
+                        <div sec:authorize="isAuthenticated()">
+                            <form th:if="${!isEnrolled}" th:action="@{'/enrollments/enroll/' + ${course.id}}" method="post">
+                                <button type="submit" class="btn-enroll">
+                                    <i class="fas fa-graduation-cap" style="margin-right:8px;"></i> Đăng ký ngay
+                                </button>
+                            </form>
+                            <a th:if="${isEnrolled}" th:href="@{/courses/my-courses}" class="btn-enrolled">
+                                <i class="fas fa-check-circle" style="margin-right:8px;"></i> Đã đăng ký · Học ngay
+                            </a>
+                        </div>
+
+                        <!-- Meta Info -->
+                        <div class="course-meta-list">
+                            <div class="course-meta-item">
+                                <i class="fas fa-signal"></i>
+                                <span>Trình độ</span>
+                                <strong th:text="${course.level != null ? course.level : 'Tất cả trình độ'}">Beginner</strong>
+                            </div>
+                            <div class="course-meta-item">
+                                <i class="far fa-clock"></i>
+                                <span>Thời lượng</span>
+                                <strong th:text="${course.duration != null ? course.duration : '--'}">--</strong>
+                            </div>
+                            <div class="course-meta-item">
+                                <i class="fas fa-users"></i>
+                                <span>Học viên</span>
+                                <strong th:text="${studentCount}">0</strong>
+                            </div>
+                            <div class="course-meta-item">
+                                <i class="fas fa-list-ul"></i>
+                                <span>Bài học</span>
+                                <strong th:text="${course.lessons != null ? course.lessons.size() : 0}">0</strong>
+                            </div>
+                            <div class="course-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Cập nhật</span>
+                                <strong th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'dd/MM/yyyy') : '--'}">--</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="lesson-card-body">
-                    <p th:if="${lesson.videoUrl}" class="lesson-video">
-                        <i class="fas fa-play-circle"></i>
-                        <span th:text="${lesson.videoUrl}"></span>
-                    </p>
-                    <p th:unless="${lesson.videoUrl}" class="lesson-video lesson-video-empty">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Chưa có video</span>
-                    </p>
+                <!-- Instructor Card -->
+                <div class="instructor-card" th:if="${course.instructor != null}">
+                    <h6>A COURSE BY</h6>
+                    <div class="instructor-info">
+                        <div class="instructor-avatar">
+                            <img th:if="${course.instructor.avatar != null and !course.instructor.avatar.isEmpty()}"
+                                 th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar
+                                         : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
+                                 alt="Instructor">
+                            <span th:unless="${course.instructor.avatar != null and !course.instructor.avatar.isEmpty()}"
+                                  th:text="${#strings.substring(course.instructor.fullName, 0, 1).toUpperCase()}">I</span>
+                        </div>
+                        <div>
+                            <div class="instructor-name-text" th:text="${course.instructor.fullName}">Instructor</div>
+                            <div class="instructor-role">Instructor</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="lesson-card-footer">
-                    <a th:if="${isEnrolled}"
-                       th:href="@{'/lessons/' + ${lesson.id}}"
-                       class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-play"></i> Vào học
-                    </a>
-                    <span th:unless="${isEnrolled}" class="btn btn-outline-secondary btn-sm disabled">
-                        <i class="fas fa-lock"></i> Cần đăng ký
-                    </span>
+                <!-- Requirements Card -->
+                <div class="sidebar-list-card" th:if="${course.requirements != null and !course.requirements.isEmpty()}">
+                    <h6>Requirements</h6>
+                    <div th:each="req : ${#strings.arraySplit(course.requirements, '|')}" class="sidebar-list-item">
+                        <i class="fas fa-check"></i>
+                        <span th:text="${req.trim()}"></span>
+                    </div>
+                </div>
+
+                <!-- Target Audience Card -->
+                <div class="sidebar-list-card" th:if="${course.targetAudience != null and !course.targetAudience.isEmpty()}">
+                    <h6>Audience</h6>
+                    <div th:each="aud : ${#strings.arraySplit(course.targetAudience, '|')}" class="sidebar-list-item">
+                        <i class="fas fa-check"></i>
+                        <span th:text="${aud.trim()}"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="admin-content">
-        <h3 style="color: var(--secondary-color); margin-bottom: 20px;">
-            <i class="fas fa-star"></i> Đánh giá khóa học
-        </h3>
-
-        <div th:if="${reviewSuccess}" class="alert alert-success" th:text="${reviewSuccess}"></div>
-        <div th:if="${reviewError}" class="alert alert-danger" th:text="${reviewError}"></div>
-
-        <form sec:authorize="isAuthenticated()" th:if="${isEnrolled}" th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post" class="mb-4">
-            <div class="form-group">
-                <label for="rating">Số sao</label>
-                <select id="rating" name="rating" class="form-control" required>
-                    <option value="">-- Chọn số sao --</option>
-                    <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}"
-                            th:selected="${reviewSuccess == null and userReview != null and userReview.rating == i}"
-                            th:text="${i} + ' sao'"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="comment">Nhận xét</label>
-                <textarea id="comment" name="comment" class="form-control" rows="3"
-                          placeholder="Chia se trai nghiem hoc cua ban"
-                          th:text="${reviewSuccess == null and userReview != null ? userReview.comment : ''}"></textarea>
-            </div>
-            <div style="margin-top: 15px;">
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="fas fa-paper-plane"></i> Gửi đánh giá
-                </button>
-            </div>
-        </form>
-
-        <div th:if="${reviews == null or reviews.isEmpty()}" class="text-muted">Chưa có đánh giá khóa học này.</div>
-        <div th:if="${reviews != null and !reviews.isEmpty()}">
-            <div th:each="review : ${reviews}" class="detail-box mb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <strong th:text="${review.user != null ? review.user.fullName : 'Hoc vien'}"></strong>
-                    <span style="color: #ffc107;">
-                        <i th:each="i : ${#numbers.sequence(1,5)}"
-                           class="fas fa-star"
-                           th:style="${i <= review.rating} ? 'opacity:1' : 'opacity:0.25'"></i>
-                    </span>
-                </div>
-                <p class="mb-0 mt-2" th:text="${review.comment}"></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-content" th:if="${course.lessons == null or course.lessons.isEmpty()}">
-        <div class="text-center py-5">
-            <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h4 style="color: var(--text-muted);">Chưa có bài học nào</h4>
-            <p style="color: var(--text-muted);">Hãy quay lại sau, khóa học này chưa có nội dung bài học.</p>
         </div>
     </div>
 </div>
 
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+<script>
+$(document).ready(function() {
+    // ===== TABS =====
+    $('.cd-tab-btn').on('click', function() {
+        var target = $(this).data('tab');
+        $('.cd-tab-btn').removeClass('active');
+        $(this).addClass('active');
+        $('.cd-tab-content').removeClass('active');
+        $('#' + target).addClass('active');
+    });
+
+     // ===== SHOW MORE =====
+    var showMoreBtn = document.getElementById('showMoreBtn');
+    var aboutText = document.getElementById('aboutText');
+
+    if (showMoreBtn && aboutText) {
+        // Check if text needs truncation
+        function checkIfNeedsShowMore() {
+            var scrollHeight = aboutText.scrollHeight;
+            var clientHeight = aboutText.clientHeight;
+            console.log('ScrollHeight:', scrollHeight, 'ClientHeight:', clientHeight);
+
+            if (scrollHeight > clientHeight) {
+                showMoreBtn.style.display = 'inline-block';
+            } else {
+                showMoreBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Check on ready
+        checkIfNeedsShowMore();
+
+        // Check on window resize
+        window.addEventListener('resize', checkIfNeedsShowMore);
+
+        // Click handler with multiple safeguards
+        showMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('SHOW MORE clicked!');
+            console.log('Current expanded state:', aboutText.classList.contains('expanded'));
+
+            if (aboutText.classList.contains('expanded')) {
+                aboutText.classList.remove('expanded');
+                showMoreBtn.innerHTML = '<i class="fas fa-plus-circle"></i> SHOW MORE';
+            } else {
+                aboutText.classList.add('expanded');
+                showMoreBtn.innerHTML = '<i class="fas fa-minus-circle"></i> SHOW LESS';
+            }
+
+            return false;
+        }, false);
+    } else {
+        console.error('SHOW MORE elements not found!');
+        console.log('showMoreBtn:', showMoreBtn);
+        console.log('aboutText:', aboutText);
+    }
+
+    // Fallback jQuery handler
+    $(document).off('click', '#showMoreBtn').on('click', '#showMoreBtn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('jQuery SHOW MORE clicked!');
+
+        var $text = $('#aboutText');
+        if ($text.hasClass('expanded')) {
+            $text.removeClass('expanded');
+            $(this).html('<i class="fas fa-plus-circle"></i> SHOW MORE');
+        } else {
+            $text.addClass('expanded');
+            $(this).html('<i class="fas fa-minus-circle"></i> SHOW LESS');
+        }
+
+        return false;
+    });
+
+    // ===== ACCORDION =====
+    $(document).on('click', '.cd-acc-header', function() {
+        var target = $(this).data('acc-target');
+        var $body = $('#' + target);
+        var isOpen = $(this).hasClass('open');
+        if (isOpen) {
+            $(this).removeClass('open');
+            $body.removeClass('open');
+        } else {
+            $(this).addClass('open');
+            $body.addClass('open');
+        }
+    });
+});
+</script>
 </body>
 </html>

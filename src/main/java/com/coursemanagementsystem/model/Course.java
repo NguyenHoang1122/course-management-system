@@ -35,6 +35,25 @@ public class Course {
     private String imageUrl; //anh thu nho khoa hoc
     private String category; //danh muc khoa hoc
 
-    @OneToMany(mappedBy = "course",fetch = FetchType.LAZY)
+    // === NEW FIELDS ===
+    /** Trình độ: Beginner / Intermediate / Advanced */
+    private String level;
+
+    /** Thời lượng khóa học, ví dụ: "30 hours", "12 weeks" */
+    private String duration;
+
+    /** Các điểm bạn sẽ học được - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String learningPoints;
+
+    /** Yêu cầu đầu vào - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String requirements;
+
+    /** Đối tượng học viên phù hợp - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String targetAudience;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<Lesson> lessons;
 }
