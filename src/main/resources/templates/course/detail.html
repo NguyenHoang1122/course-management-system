@@ -464,6 +464,27 @@
         }
         .sidebar-list-item:last-child { margin-bottom: 0; }
         .sidebar-list-item i { color: #6d28d9; font-size: 12px; flex-shrink: 0; margin-top: 3px; }
+        
+        .wishlist-btn-wrap { margin-top: 15px; }
+        .btn-wishlist {
+            width: 100%;
+            padding: 12px;
+            background: #fff;
+            color: #ff4d4d;
+            border: 2px solid #ff4d4d;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-wishlist:hover { background: #fff5f5; transform: translateY(-1px); }
+        .btn-wishlist.active { background: #ff4d4d; color: #fff; }
+        .btn-wishlist.active:hover { background: #ff3333; }
 
         /* Responsive */
         @media (max-width: 992px) {
@@ -734,6 +755,15 @@
                             </a>
                         </div>
 
+                        <!-- Wishlist Toggle -->
+                        <div class="wishlist-btn-wrap">
+                            <button th:id="'wishlistBtn-' + ${course.id}" class="btn-wishlist" th:classappend="${isWishlisted} ? 'active' : ''" 
+                                    th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'">
+                                <i th:class="${isWishlisted} ? 'fas fa-heart' : 'far fa-heart'"></i>
+                                <span th:id="'wishlist-text-' + ${course.id}" th:text="${isWishlisted} ? 'Đã trong Wishlist' : 'Thêm vào Wishlist'">Yêu thích</span>
+                            </button>
+                        </div>
+
                         <!-- Meta Info -->
                         <div class="course-meta-list">
                             <div class="course-meta-item">
@@ -809,97 +839,49 @@
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
-<script>
-$(document).ready(function() {
-    // ===== TABS =====
-    $('.cd-tab-btn').on('click', function() {
-        var target = $(this).data('tab');
-        $('.cd-tab-btn').removeClass('active');
-        $(this).addClass('active');
-        $('.cd-tab-content').removeClass('active');
-        $('#' + target).addClass('active');
-    });
+<script th:inline="javascript">
+/* Global toggleWishlist function is used since it's already defined in layout.html */
 
-     // ===== SHOW MORE =====
-    var showMoreBtn = document.getElementById('showMoreBtn');
-    var aboutText = document.getElementById('aboutText');
+    $(document).ready(function() {
+        // ===== TABS =====
+        $('.cd-tab-btn').on('click', function() {
+            var target = $(this).data('tab');
+            $('.cd-tab-btn').removeClass('active');
+            $(this).addClass('active');
+            $('.cd-tab-content').removeClass('active');
+            $('#' + target).addClass('active');
+        });
 
-    if (showMoreBtn && aboutText) {
-        // Check if text needs truncation
-        function checkIfNeedsShowMore() {
-            var scrollHeight = aboutText.scrollHeight;
-            var clientHeight = aboutText.clientHeight;
-            console.log('ScrollHeight:', scrollHeight, 'ClientHeight:', clientHeight);
+        // ===== SHOW MORE =====
+        var showMoreBtn = document.getElementById('showMoreBtn');
+        var aboutText = document.getElementById('aboutText');
 
-            if (scrollHeight > clientHeight) {
-                showMoreBtn.style.display = 'inline-block';
+        if (showMoreBtn && aboutText) {
+            showMoreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (aboutText.classList.contains('expanded')) {
+                    aboutText.classList.remove('expanded');
+                    showMoreBtn.innerHTML = '<i class="fas fa-plus-circle"></i> SHOW MORE';
+                } else {
+                    aboutText.classList.add('expanded');
+                    showMoreBtn.innerHTML = '<i class="fas fa-minus-circle"></i> SHOW LESS';
+                }
+            });
+        }
+
+        // ===== ACCORDION =====
+        $(document).on('click', '.cd-acc-header', function() {
+            var target = $(this).data('acc-target');
+            var $body = $('#' + target);
+            if ($(this).hasClass('open')) {
+                $(this).removeClass('open');
+                $body.removeClass('open');
             } else {
-                showMoreBtn.style.display = 'inline-block';
+                $(this).addClass('open');
+                $body.addClass('open');
             }
-        }
-
-        // Check on ready
-        checkIfNeedsShowMore();
-
-        // Check on window resize
-        window.addEventListener('resize', checkIfNeedsShowMore);
-
-        // Click handler with multiple safeguards
-        showMoreBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            console.log('SHOW MORE clicked!');
-            console.log('Current expanded state:', aboutText.classList.contains('expanded'));
-
-            if (aboutText.classList.contains('expanded')) {
-                aboutText.classList.remove('expanded');
-                showMoreBtn.innerHTML = '<i class="fas fa-plus-circle"></i> SHOW MORE';
-            } else {
-                aboutText.classList.add('expanded');
-                showMoreBtn.innerHTML = '<i class="fas fa-minus-circle"></i> SHOW LESS';
-            }
-
-            return false;
-        }, false);
-    } else {
-        console.error('SHOW MORE elements not found!');
-        console.log('showMoreBtn:', showMoreBtn);
-        console.log('aboutText:', aboutText);
-    }
-
-    // Fallback jQuery handler
-    $(document).off('click', '#showMoreBtn').on('click', '#showMoreBtn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('jQuery SHOW MORE clicked!');
-
-        var $text = $('#aboutText');
-        if ($text.hasClass('expanded')) {
-            $text.removeClass('expanded');
-            $(this).html('<i class="fas fa-plus-circle"></i> SHOW MORE');
-        } else {
-            $text.addClass('expanded');
-            $(this).html('<i class="fas fa-minus-circle"></i> SHOW LESS');
-        }
-
-        return false;
+        });
     });
-
-    // ===== ACCORDION =====
-    $(document).on('click', '.cd-acc-header', function() {
-        var target = $(this).data('acc-target');
-        var $body = $('#' + target);
-        var isOpen = $(this).hasClass('open');
-        if (isOpen) {
-            $(this).removeClass('open');
-            $body.removeClass('open');
-        } else {
-            $(this).addClass('open');
-            $body.addClass('open');
-        }
-    });
-});
 </script>
 </body>
 </html>

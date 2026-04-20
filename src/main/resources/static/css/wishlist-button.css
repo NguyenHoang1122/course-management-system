@@ -1,0 +1,44 @@
+
+/* Reusable Wishlist Heart Button Style - Premium Design Inspired by n1.png */
+
+.wishlist-heart-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-heart-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.wishlist-heart-btn:active {
+    transform: scale(0.95);
+}
+
+.wishlist-heart-btn i {
+    font-size: 18px;
+    color: #bbbbbb; /* Default hollow color */
+    transition: color 0.3s ease;
+}
+
+.wishlist-heart-btn.active i {
+    color: #ff4d4d; /* Red color when active */
+}
+
+/* Specific to Detail Page Button - if we want to differentiate */
+.btn-wishlist-detail {
+    /* reuse classes or override */
+}
