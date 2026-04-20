@@ -48,6 +48,15 @@
                 <div th:each="course : ${courses}" class="premium-course-card">
                     <div class="course-img-wrapper">
                         <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" alt="Course Image">
+                        
+                        <!-- Wishlist Heart Button -->
+                        <button class="wishlist-heart-btn" 
+                                th:classappend="${wishlistedCourseIds.contains(course.id)} ? 'active' : ''"
+                                th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'"
+                                title="Thêm vào Wishlist">
+                            <i th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
+                        
                         <!-- Badge for new courses (within last 30 days) -->
                         <div th:if="${course.createdAt != null && course.createdAt.isAfter(T(java.time.LocalDate).now().minusDays(30))}" class="course-badge">New</div>
                     </div>

@@ -135,7 +135,7 @@
 .course-badge {
     position: absolute;
     top: 15px;
-    right: 15px;
+    left: 15px;
     background: var(--accent-blue);
     color: #fff;
     padding: 5px 12px;

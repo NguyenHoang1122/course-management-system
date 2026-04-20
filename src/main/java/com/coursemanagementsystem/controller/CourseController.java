@@ -8,6 +8,7 @@ import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.LessonProgressService;
 import com.coursemanagementsystem.service.ReviewService;
 import com.coursemanagementsystem.service.UserService;
+import com.coursemanagementsystem.service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/courses")
@@ -40,12 +42,14 @@ public class CourseController {
     private LessonProgressService lessonProgressService;
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private WishlistService wishlistService;
 
     @GetMapping("")
     public String findAllCourse(@RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size,
                                 @RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                Model model) {
+                                Model model, Principal principal) {
         Page<Course> coursePage = courseService.findCoursesPaged(keyword, page, size);
 
         // Calculate total value
@@ -60,6 +64,16 @@ public class CourseController {
         // Pass student counts and ratings
         java.util.Map<Long, Long> studentCounts = new java.util.HashMap<>();
         java.util.Map<Long, Double> averageRatings = new java.util.HashMap<>();
+        Set<Long> wishlistedCourseIds = Collections.emptySet();
+
+        if (principal != null) {
+            User user = userService.findByUsername(principal.getName());
+            if (user != null) {
+                wishlistedCourseIds = wishlistService.getWishlistByUser(user).stream()
+                        .map(w -> w.getCourse().getId())
+                        .collect(Collectors.toSet());
+            }
+        }
 
         for (Course course : coursePage.getContent()) {
             studentCounts.put(course.getId(), enrollmentService.countEnrollmentsByCourseId(course.getId()));
@@ -69,6 +83,7 @@ public class CourseController {
         model.addAttribute("coursePage", coursePage);
         model.addAttribute("studentCounts", studentCounts);
         model.addAttribute("averageRatings", averageRatings);
+        model.addAttribute("wishlistedCourseIds", wishlistedCourseIds);
         model.addAttribute("courses", coursePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
@@ -99,7 +114,10 @@ public class CourseController {
                 completedLessonIds = lessonProgressService.getCompletedLessonIds(user.getId(), id);
                 Optional<Review> currentReview = reviewService.getUserReview(user.getId(), id);
                 userReview = currentReview.orElse(null);
+                model.addAttribute("isWishlisted", wishlistService.isWishlisted(user, id));
             }
+        } else {
+            model.addAttribute("isWishlisted", false);
         }
 
         model.addAttribute("course", course);

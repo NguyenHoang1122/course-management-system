@@ -15,7 +15,7 @@
         <li th:classappend="${activeTab == 'dashboard' ? 'active' : ''}"><a th:href="@{/profile}"><i class="fas fa-th-large"></i> Dashboard</a></li>
         <li th:classappend="${activeTab == 'edit' ? 'active' : ''}"><a th:href="@{/profile/edit}"><i class="fas fa-user"></i> My Profile</a></li>
         <li th:classappend="${activeTab == 'courses' ? 'active' : ''}"><a th:href="@{/courses/my-courses}"><i class="fas fa-play-circle"></i> Enrolled Courses</a></li>
-        <li th:classappend="${activeTab == 'wishlist' ? 'active' : ''}"><a href="#"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li th:classappend="${activeTab == 'wishlist' ? 'active' : ''}"><a th:href="@{/profile/wishlist}"><i class="fas fa-heart"></i> Wishlist</a></li>
         <li th:classappend="${activeTab == 'reviews' ? 'active' : ''}"><a href="#"><i class="fas fa-star"></i> Reviews</a></li>
         <li th:classappend="${activeTab == 'history' ? 'active' : ''}"><a href="#"><i class="fas fa-history"></i> Order History</a></li>
         <li th:classappend="${activeTab == 'settings' ? 'active' : ''}"><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
