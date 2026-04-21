@@ -109,14 +109,26 @@
                 </div>
 
                 <!-- Image URL -->
-                <div class="form-group">
+                <div class="form-group" style="grid-column: span 1;">
                     <label for="imageUrl">
-                        <i class="fas fa-image"></i> link ảnh khóa học
+                        <i class="fas fa-image"></i> Link Ảnh Khóa Học
                     </label>
                     <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
                            placeholder="Nhập link ảnh (URL)">
                     <small style="color: var(--text-muted);">
                         <i class="fas fa-info-circle"></i> Sử dụng link ảnh từ Unsplash hoặc các nguồn host ảnh khác.
+                    </small>
+                </div>
+
+                <!-- Preview Video URL -->
+                <div class="form-group" style="grid-column: span 1;">
+                    <label for="previewVideoUrl">
+                        <i class="fas fa-video"></i> Link Video Giới Thiệu
+                    </label>
+                    <input type="text" id="previewVideoUrl" th:field="*{previewVideoUrl}" class="form-control"
+                           placeholder="Dán link YouTube, Vimeo hoặc link .mp4 trực tiếp">
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Hỗ trợ YouTube, Vimeo và link file video trực tiếp.
                     </small>
                 </div>
 

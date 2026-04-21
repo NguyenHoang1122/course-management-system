@@ -26,6 +26,7 @@ public class CourseDTO {
     private Long instructorId;
 
     private String imageUrl;
+    private String previewVideoUrl;
     private String category;
 
     private List<?> lessons;
