@@ -131,9 +131,13 @@
                      th:id="'section-' + ${section.id}">
                     <div th:if="${section.lessons != null and !section.lessons.isEmpty()}">
                         <div th:each="lesson, lessonStat : ${section.lessons}" class="admin-lesson-row py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #f1f5f9;">
-                            <div class="lesson-info">
+                            <div class="lesson-info d-flex align-items-center">
                                 <span style="color: #94a3b8; font-family: monospace; margin-right: 10px;" th:text="${lessonStat.index + 1}"></span>
                                 <span th:text="${lesson.title}" style="color: #475569; font-weight: 500;"></span>
+                                <span th:if="${lesson.duration != null and !lesson.duration.isEmpty()}" 
+                                      style="background: #f1f5f9; color: #64748b; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 10px;">
+                                    <i class="far fa-clock" style="font-size: 10px;"></i> [[${lesson.duration}]]
+                                </span>
                             </div>
                             <div class="lesson-actions">
                                 <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-sm btn-link text-primary" title="Sửa bài học"><i class="fas fa-edit"></i></a>
@@ -171,6 +175,61 @@
             <button class="btn btn-primary" onclick="showAddSectionModal()">
                 <i class="fas fa-plus"></i> Thêm Chương Đầu Tiên
             </button>
+        </div>
+    <!-- New: Resources Management Area -->
+    <div class="admin-content mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="color: var(--secondary-color); margin: 0;">
+                <i class="fas fa-file-download"></i> Tài Liệu Khóa Học
+            </h3>
+            <button class="btn btn-outline-success" onclick="showAddResourceModal()">
+                <i class="fas fa-plus-circle"></i> Thêm Tài Liệu
+            </button>
+        </div>
+
+        <div th:if="${course.resources != null and !course.resources.isEmpty()}" class="admin-resources-list">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tên tài liệu</th>
+                            <th>Loại</th>
+                            <th>Nguồn</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="resource : ${course.resources}">
+                            <td>
+                                <i th:class="${resource.fileType == 'PDF' ? 'fas fa-file-pdf text-danger' : 
+                                             (resource.fileType == 'ZIP' ? 'fas fa-file-archive text-warning' : 
+                                             (resource.fileType == 'CODE' ? 'fas fa-file-code text-info' : 'fas fa-file-alt text-secondary'))}"
+                                   style="margin-right: 10px;"></i>
+                                <span th:text="${resource.title}"></span>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${resource.fileType == 'PDF' ? 'bg-danger' : 
+                                                       (resource.fileType == 'ZIP' ? 'bg-warning' : 
+                                                       (resource.fileType == 'CODE' ? 'bg-info' : 'bg-secondary'))}"
+                                      th:text="${resource.fileType}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${resource.external}" class="badge" style="background-color: #6d28d9;">Link ngoài</span>
+                                <span th:unless="${resource.external}" class="badge bg-success">File upload</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger" th:onclick="'showDeleteResourceConfirm(' + ${resource.id} + ');'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div th:if="${course.resources == null or course.resources.isEmpty()}" class="text-center py-4" style="border: 2px dashed #e2e8f0; border-radius: 12px;">
+            <p style="color: #94a3b8; font-style: italic; margin: 0;">Chưa có tài liệu nào cho khóa học này.</p>
         </div>
     </div>
 
@@ -266,6 +325,72 @@
 </div> <!-- admin-shell-main -->
 </div> <!-- admin-shell -->
 
+    <div id="addResourceModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3><i class="fas fa-plus-circle"></i> Thêm Tài Liệu Mới</h3>
+            <form th:action="@{'/admin/course/' + ${course.id} + '/add-resource'}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="courseId" th:value="${course.id}">
+                
+                <div class="form-group mb-3">
+                    <label>Tên tài liệu</label>
+                    <input type="text" name="title" class="form-control" placeholder="Ví dụ: Slide bài giảng chương 1" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Loại tài liệu</label>
+                    <select name="fileType" class="form-control" required>
+                        <option value="PDF">PDF Document</option>
+                        <option value="ZIP">ZIP/RAR Archive</option>
+                        <option value="CODE">Source Code</option>
+                        <option value="LINK">External Link</option>
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="d-block mb-2">Chế độ nguồn tài liệu</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="isExternal" id="modeFile" value="false" checked onclick="toggleResourceMode(false)">
+                        <label class="btn btn-outline-primary" for="modeFile">Tải file lên</label>
+                        
+                        <input type="radio" class="btn-check" name="isExternal" id="modeLink" value="true" onclick="toggleResourceMode(true)">
+                        <label class="btn btn-outline-primary" for="modeLink">Dùng Link ngoài</label>
+                    </div>
+                </div>
+
+                <div id="fileUploadGroup" class="form-group mb-3">
+                    <label>Chọn File tài liệu</label>
+                    <input type="file" name="resourceFile" class="form-control">
+                    <small class="text-muted">Hỗ trợ PDF, ZIP, RAR, DOCX, XLSX (Max 100MB)</small>
+                </div>
+
+                <div id="externalLinkGroup" class="form-group mb-3" style="display: none;">
+                    <label>Link tài liệu bên ngoài</label>
+                    <input type="url" name="externalUrl" class="form-control" placeholder="https://drive.google.com/...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Xác Nhận Thêm</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideAddResourceModal()">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteResourceConfirmBox" class="modal-overlay">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Tài Liệu</h3>
+            <p>Bạn có chắc chắn muốn xóa tài liệu này? Nếu là file đã upload, nó sẽ bị xóa vĩnh viễn khỏi server.</p>
+            <div class="modal-actions">
+                <form id="deleteResourceForm" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-danger">Xóa Vĩnh Viễn</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideDeleteResourceConfirm()">Hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 <script>
     function showAddSectionModal() {
         document.getElementById("addSectionModal").style.display = "flex";
@@ -273,6 +398,28 @@
 
     function hideAddSectionModal() {
         document.getElementById("addSectionModal").style.display = "none";
+    }
+
+    function showAddResourceModal() {
+        document.getElementById("addResourceModal").style.display = "flex";
+    }
+
+    function hideAddResourceModal() {
+        document.getElementById("addResourceModal").style.display = "none";
+    }
+
+    function toggleResourceMode(isExternal) {
+        document.getElementById("fileUploadGroup").style.display = isExternal ? "none" : "block";
+        document.getElementById("externalLinkGroup").style.display = isExternal ? "block" : "none";
+    }
+
+    function showDeleteResourceConfirm(id) {
+        document.getElementById("deleteResourceForm").action = '/admin/resources/delete/' + id;
+        document.getElementById("deleteResourceConfirmBox").style.display = "flex";
+    }
+
+    function hideDeleteResourceConfirm() {
+        document.getElementById("deleteResourceConfirmBox").style.display = "none";
     }
 
     function showDeleteSectionConfirm(id) {

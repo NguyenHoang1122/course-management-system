@@ -32,4 +32,6 @@ public class Lesson {
     private CourseSection section;
 
     private int displayOrder;
+
+    private String duration;
 }

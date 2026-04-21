@@ -2,11 +2,11 @@ package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.dto.CourseDTO;
 import com.coursemanagementsystem.dto.LessonDTO;
-import com.coursemanagementsystem.model.Course;
-import com.coursemanagementsystem.model.CourseSection;
-import com.coursemanagementsystem.model.Lesson;
-import com.coursemanagementsystem.model.User;
+import com.coursemanagementsystem.model.*;
+import com.coursemanagementsystem.repository.CourseResourceRepository;
+import com.coursemanagementsystem.repository.LessonRepository;
 import com.coursemanagementsystem.service.CourseService;
+import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.LessonService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
@@ -31,6 +31,14 @@ public class AdminController {
     private UserService userService;
     @Autowired
     private LessonService lessonService;
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private CourseResourceRepository resourceRepository;
+
+    @Autowired
+    private LessonRepository lessonRepository;
     @Autowired
     private com.coursemanagementsystem.repository.CourseSectionRepository courseSectionRepository;
 
@@ -252,6 +260,7 @@ public class AdminController {
         dto.setId(lesson.getId());
         dto.setTitle(lesson.getTitle());
         dto.setVideoUrl(lesson.getVideoUrl());
+        dto.setDuration(lesson.getDuration());
         dto.setCourseId(lesson.getCourse().getId());
         dto.setSectionId(lesson.getSection() != null ? lesson.getSection().getId() : null);
         model.addAttribute("lessonDTO", dto);
@@ -412,5 +421,71 @@ public class AdminController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật bài học cho chương thành công.");
         return "redirect:/admin/" + courseId;
+    }
+
+    // --- COURSE RESOURCES MANAGEMENT ---
+
+    @PostMapping("/course/{courseId}/add-resource")
+    public String addResource(@PathVariable Long courseId,
+                             @RequestParam("title") String title,
+                             @RequestParam("fileType") String fileType,
+                             @RequestParam(value = "externalUrl", required = false) String externalUrl,
+                             @RequestParam(value = "resourceFile", required = false) org.springframework.web.multipart.MultipartFile resourceFile,
+                             @RequestParam("isExternal") boolean isExternal,
+                             org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            Course course = courseService.findById(courseId);
+            if (course == null) return "redirect:/admin/course-list";
+
+            CourseResource resource = new CourseResource();
+            resource.setTitle(title);
+            resource.setFileType(fileType);
+            resource.setCourse(course);
+            resource.setExternal(isExternal);
+
+            if (isExternal) {
+                if (externalUrl == null || externalUrl.trim().isEmpty()) {
+                    redirectAttributes.addFlashAttribute("error", "Link ngoài không được để trống");
+                    return "redirect:/admin/" + courseId;
+                }
+                resource.setUrl(externalUrl.trim());
+            } else {
+                if (resourceFile == null || resourceFile.isEmpty()) {
+                    redirectAttributes.addFlashAttribute("error", "Vui lòng chọn file để upload");
+                    return "redirect:/admin/" + courseId;
+                }
+                String fileUrl = fileService.uploadResource(resourceFile);
+                resource.setUrl(fileUrl);
+            }
+
+            resourceRepository.save(resource);
+            redirectAttributes.addFlashAttribute("success", "Đã thêm tài liệu thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi thêm tài liệu: " + e.getMessage());
+        }
+        return "redirect:/admin/" + courseId;
+    }
+
+    @PostMapping("/resources/delete/{id}")
+    public String deleteResource(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            java.util.Optional<CourseResource> resourceOpt = resourceRepository.findById(id);
+            if (resourceOpt.isPresent()) {
+                CourseResource resource = resourceOpt.get();
+                Long courseId = resource.getCourse().getId();
+                
+                // If local file, delete it from disk
+                if (!resource.isExternal()) {
+                    fileService.deleteFile(resource.getUrl());
+                }
+                
+                resourceRepository.delete(resource);
+                redirectAttributes.addFlashAttribute("success", "Đã xóa tài liệu!");
+                return "redirect:/admin/" + courseId;
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa tài liệu: " + e.getMessage());
+        }
+        return "redirect:/admin/course-list";
     }
 }

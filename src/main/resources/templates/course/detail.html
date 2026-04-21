@@ -273,8 +273,84 @@
         .cd-lesson-row:last-child { border-bottom: none; }
         .cd-lesson-row .lesson-left { display: flex; align-items: center; gap: 10px; }
         .cd-lesson-row .lesson-left i { color: #6d28d9; font-size: 13px; }
-        .cd-lesson-row .lesson-duration { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+        .cd-lesson-row .lesson-duration { 
+            font-size: 11.5px; 
+            color: #64748b; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
         .acc-section-meta { font-size: 12px; color: #9ca3af; font-weight: 400; }
+
+        /* RESOURCES TAB STYLES */
+        .resources-grid { display: grid; gap: 16px; margin-top: 10px; }
+        .resource-premium-card {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .resource-premium-card:hover {
+            border-color: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.08);
+        }
+        .resource-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 18px;
+        }
+        .resource-icon-box.pdf { background: #fee2e2; color: #ef4444; }
+        .resource-icon-box.zip { background: #fef3c7; color: #f59e0b; }
+        .resource-icon-box.code { background: #e0f2fe; color: #0ea5e9; }
+        .resource-icon-box.link { background: #f3f4f6; color: #6b7280; }
+        
+        .resource-details { flex-grow: 1; }
+        .resource-details h4 { margin: 0 0 4px 0; font-size: 15px; font-weight: 600; color: #1e293b; }
+        .resource-meta-info { font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px; }
+        .resource-meta-info .dot { color: #cbd5e1; }
+        
+        .download-btn-premium {
+            padding: 8px 16px;
+            background: #f8fafc;
+            color: #475569;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn-premium:hover {
+            background: #6d28d9;
+            color: #ffffff;
+            border-color: #6d28d9;
+        }
+        .empty-resources {
+            text-align: center;
+            padding: 50px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #e2e8f0;
+            color: #94a3b8;
+        }
+        .empty-resources i { font-size: 40px; margin-bottom: 12px; display: block; }
 
         /* ACTIVE LESSON HIGHLIGHT - PREMIUM STYLE */
         .cd-lesson-row.active-lesson {
@@ -621,6 +697,11 @@
                             <span style="background:#ede9fe;color:#6d28d9;padding:1px 8px;border-radius:20px;font-size:11px;margin-left:6px;"
                                   th:text="${reviews.size()}">0</span>
                         </button>
+                        <button class="cd-tab-btn" data-tab="tab-resources">
+                            Tài liệu
+                            <span style="background:#dcfce7;color:#166534;padding:1px 8px;border-radius:20px;font-size:11px;margin-left:6px;"
+                                  th:text="${course.resources != null ? course.resources.size() : 0}">0</span>
+                        </button>
                     </div>
 
                     <!-- TAB: COURSE INFO -->
@@ -690,7 +771,8 @@
                                                 </div>
                                                 <div style="display:flex;align-items:center;gap:12px;">
                                                     <span class="lesson-duration">
-                                                        <i class="far fa-clock"></i> --
+                                                        <i class="far fa-clock"></i>
+                                                        <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
                                                     </span>
                                                     <div th:if="${isEnrolled}" class="lesson-status-box" 
                                                          th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
@@ -734,7 +816,8 @@
                                                 </div>
                                                 <div style="display:flex;align-items:center;gap:12px;">
                                                     <span class="lesson-duration">
-                                                        <i class="far fa-clock"></i> --
+                                                        <i class="far fa-clock"></i>
+                                                        <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
                                                     </span>
                                                     <div th:if="${isEnrolled}" class="lesson-status-box" 
                                                          th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
@@ -830,6 +913,48 @@
                         </div>
                         <div sec:authorize="isAnonymous()" style="margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;text-align:center;font-size:14px;color:#6b7280;">
                             <a th:href="@{/auth/login}" style="color:#6d28d9;font-weight:600;">Đăng nhập</a> để viết đánh giá khóa học.
+                        </div>
+                    </div>
+
+                    <!-- TAB: RESOURCES -->
+                    <div id="tab-resources" class="cd-tab-content">
+                        <div class="resources-intro">
+                            <h3 class="section-title-sm">Tài liệu học tập</h3>
+                            <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">
+                                <i class="fas fa-info-circle"></i> Tải về các tài liệu bổ trợ, mã nguồn mẫu và slides bài giảng để hỗ trợ việc học.
+                            </p>
+                        </div>
+
+                        <div th:if="${course.resources != null and !course.resources.isEmpty()}" class="resources-grid">
+                            <div th:each="resource : ${course.resources}" class="resource-premium-card">
+                                <div class="resource-icon-box" 
+                                     th:classappend="${resource.fileType == 'PDF' ? 'pdf' : 
+                                                      (resource.fileType == 'ZIP' ? 'zip' : 
+                                                      (resource.fileType == 'CODE' ? 'code' : 'link'))}">
+                                    <i th:class="${resource.fileType == 'PDF' ? 'fas fa-file-pdf' : 
+                                                 (resource.fileType == 'ZIP' ? 'fas fa-file-archive' : 
+                                                 (resource.fileType == 'CODE' ? 'fas fa-file-code' : 'fas fa-external-link-alt'))}"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <h4 th:text="${resource.title}">Resource Title</h4>
+                                    <div class="resource-meta-info">
+                                        <span th:text="${resource.fileType}">PDF</span>
+                                        <span class="dot">•</span>
+                                        <span th:text="${resource.external ? 'Cloud Link' : 'Server File'}">Nguồn</span>
+                                    </div>
+                                </div>
+                                <div class="resource-action">
+                                    <a th:href="${resource.url}" target="_blank" class="download-btn-premium" th:title="${resource.external ? 'Mở liên kết ngoài' : 'Tải file từ server'}">
+                                        <i th:class="${resource.external ? 'fas fa-external-link-alt' : 'fas fa-download'}"></i> 
+                                        <span th:text="${resource.external ? 'Mở Link' : 'Tải về'}">Tải về</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${course.resources == null or course.resources.isEmpty()}" class="empty-resources">
+                            <i class="fas fa-folder-open"></i>
+                            <p>Khóa học này hiện chưa có tài liệu đính kèm.</p>
                         </div>
                     </div>
                 </div>

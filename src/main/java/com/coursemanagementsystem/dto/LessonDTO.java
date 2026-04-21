@@ -23,4 +23,6 @@ public class LessonDTO {
     private Long courseId;
 
     private Long sectionId;
+
+    private String duration;
 }
