@@ -104,4 +104,32 @@ public class LessonController {
         redirectAttributes.addFlashAttribute("lessonSuccess", "Da danh dau bai hoc la da hoc.");
         return "redirect:/lessons/" + id;
     }
+
+    @PostMapping("/lessons/{id}/toggle-progress")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<String> toggleLessonProgress(@PathVariable Long id) {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+            return org.springframework.http.ResponseEntity.status(401).body("UNAUTHORIZED");
+        }
+
+        User user = userService.findByUsername(auth.getName());
+        Lesson lesson = lessonService.findById(id);
+
+        if (user == null || lesson == null) {
+            return org.springframework.http.ResponseEntity.status(404).body("NOT_FOUND");
+        }
+
+        boolean canToggle = auth.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority) || "ROLE_INSTRUCTOR".equals(authority))
+                || enrollmentService.isEnrolled(user.getId(), lesson.getCourse().getId());
+
+        if (!canToggle) {
+            return org.springframework.http.ResponseEntity.status(403).body("FORBIDDEN");
+        }
+
+        boolean isCompletedNow = lessonProgressService.toggleProgress(user, lesson);
+        return org.springframework.http.ResponseEntity.ok(isCompletedNow ? "COMPLETED" : "REMOVED");
+    }
 }

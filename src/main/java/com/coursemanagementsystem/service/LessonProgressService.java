@@ -42,5 +42,20 @@ public class LessonProgressService {
     public long countCompletedLessons(Long userId, Long courseId) {
         return lessonProgressRepository.countByUserIdAndLessonCourseId(userId, courseId);
     }
+
+    public boolean toggleProgress(User user, Lesson lesson) {
+        var existing = lessonProgressRepository.findByUserIdAndLessonId(user.getId(), lesson.getId());
+        if (existing.isPresent()) {
+            lessonProgressRepository.delete(existing.get());
+            return false; // Result: NOT COMPLETED
+        } else {
+            LessonProgress progress = new LessonProgress();
+            progress.setUser(user);
+            progress.setLesson(lesson);
+            progress.setCompletedAt(LocalDateTime.now());
+            lessonProgressRepository.save(progress);
+            return true; // Result: COMPLETED
+        }
+    }
 }
 
