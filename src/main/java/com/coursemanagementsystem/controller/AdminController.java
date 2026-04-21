@@ -28,6 +28,8 @@ public class AdminController {
     private UserService userService;
     @Autowired
     private LessonService lessonService;
+    @Autowired
+    private com.coursemanagementsystem.repository.CourseSectionRepository courseSectionRepository;
 
     @GetMapping("/course-list")
     public String findALlCourseList(@RequestParam(value = "page", defaultValue = "1") int page,
@@ -167,11 +169,15 @@ public class AdminController {
     }
 
     @GetMapping("course/{courseId}/add-lesson")
-    public String showAddLessonForm(@PathVariable("courseId") Long courseId, Model model) {
+    public String showAddLessonForm(@PathVariable("courseId") Long courseId, 
+                                    @RequestParam(value = "sectionId", required = false) Long sectionId,
+                                    Model model) {
         LessonDTO dto = new LessonDTO();
         dto.setCourseId(courseId);
+        dto.setSectionId(sectionId);
         model.addAttribute("lessonDTO", dto);
         model.addAttribute("courseId", courseId);
+        model.addAttribute("sections", courseSectionRepository.findByCourseIdOrderByDisplayOrderAsc(courseId));
         model.addAttribute("courseTitle", courseService.findById(courseId).getTitle());
         model.addAttribute("activeMenu", "lessons");
         return "admin/add-lesson";
@@ -184,6 +190,7 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("courseId", dto.getCourseId());
             if (dto.getCourseId() != null) {
+                model.addAttribute("sections", courseSectionRepository.findByCourseIdOrderByDisplayOrderAsc(dto.getCourseId()));
                 model.addAttribute("courseTitle", courseService.findById(dto.getCourseId()).getTitle());
             } else {
                 model.addAttribute("courses", courseService.findAll());
@@ -236,8 +243,10 @@ public class AdminController {
         dto.setTitle(lesson.getTitle());
         dto.setVideoUrl(lesson.getVideoUrl());
         dto.setCourseId(lesson.getCourse().getId());
+        dto.setSectionId(lesson.getSection() != null ? lesson.getSection().getId() : null);
         model.addAttribute("lessonDTO", dto);
         model.addAttribute("courseId", lesson.getCourse().getId());
+        model.addAttribute("sections", courseSectionRepository.findByCourseIdOrderByDisplayOrderAsc(lesson.getCourse().getId()));
         model.addAttribute("courseTitle", lesson.getCourse().getTitle());
         model.addAttribute("activeMenu", "lessons");
         return "admin/add-lesson"; // reuse the same template

@@ -74,6 +74,23 @@
                 <!-- Hidden Course ID when coming from course detail page -->
                 <input th:unless="${courses != null}" type="hidden" th:field="*{courseId}">
 
+                <!-- Section (Chapter) Selection -->
+                <div class="form-group" th:if="${sections != null and !sections.isEmpty()}" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 25px;">
+                    <label for="sectionId">
+                        <i class="fas fa-folder-open"></i> Chọn Chương (Không bắt buộc)
+                    </label>
+                    <select id="sectionId" th:field="*{sectionId}" class="form-control">
+                        <option value="">-- Để trống (Không thuộc chương nào) --</option>
+                        <option th:each="sec : ${sections}"
+                                th:value="${sec.id}"
+                                th:text="${sec.title}">
+                        </option>
+                    </select>
+                    <small style="color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Giúp học viên dễ dàng theo dõi theo lộ trình học tập.
+                    </small>
+                </div>
+
                 <!-- Title -->
                 <div class="form-group">
                     <label for="title">

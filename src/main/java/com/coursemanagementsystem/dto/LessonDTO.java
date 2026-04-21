@@ -21,4 +21,6 @@ public class LessonDTO {
 
     @NotNull(message = "Khóa học không được để trống")
     private Long courseId;
+
+    private Long sectionId;
 }
