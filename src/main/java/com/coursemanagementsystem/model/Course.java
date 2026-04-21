@@ -54,6 +54,10 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String targetAudience;
 
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CourseSection> sections;
+
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<Lesson> lessons;
 }

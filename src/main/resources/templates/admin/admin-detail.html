@@ -82,53 +82,136 @@
         </div>
     </div>
 
-    <div class="admin-content" th:if="${course.lessons != null and !course.lessons.isEmpty()}">
-        <h3 style="color: var(--secondary-color); margin-bottom: 25px;">
-            <i class="fas fa-list-ul"></i> Danh Sách Bài Học
-        </h3>
+    <!-- New: Section Management Area -->
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="color: var(--secondary-color); margin: 0;">
+                <i class="fas fa-layer-group"></i> Quản Lý Nội Dung (Chương & Bài Học)
+            </h3>
+            <button class="btn btn-outline-primary" onclick="showAddSectionModal()">
+                <i class="fas fa-plus-circle"></i> Thêm Chương Mới
+            </button>
+        </div>
 
-        <div class="lesson-list">
-            <div th:each="lesson, iterStat : ${course.lessons}" class="lesson-item">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="lesson-info">
-                        <h4>
-                            <span th:text="${iterStat.index + 1}"></span>.
-                            <span th:text="${lesson.title}"></span>
+        <!-- Section list with nested lessons -->
+        <div th:if="${course.sections != null and !course.sections.isEmpty()}" class="admin-sections">
+            <div th:each="section : ${course.sections}" class="admin-section-card mb-4" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff;">
+                <div class="section-header d-flex justify-content-between align-items-center" style="background: #f8fafc; padding: 15px 25px; border-bottom: 1px solid #e2e8f0;">
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #1e293b;">
+                            <i class="fas fa-folder-open" style="color: var(--primary-color); margin-right: 10px;"></i>
+                            <span th:text="${section.title}">Section Title</span>
                         </h4>
+                        <small style="color: #64748b;" th:text="${section.lessons.size()} + ' bài học'"></small>
                     </div>
-                    <div class="lesson-actions">
-                        <a th:if="${lesson.videoUrl}" th:href="${lesson.videoUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-play"></i> Xem
+                    <div class="section-actions">
+                        <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson?sectionId=' + ${section.id}}" class="btn btn-sm btn-outline-primary" title="Thêm bài học vào chương này">
+                            <i class="fas fa-plus"></i> Thêm bài học
                         </a>
-                        <span th:unless="${lesson.videoUrl}" class="btn btn-outline-secondary btn-sm disabled">
-                            <i class="fas fa-play"></i> Xem
-                        </span>
-                        <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-edit"></i> Sửa
-                        </a>
-                        <button type="button"
-                                class="btn btn-outline-danger btn-sm btn-delete-lesson"
-                                th:data-id="${lesson.id}"
-                                th:data-title="${lesson.title}">
-                            <i class="fas fa-trash"></i> Xóa
+                        <button type="button" class="btn btn-sm btn-outline-info btn-edit-section" 
+                                th:data-id="${section.id}" 
+                                th:data-title="${section.title}" 
+                                title="Sửa tên chương">
+                            <i class="fas fa-edit"></i>
                         </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" th:onclick="'showDeleteSectionConfirm(' + ${section.id} + ')'" title="Xóa chương">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body" style="padding: 10px 25px;">
+                    <div th:if="${section.lessons != null and !section.lessons.isEmpty()}">
+                        <div th:each="lesson : ${section.lessons}" class="admin-lesson-row py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #f1f5f9;">
+                            <div class="lesson-info">
+                                <span style="color: #94a3b8; font-family: monospace; margin-right: 10px;" th:text="${lessonStat.index + 1}"></span>
+                                <span th:text="${lesson.title}" style="color: #475569; font-weight: 500;"></span>
+                            </div>
+                            <div class="lesson-actions">
+                                <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-sm btn-link text-primary" title="Sửa bài học"><i class="fas fa-edit"></i></a>
+                                <button type="button" class="btn btn-sm btn-link text-danger btn-delete-lesson" th:data-id="${lesson.id}" th:data-title="${lesson.title}" title="Xóa bài học"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${section.lessons == null or section.lessons.isEmpty()}" class="text-center py-3" style="color: #94a3b8; font-style: italic;">
+                        Chưa có bài học nào trong chương này.
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="admin-content" th:if="${course.lessons == null or course.lessons.isEmpty()}">
-        <div class="text-center py-5">
-            <i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h4 style="color: var(--text-muted);">Chưa có bài học nào</h4>
-            <p style="color: var(--text-muted);">Hãy thêm bài học đầu tiên cho khóa học này.</p>
-            <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson'}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Thêm Bài Học Đầu Tiên
-            </a>
+        <!-- Fallback for unassigned lessons (Auto-Migration rejected, but good to show them if they exist) -->
+        <div th:if="${course.lessons != null and !course.lessons.isEmpty()}" class="mt-4">
+             <h4 style="font-size: 1rem; color: #64748b; margin-bottom: 15px;">Bài học lẻ (Chưa thuộc chương nào)</h4>
+             <div class="admin-section-card" style="border: 1px dashed #e2e8f0; border-radius: 12px; padding: 20px;">
+                <div th:each="lesson : ${course.lessons}" th:if="${lesson.section == null}" class="admin-lesson-row py-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-play-circle" style="color: #cbd5e1; margin-right: 10px;"></i>
+                        <span th:text="${lesson.title}"></span>
+                    </div>
+                    <div>
+                        <a th:href="@{'/admin/edit-lesson/' + ${lesson.id}}" class="btn btn-sm btn-link text-primary"><i class="fas fa-edit"></i></a>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}" class="text-center py-5">
+            <i class="fas fa-layer-group" style="font-size: 4rem; color: #e2e8f0; margin-bottom: 20px; display: block;"></i>
+            <h4 style="color: #94a3b8;">Khóa học này chưa có nội dung</h4>
+            <p style="color: #94a3b8;">Bắt đầu bằng việc thêm các chương (Modules) đào tạo.</p>
+            <button class="btn btn-primary" onclick="showAddSectionModal()">
+                <i class="fas fa-plus"></i> Thêm Chương Đầu Tiên
+            </button>
         </div>
     </div>
-</div>
+
+    <!-- Modals -->
+    <div id="addSectionModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3><i class="fas fa-plus-circle"></i> Thêm Chương Mới</h3>
+            <form th:action="@{/admin/sections/add}" method="post">
+                <input type="hidden" name="courseId" th:value="${course.id}">
+                <div class="form-group mb-3">
+                    <label>Tên chương (Ví dụ: Chương 1: Giới thiệu)</label>
+                    <input type="text" name="title" class="form-control" placeholder="Nhập tên chương..." required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Thêm Chương</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideAddSectionModal()">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editSectionModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3><i class="fas fa-edit"></i> Chỉnh Sửa Tên Chương</h3>
+            <form th:action="@{/admin/sections/update}" method="post">
+                <input type="hidden" name="id" id="editSectionId">
+                <div class="form-group mb-3">
+                    <label>Tên chương mới</label>
+                    <input type="text" name="title" id="editSectionTitle" class="form-control" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Cập Nhật</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideEditSectionModal()">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteSectionConfirmBox" class="modal-overlay">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Chương</h3>
+            <p>Xóa chương này sẽ **KHÔNG** xóa các bài học bên trong, nhưng chúng sẽ không còn nằm trong chương nào.</p>
+            <div class="modal-actions">
+                <form id="deleteSectionForm" method="post">
+                    <button type="submit" class="btn btn-danger">Đồng Ý Xóa</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideDeleteSectionConfirm()">Hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 </div>
 
@@ -170,9 +253,38 @@
             </button>
         </div>
     </div>
-</div>
+</div> <!-- admin-container -->
+</div> <!-- admin-shell-main -->
+</div> <!-- admin-shell -->
 
 <script>
+    function showAddSectionModal() {
+        document.getElementById("addSectionModal").style.display = "flex";
+    }
+
+    function hideAddSectionModal() {
+        document.getElementById("addSectionModal").style.display = "none";
+    }
+
+    function showDeleteSectionConfirm(id) {
+        document.getElementById("deleteSectionForm").action = '/admin/sections/delete/' + id;
+        document.getElementById("deleteSectionConfirmBox").style.display = "flex";
+    }
+
+    function hideDeleteSectionConfirm() {
+        document.getElementById("deleteSectionConfirmBox").style.display = "none";
+    }
+
+    function showEditSectionModal(id, title) {
+        document.getElementById("editSectionId").value = id;
+        document.getElementById("editSectionTitle").value = title;
+        document.getElementById("editSectionModal").style.display = "flex";
+    }
+
+    function hideEditSectionModal() {
+        document.getElementById("editSectionModal").style.display = "none";
+    }
+
     function showConfirm() {
         document.getElementById("confirmBox").style.display = "flex";
     }
@@ -187,6 +299,13 @@
             const lessonId = button.getAttribute('data-id');
             const lessonTitle = button.getAttribute('data-title');
             showLessonConfirm(lessonId, lessonTitle);
+        }
+        
+        if (event.target.closest('.btn-edit-section')) {
+            const button = event.target.closest('.btn-edit-section');
+            const sectionId = button.getAttribute('data-id');
+            const sectionTitle = button.getAttribute('data-title');
+            showEditSectionModal(sectionId, sectionTitle);
         }
     });
 
@@ -204,6 +323,9 @@
         if (event.target.classList.contains('modal-overlay')) {
             hideConfirm();
             hideLessonConfirm();
+            hideAddSectionModal();
+            hideEditSectionModal();
+            hideDeleteSectionConfirm();
         }
     }
 
@@ -211,6 +333,9 @@
         if (event.key === "Escape") {
             hideConfirm();
             hideLessonConfirm();
+            hideAddSectionModal();
+            hideEditSectionModal();
+            hideDeleteSectionConfirm();
         }
     });
 </script>

@@ -3,6 +3,7 @@ package com.coursemanagementsystem.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name = "lessons")
@@ -20,8 +21,15 @@ public class Lesson {
     @NotBlank(message = "Video URL is required")
     private String videoUrl;
 
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
+    @ToString.Exclude
     private Course course;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_id")
+    @ToString.Exclude
+    private CourseSection section;
+
+    private int displayOrder;
 }

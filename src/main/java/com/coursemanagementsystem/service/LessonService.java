@@ -4,6 +4,7 @@ import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.repository.CourseRepository;
+import com.coursemanagementsystem.repository.CourseSectionRepository;
 import com.coursemanagementsystem.repository.LessonRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class LessonService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private CourseSectionRepository courseSectionRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -40,6 +44,10 @@ public class LessonService {
 
         Course course = courseRepository.findById(dto.getCourseId()).orElse(null);
         lesson.setCourse(course);
+
+        if (dto.getSectionId() != null) {
+            lesson.setSection(courseSectionRepository.findById(dto.getSectionId()).orElse(null));
+        }
 
         lessonRepository.save(lesson);
     }

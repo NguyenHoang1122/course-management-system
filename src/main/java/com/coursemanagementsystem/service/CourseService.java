@@ -10,11 +10,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
 public class CourseService {
 
     @Autowired
@@ -127,7 +129,18 @@ public class CourseService {
     public Course findByIdWithLessons(Long id) {
         Course course = courseRepository.findById(id).orElse(null);
         if (course != null) {
-            course.getLessons().size();
+            // Khởi tạo các chương và bài học bên trong
+            if (course.getSections() != null) {
+                course.getSections().forEach(section -> {
+                    if (section.getLessons() != null) {
+                        section.getLessons().size();
+                    }
+                });
+            }
+            // Giữ lại lessons list cho tương thích ngược (legacy)
+            if (course.getLessons() != null) {
+                course.getLessons().size();
+            }
         }
         return course;
     }

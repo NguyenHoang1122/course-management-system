@@ -601,55 +601,86 @@
                             </div>
                         </div>
 
-                        <!-- Course Content (Accordion Lessons) -->
-                        <div th:if="${course.lessons != null and !course.lessons.isEmpty()}" style="margin-top: 28px;">
-                            <h3 class="section-title-sm" style="margin-bottom: 12px;">Course Content
-                                <span style="font-size:13px;color:#9ca3af;font-weight:400;margin-left:8px;"
-                                      th:text="'(' + ${course.lessons.size()} + ' bài học)'"></span>
-                            </h3>
+                        <!-- Course Content (Hierarchical Sections) -->
+                        <div style="margin-top: 28px;">
+                            <h3 class="section-title-sm" style="margin-bottom: 12px;">Course Content</h3>
+                            
                             <div class="cd-accordion">
-                                <!-- Nhóm tất cả lessons vào 1 section duy nhất nếu chưa có phân chương -->
-                                <div>
-                                    <div class="cd-acc-header open" data-acc-target="section-0">
-                                        <span><i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
-                                            Nội dung khóa học
-                                        </span>
-                                        <div style="display:flex;align-items:center;gap:12px;">
-                                            <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài'"></span>
-                                            <i class="fas fa-chevron-down acc-chevron"></i>
-                                        </div>
-                                    </div>
-                                    <div class="cd-acc-body open" id="section-0">
-                                        <div th:each="lesson, stat : ${course.lessons}" class="cd-lesson-row">
-                                            <div class="lesson-left">
-                                                <i class="fas fa-play-circle"></i>
-                                                <span th:text="${stat.index + 1} + '. ' + ${lesson.title}">Lesson</span>
-                                            </div>
+                                <!-- CASE 1: Hierarchical Sections -->
+                                <th:block th:if="${course.sections != null and !course.sections.isEmpty()}">
+                                    <div th:each="section, sStat : ${course.sections}" class="cd-acc-item" style="margin-bottom: 10px; border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                        <div class="cd-acc-header" th:classappend="${sStat.index == 0} ? 'open' : ''" th:attr="data-acc-target='section-' + ${section.id}">
+                                            <span style="font-weight: 600;">
+                                                <i class="fas fa-folder-open" style="margin-right:8px;color:#6d28d9;"></i>
+                                                <span th:text="${section.title}">Section Title</span>
+                                            </span>
                                             <div style="display:flex;align-items:center;gap:12px;">
-                                                <span class="lesson-duration">
-                                                    <i class="far fa-clock"></i> --
-                                                </span>
-                                                <a th:if="${isEnrolled}"
-                                                   th:href="@{'/lessons/' + ${lesson.id}}"
-                                                   style="background:#ede9fe;color:#6d28d9;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">
-                                                    Vào học
-                                                </a>
-                                                <span th:unless="${isEnrolled}"
-                                                      style="color:#d1d5db;font-size:13px;">
-                                                    <i class="fas fa-lock"></i>
-                                                </span>
+                                                <span class="acc-section-meta" th:text="${section.lessons.size()} + ' bài học'"></span>
+                                                <i class="fas fa-chevron-down acc-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
+                                            <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row">
+                                                <div class="lesson-left">
+                                                    <i class="fas fa-play-circle" style="color: #94a3b8;"></i>
+                                                    <span th:text="${lesson.title}">Lesson</span>
+                                                </div>
+                                                <div style="display:flex;align-items:center;gap:12px;">
+                                                    <span class="lesson-duration">
+                                                        <i class="far fa-clock"></i> --
+                                                    </span>
+                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter">Vào học</a>
+                                                    <span th:unless="${isEnrolled}" class="lesson-locked">
+                                                        <i class="fas fa-lock"></i>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </th:block>
+
+                                <!-- CASE 2: Fallback Flat List (no sections) -->
+                                <th:block th:if="${(course.sections == null or course.sections.isEmpty()) and course.lessons != null and !course.lessons.isEmpty()}">
+                                    <div class="cd-acc-item" style="border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                        <div class="cd-acc-header open" data-acc-target="section-0">
+                                            <span style="font-weight: 600;">
+                                                <i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
+                                                Nội dung khóa học
+                                            </span>
+                                            <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài học'"></span>
+                                                <i class="fas fa-chevron-down acc-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="cd-acc-body open" id="section-0">
+                                            <div th:each="lesson : ${course.lessons}" class="cd-lesson-row">
+                                                <div class="lesson-left">
+                                                    <i class="fas fa-play-circle" style="color: #94a3b8;"></i>
+                                                    <span th:text="${lesson.title}">Lesson</span>
+                                                </div>
+                                                <div style="display:flex;align-items:center;gap:12px;">
+                                                    <span class="lesson-duration">
+                                                        <i class="far fa-clock"></i> --
+                                                    </span>
+                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter">Vào học</a>
+                                                    <span th:unless="${isEnrolled}" class="lesson-locked">
+                                                        <i class="fas fa-lock"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
+
+                                <!-- CASE 3: No content yet -->
+                                <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}" 
+                                     style="text-align:center; padding: 40px 0; color: #9ca3af;">
+                                    <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                                    <p>Chưa có bài học nào. Hãy quay lại sau!</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Empty lessons state -->
-                        <div th:if="${course.lessons == null or course.lessons.isEmpty()}" style="margin-top:28px; text-align:center; padding: 40px 0; color: #9ca3af;">
-                            <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
-                            <p>Chưa có bài học nào. Hãy quay lại sau!</p>
-                        </div>
                     </div>
 
                     <!-- TAB: REVIEWS -->
