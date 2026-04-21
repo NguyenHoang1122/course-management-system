@@ -34,18 +34,24 @@
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <p class="mb-0" th:text="'Showing ' + ${courses.size()} + ' of ' + ${totalItems} + ' results'">Showing 6 of 20 results</p>
                 <div class="sort-dropdown">
-                    <select class="form-control" style="border-radius: 20px; padding: 5px 20px;">
-                        <option>Release Date (newest first)</option>
-                        <option>Price (low to high)</option>
-                        <option>Price (high to low)</option>
-                    </select>
+                    <form th:action="@{/courses}" method="get" style="display: flex; gap: 10px; align-items: center;">
+                        <label for="sortBy" style="margin: 0; font-weight: 600;">Sort by:</label>
+                        <select class="form-control" id="sortBy" name="sortBy"
+                                style="border-radius: 20px; padding: 8px 15px; width: auto; display: inline-block;"
+                                onchange="this.form.submit()">
+                            <option value="newest" th:selected="${sortBy == 'newest'}">Newest First</option>
+                            <option value="oldest" th:selected="${sortBy == 'oldest'}">Oldest First</option>
+                            <option value="price_low_high" th:selected="${sortBy == 'price_low_high'}">Price: Low to High</option>
+                            <option value="price_high_low" th:selected="${sortBy == 'price_high_low'}">Price: High to Low</option>
+                        </select>
+                    </form>
                 </div>
             </div>
 
             <!-- Course Grid -->
             <div class="course-grid">
                 <!-- Iterate through courses -->
-                <div th:each="course : ${courses}" class="premium-course-card">
+                <div th:each="course : ${courses}" class="premium-course-card" th:onclick="|window.location.href='/courses/' + ${course.id}|" style="cursor: pointer;">
                     <div class="course-img-wrapper">
                         <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" alt="Course Image">
                         
@@ -53,6 +59,7 @@
                         <button class="wishlist-heart-btn" 
                                 th:classappend="${wishlistedCourseIds.contains(course.id)} ? 'active' : ''"
                                 th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'"
+                                onclick="event.stopPropagation();"
                                 title="Thêm vào Wishlist">
                             <i th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
                         </button>
@@ -71,7 +78,7 @@
                         </div>
                         
                         <h3>
-                            <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}">Course Title</a>
+                            <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}" style="color: inherit; text-decoration: none;">Course Title</a>
                         </h3>
                         
                         <div class="course-meta">
@@ -94,9 +101,7 @@
                     
                     <div class="course-footer">
                         <div class="course-price" th:text="${course.price > 0 ? #numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT') + ' VND' : 'Free'}">0 VND</div>
-                        <a th:href="@{'/courses/' + ${course.id}}" class="cart-btn">
-                            <i class="fas fa-shopping-cart"></i>
-                        </a>
+                        <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary view-btn" onclick="event.stopPropagation();">Xem</a>
                     </div>
                 </div>
             </div>
@@ -105,15 +110,15 @@
             <nav th:if="${totalPages > 1}" aria-label="Course pagination" class="premium-pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-left"></i></a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}"><i class="fas fa-chevron-left"></i></a>
                     </li>
 
                     <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}" th:text="${i}">1</a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}" th:text="${i}">1</a>
                     </li>
 
                     <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-right"></i></a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage + 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}"><i class="fas fa-chevron-right"></i></a>
                     </li>
                 </ul>
             </nav>

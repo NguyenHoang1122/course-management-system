@@ -7,6 +7,7 @@ import com.coursemanagementsystem.repository.CourseRepository;
 import com.coursemanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,70 @@ public class CourseService {
         }
 
         return courseRepository.searchCourses(keyword.trim(), pageable);
+    }
+
+    public Page<Course> findCoursesFiltered(String keyword, Double minPrice, Double maxPrice, String sortBy, int page, int size) {
+        int normalizedPage = Math.max(page - 1, 0);
+        int normalizedSize = normalizePageSize(size);
+        Pageable pageable = PageRequest.of(normalizedPage, normalizedSize);
+
+        List<Course> courses;
+
+        // Get base courses
+        courses = courseRepository.findAll();
+
+
+        // Apply sort
+        if (sortBy != null && !sortBy.isEmpty()) {
+            courses = sortCourses(courses, sortBy);
+        }
+
+        // Apply pagination manually
+        int total = courses.size();
+        int start = normalizedPage * normalizedSize;
+        int end = Math.min(start + normalizedSize, total);
+
+        if (start >= total) {
+            courses = List.of();
+        } else {
+            courses = courses.subList(start, end);
+        }
+
+        return new PageImpl<>(courses, pageable, total);
+    }
+
+    private List<Course> sortCourses(List<Course> courses, String sortBy) {
+        return switch (sortBy) {
+            case "price_low_high" -> courses.stream()
+                    .sorted((a, b) -> {
+                        Double priceA = a.getPrice() != null ? a.getPrice().doubleValue() : 0.0;
+                        Double priceB = b.getPrice() != null ? b.getPrice().doubleValue() : 0.0;
+                        return priceA.compareTo(priceB);
+                    })
+                    .toList();
+            case "price_high_low" -> courses.stream()
+                    .sorted((a, b) -> {
+                        Double priceA = a.getPrice() != null ? a.getPrice().doubleValue() : 0.0;
+                        Double priceB = b.getPrice() != null ? b.getPrice().doubleValue() : 0.0;
+                        return priceB.compareTo(priceA);
+                    })
+                    .toList();
+            case "newest" -> courses.stream()
+                    .sorted((a, b) -> {
+                        LocalDate dateA = a.getCreatedAt() != null ? a.getCreatedAt() : LocalDate.MIN;
+                        LocalDate dateB = b.getCreatedAt() != null ? b.getCreatedAt() : LocalDate.MIN;
+                        return dateB.compareTo(dateA);
+                    })
+                    .toList();
+            case "oldest" -> courses.stream()
+                    .sorted((a, b) -> {
+                        LocalDate dateA = a.getCreatedAt() != null ? a.getCreatedAt() : LocalDate.MIN;
+                        LocalDate dateB = b.getCreatedAt() != null ? b.getCreatedAt() : LocalDate.MIN;
+                        return dateA.compareTo(dateB);
+                    })
+                    .toList();
+            default -> courses;
+        };
     }
 
     private int normalizePageSize(int size) {

@@ -48,9 +48,9 @@ public class CourseController {
     @GetMapping("")
     public String findAllCourse(@RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size,
-                                @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                @RequestParam(value = "sortBy", defaultValue = "newest") String sortBy,
                                 Model model, Principal principal) {
-        Page<Course> coursePage = courseService.findCoursesPaged(keyword, page, size);
+        Page<Course> coursePage = courseService.findCoursesFiltered(null, null, null, sortBy, page, size);
 
         // Calculate total value
         long totalValue = coursePage.getContent().stream()
@@ -91,7 +91,7 @@ public class CourseController {
         model.addAttribute("totalValue", totalValue);
         model.addAttribute("totalLessons", totalLessons);
         model.addAttribute("size", size);
-        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortBy", sortBy);
         model.addAttribute("pageTitle", "Course List");
         return "course/list";
     }
