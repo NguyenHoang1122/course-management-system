@@ -36,23 +36,30 @@ public class AdminController {
                                     @RequestParam(value = "size", defaultValue = "10") int size,
                                     @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                     Model model) {
-        Page<Course> coursePage = courseService.findCoursesPaged(keyword, page, size);
+        java.util.List<Course> allCourses = courseService.searchCoursesByKeyword(keyword);
+        int totalCourses = allCourses.size();
+        int normalizedPage = Math.max(page - 1, 0);
+        int totalPages = (int) Math.ceil((double) totalCourses / size);
+
+        int start = normalizedPage * size;
+        int end = Math.min(start + size, totalCourses);
+
+        java.util.List<Course> paginatedCourses = start >= totalCourses ? java.util.List.of() : allCourses.subList(start, end);
 
         // Calculate total value
-        long totalValue = coursePage.getContent().stream()
+        long totalValue = paginatedCourses.stream()
                 .mapToLong(course -> course.getPrice() != null ? course.getPrice().longValue() : 0)
                 .sum();
 
         // Calculate total lessons
-        long totalLessons = coursePage.getContent().stream()
+        long totalLessons = paginatedCourses.stream()
                 .mapToLong(course -> course.getLessons() != null ? course.getLessons().size() : 0)
                 .sum();
 
-        model.addAttribute("coursePage", coursePage);
-        model.addAttribute("courses", coursePage.getContent());
+        model.addAttribute("courses", paginatedCourses);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", coursePage.getTotalPages());
-        model.addAttribute("totalItems", coursePage.getTotalElements());
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalCourses);
         model.addAttribute("totalValue", totalValue);
         model.addAttribute("totalLessons", totalLessons);
         model.addAttribute("size", size);
@@ -292,8 +299,26 @@ public class AdminController {
     }
 
     @GetMapping("/lesson-list")
-    public String lessonList(Model model) {
-        model.addAttribute("lessons", lessonService.findAll());
+    public String lessonList(@RequestParam(value = "page", defaultValue = "1") int page,
+                            @RequestParam(value = "size", defaultValue = "10") int size,
+                            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                            Model model) {
+        java.util.List<Lesson> allLessons = lessonService.searchLessons(keyword);
+        int totalLessons = allLessons.size();
+        int normalizedPage = Math.max(page - 1, 0);
+        int totalPages = (int) Math.ceil((double) totalLessons / size);
+
+        int start = normalizedPage * size;
+        int end = Math.min(start + size, totalLessons);
+
+        java.util.List<Lesson> paginatedLessons = start >= totalLessons ? java.util.List.of() : allLessons.subList(start, end);
+
+        model.addAttribute("lessons", paginatedLessons);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalLessons);
+        model.addAttribute("size", size);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("activeMenu", "lessons");
         return "admin/lesson-list";
     }

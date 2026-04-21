@@ -45,30 +45,23 @@
             </a>
         </div>
 
-        <div class="list-toolbar-row mb-4">
-            <form th:action="@{/admin/course-list}" method="get" class="d-flex list-toolbar-form list-size-form">
-                <label for="adminPageSize" class="mb-0 toolbar-size-label"></label>
-                <input type="hidden" name="keyword" th:value="${keyword}">
+        <!-- Search Form -->
+        <div class="mb-4" style="background: var(--white); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+            <form th:action="@{/admin/course-list}" method="get" style="display: flex; gap: 10px; align-items: center;">
                 <input type="hidden" name="page" value="1">
-                <select id="adminPageSize" name="size" class="form-control toolbar-control toolbar-size-select" onchange="this.form.submit()">
-                    <option value="10" th:selected="${size == 10}">10</option>
-                    <option value="20" th:selected="${size == 20}">20</option>
-                    <option value="50" th:selected="${size == 50}">50</option>
-                </select>
+                <input type="hidden" name="size" th:value="${size}">
+                <label for="keyword" style="margin: 0; font-weight: 600; white-space: nowrap;"><i class="fas fa-search"></i> Tìm kiếm:</label>
+                <input type="text" id="keyword" name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Tìm theo tên khóa học..."
+                       style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+                <a th:href="@{/admin/course-list}" class="btn btn-secondary" style="white-space: nowrap;">
+                    <i class="fas fa-redo"></i> Xóa bộ lọc
+                </a>
             </form>
-
-            <div class="d-flex list-toolbar-form list-search-side">
-                <form th:action="@{/admin/course-list}" method="get" class="d-flex list-toolbar-form list-search-form">
-                    <label for="adminCourseKeyword" style="display:none;">Tìm khóa học</label>
-                    <input id="adminCourseKeyword" type="text" name="keyword" class="form-control toolbar-keyword"
-                           placeholder="Tìm theo tên, mô tả, giảng viên" th:value="${keyword}">
-                    <input type="hidden" name="size" th:value="${size}">
-                    <button type="submit" class="btn btn-outline-primary btn-sm toolbar-control toolbar-search-btn">
-                        <i class="fas fa-search"></i>
-                        <span>Tìm</span>
-                    </button>
-                </form>
-            </div>
         </div>
 
         <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
@@ -139,7 +132,7 @@
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{'/admin/course-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Previous</a>
+                       th:href="@{'/admin/course-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-left"></i></a>
                 </li>
 
                 <li class="page-item"
@@ -152,7 +145,7 @@
 
                 <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{'/admin/course-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">Next</a>
+                       th:href="@{'/admin/course-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-right"></i></a>
                 </li>
             </ul>
         </nav>

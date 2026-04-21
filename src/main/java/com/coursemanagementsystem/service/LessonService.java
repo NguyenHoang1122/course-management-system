@@ -64,6 +64,13 @@ public class LessonService {
         return lessonRepository.findAll();
     }
 
+    public List<Lesson> searchLessons(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return lessonRepository.findAll();
+        }
+        return lessonRepository.searchLessons(keyword.trim());
+    }
+
     public Lesson getLessonForUser(Long lessonId, Long userId) {
 
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);

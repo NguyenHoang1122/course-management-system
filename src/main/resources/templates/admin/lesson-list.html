@@ -21,7 +21,7 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3 th:text="${lessons != null ? lessons.size() : 0}">0</h3>
+                    <h3 th:text="${totalItems != null ? totalItems : 0}">0</h3>
                     <p><i class="fas fa-list"></i> Tổng Bài Học</p>
                 </div>
             </div>
@@ -34,6 +34,25 @@
                     <a th:href="@{/admin/create-lesson}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Tạo Bài Học Mới
                     </a>
+                </div>
+
+                <!-- Search Form -->
+                <div class="mb-4" style="background: var(--white); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <form th:action="@{/admin/lesson-list}" method="get" style="display: flex; gap: 10px; align-items: center;">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="size" th:value="${size}">
+                        <label for="keyword" style="margin: 0; font-weight: 600; white-space: nowrap;"><i class="fas fa-search"></i> Tìm kiếm:</label>
+                        <input type="text" id="keyword" name="keyword"
+                               th:value="${keyword}"
+                               placeholder="Tìm theo tên bài học hoặc khóa học..."
+                               style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                        <a th:href="@{/admin/lesson-list}" class="btn btn-secondary" style="white-space: nowrap;">
+                            <i class="fas fa-redo"></i> Xóa bộ lọc
+                        </a>
+                    </form>
                 </div>
 
                 <div th:if="${lessons != null and !lessons.isEmpty()}" class="course-grid">
@@ -95,6 +114,23 @@
                         <i class="fas fa-plus"></i> Tạo Bài Học Đầu Tiên
                     </a>
                 </div>
+
+                <!-- Pagination -->
+                <nav th:if="${totalPages != null && totalPages > 1}" aria-label="Lesson pagination" class="premium-pagination" style="margin-top: 30px;">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-left"></i></a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}" th:text="${i}">1</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
