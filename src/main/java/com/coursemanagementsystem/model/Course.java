@@ -33,6 +33,7 @@ public class Course {
     private User instructor;
 
     private String imageUrl; //anh thu nho khoa hoc
+    private String previewVideoUrl; //video gioi thieu khoa hoc
     private String category; //danh muc khoa hoc
 
     // === NEW FIELDS ===

@@ -43,6 +43,7 @@ public class CourseService {
             course.setDescription(dto.getDescription());
             course.setPrice(dto.getPrice());
             course.setImageUrl(dto.getImageUrl());
+            course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
             course.setCategory(dto.getCategory());
 
         } else {
@@ -52,6 +53,7 @@ public class CourseService {
             course.setDescription(dto.getDescription());
             course.setPrice(dto.getPrice());
             course.setImageUrl(dto.getImageUrl());
+            course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
             course.setCategory(dto.getCategory());
             course.setCreatedAt(LocalDate.now());
         }
@@ -172,6 +174,7 @@ public class CourseService {
         dto.setDescription(course.getDescription());
         dto.setPrice(course.getPrice());
         dto.setImageUrl(course.getImageUrl());
+        dto.setPreviewVideoUrl(course.getPreviewVideoUrl());
         dto.setCategory(course.getCategory());
 
         if (course.getInstructor() != null) {

@@ -276,6 +276,37 @@
         .cd-lesson-row .lesson-duration { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
         .acc-section-meta { font-size: 12px; color: #9ca3af; font-weight: 400; }
 
+        /* ACTIVE LESSON HIGHLIGHT - PREMIUM STYLE */
+        .cd-lesson-row.active-lesson {
+            background: linear-gradient(to right, #f0f4ff, #ffffff) !important;
+            border-left: 4px solid #6366f1 !important;
+            box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .cd-lesson-row.active-lesson::after {
+            content: 'NOW PLAYING';
+            position: absolute;
+            right: 130px;
+            font-size: 9px;
+            font-weight: 800;
+            color: #6366f1;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+        .cd-lesson-row.active-lesson .lesson-left span {
+            color: #4338ca !important;
+            font-weight: 700;
+        }
+        .cd-lesson-row.active-lesson .lesson-left i {
+            color: #6366f1 !important;
+            transform: scale(1.2);
+        }
+        .cd-lesson-row.active-lesson .lesson-preview-btn {
+            background: #6366f1 !important;
+            color: #fff !important;
+        }
+
         /* ========== REVIEWS ========== */
         .review-summary {
             display: flex;
@@ -540,15 +571,25 @@
 
                 <!-- Course Image / Video Preview -->
                 <div class="cd-card" style="padding: 0; overflow: hidden;">
-                    <div class="course-media-wrap">
-                        <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty()
-                                        ? (course.imageUrl.startsWith('http') ? course.imageUrl
-                                            : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl))
-                                        : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop'}"
+                    <div class="course-media-wrap" id="mainPlayerContainer" style="position: relative;">
+                        <img id="courseThumbnail" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
                              alt="Course Preview">
-                        <div class="play-btn-overlay">
+                        
+                        <!-- Overlay for course intro video -->
+                        <div class="play-btn-overlay" th:if="${course.previewVideoUrl != null and !course.previewVideoUrl.isEmpty()}" 
+                             th:data-video-url="${course.previewVideoUrl}"
+                             onclick="playCoursePreview(this)" style="cursor: pointer;">
                             <i class="fas fa-play"></i>
                         </div>
+                        
+                        <!-- Video Placeholder (Hidden by default) -->
+                        <div id="videoEmbedWrapper" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
+                             <div id="playerPlaceholder" style="width:100%; height:100%;"></div>
+                             <button type="button" onclick="closePlayer()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
+                                 <i class="fas fa-times"></i>
+                             </button>
+                        </div>
+
                         <div class="media-duration-badge" th:if="${course.duration != null}">
                             <i class="far fa-clock" style="margin-right:4px;"></i>
                             <span th:text="${course.duration}"></span>
@@ -620,19 +661,26 @@
                                             </div>
                                         </div>
                                         <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
-                                            <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row">
+                                            <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row" 
+                                                 th:classappend="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'playable' : 'locked'"
+                                                 th:data-video-url="${lesson.videoUrl}"
+                                                 th:data-lesson-title="${lesson.title}"
+                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
                                                 <div class="lesson-left">
-                                                    <i class="fas fa-play-circle" style="color: #94a3b8;"></i>
+                                                    <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'" 
+                                                       th:style="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
                                                     <span th:text="${lesson.title}">Lesson</span>
+                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="preview-badge">Dùng thử</span>
                                                 </div>
                                                 <div style="display:flex;align-items:center;gap:12px;">
                                                     <span class="lesson-duration">
                                                         <i class="far fa-clock"></i> --
                                                     </span>
-                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter">Vào học</a>
-                                                    <span th:unless="${isEnrolled}" class="lesson-locked">
+                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter" onclick="event.stopPropagation()">Vào học</a>
+                                                    <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
                                                         <i class="fas fa-lock"></i>
                                                     </span>
+                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -653,19 +701,26 @@
                                             </div>
                                         </div>
                                         <div class="cd-acc-body open" id="section-0">
-                                            <div th:each="lesson : ${course.lessons}" class="cd-lesson-row">
+                                            <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
+                                                 th:classappend="${isEnrolled or lStat.index == 0} ? 'playable' : 'locked'"
+                                                 th:data-video-url="${lesson.videoUrl}"
+                                                 th:data-lesson-title="${lesson.title}"
+                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
                                                 <div class="lesson-left">
-                                                    <i class="fas fa-play-circle" style="color: #94a3b8;"></i>
+                                                    <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
+                                                       th:style="${isEnrolled or lStat.index == 0} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
                                                     <span th:text="${lesson.title}">Lesson</span>
+                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="preview-badge">Dùng thử</span>
                                                 </div>
                                                 <div style="display:flex;align-items:center;gap:12px;">
                                                     <span class="lesson-duration">
                                                         <i class="far fa-clock"></i> --
                                                     </span>
-                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter">Vào học</a>
-                                                    <span th:unless="${isEnrolled}" class="lesson-locked">
+                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter" onclick="event.stopPropagation()">Vào học</a>
+                                                    <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
                                                         <i class="fas fa-lock"></i>
                                                     </span>
+                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -687,7 +742,7 @@
                     <div id="tab-reviews" class="cd-tab-content">
                         <!-- Rating Summary -->
                         <div class="review-summary">
-                            <div class="review-big-score" th:text="${#numbers.formatDecimal(averageRating,1,1)}">4.8</div>
+                            <div class="review-big-score" th:text="${#numbers.formatDecimal(averageRating,1,1)}">0.0</div>
                             <div>
                                 <div class="review-stars-row">
                                     <th:block th:each="i : ${#numbers.sequence(1,5)}">
@@ -789,7 +844,8 @@
                         <!-- Wishlist Toggle -->
                         <div class="wishlist-btn-wrap">
                             <button th:id="'wishlistBtn-' + ${course.id}" class="btn-wishlist" th:classappend="${isWishlisted} ? 'active' : ''" 
-                                    th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'">
+                                    th:data-course-id="${course.id}"
+                                    onclick="handleWishlistClick(this, event)">
                                 <i th:class="${isWishlisted} ? 'fas fa-heart' : 'far fa-heart'"></i>
                                 <span th:id="'wishlist-text-' + ${course.id}" th:text="${isWishlisted} ? 'Đã trong Wishlist' : 'Thêm vào Wishlist'">Yêu thích</span>
                             </button>
@@ -913,6 +969,78 @@
             }
         });
     });
+
+    // ===== VIDEO ENGINE =====
+    function playCoursePreview(element) {
+        const videoUrl = element.getAttribute('data-video-url');
+        if (!videoUrl) return;
+
+        // Clear any active lesson highlights when playing intro
+        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
+
+        renderVideoPlayer(videoUrl);
+    }
+
+    function playLesson(element) {
+        const videoUrl = element.getAttribute('data-video-url');
+        const title = element.getAttribute('data-lesson-title');
+        if (!videoUrl) return;
+
+        // Visual Highlight: Remove active from all, add to current
+        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
+        element.classList.add('active-lesson');
+
+        renderVideoPlayer(videoUrl);
+        // Scroll to player for mobile
+        if (window.innerWidth < 992) {
+            document.getElementById('mainPlayerContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function handleWishlistClick(element, event) {
+        const courseId = element.getAttribute('data-course-id');
+        if (typeof toggleWishlist === 'function') {
+            toggleWishlist(courseId, event, element);
+        }
+    }
+
+    function renderVideoPlayer(url) {
+        const wrapper = document.getElementById('videoEmbedWrapper');
+        const placeholder = document.getElementById('playerPlaceholder');
+        if (!wrapper || !placeholder) return;
+        
+        wrapper.style.display = 'block';
+        
+        let embedHtml = "";
+        // Improved Regex for YouTube and Vimeo
+        const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/|vimeo\.com\/channels\/.+\/|vimeo\.com\/groups\/.+\/videos\/)(\d+)(?:[#?].*)?/;
+        
+        const ytMatch = url.match(youtubeRegex);
+        const vimeoMatch = url.match(vimeoRegex);
+        
+        if (ytMatch) {
+            const videoId = ytMatch[1];
+            embedHtml = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (vimeoMatch) {
+            const videoId = vimeoMatch[1];
+            embedHtml = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (url.toLowerCase().endsWith('.mp4') || url.includes('.mp4?') || url.includes('.mp4#')) {
+            embedHtml = `<video width="100%" height="100%" controls autoplay style="background:#000;"><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+        } else {
+            // Fallback for direct links
+            embedHtml = `<iframe width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+        }
+        
+        placeholder.innerHTML = embedHtml;
+    }
+
+    function closePlayer() {
+        const wrapper = document.getElementById('videoEmbedWrapper');
+        const placeholder = document.getElementById('playerPlaceholder');
+        wrapper.style.display = 'none';
+        placeholder.innerHTML = '';
+    }
 </script>
 </body>
 </html>
