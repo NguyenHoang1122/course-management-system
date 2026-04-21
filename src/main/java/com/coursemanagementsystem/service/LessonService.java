@@ -60,6 +60,10 @@ public class LessonService {
         lessonRepository.deleteById(id);
     }
 
+    public void save(Lesson lesson) {
+        lessonRepository.save(lesson);
+    }
+
     public List<Lesson> findAll() {
         return lessonRepository.findAll();
     }

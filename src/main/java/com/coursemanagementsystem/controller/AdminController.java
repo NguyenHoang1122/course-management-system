@@ -3,6 +3,7 @@ package com.coursemanagementsystem.controller;
 import com.coursemanagementsystem.dto.CourseDTO;
 import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Course;
+import com.coursemanagementsystem.model.CourseSection;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.CourseService;
@@ -18,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -340,5 +343,74 @@ public class AdminController {
         model.addAttribute("courses", courseService.findAll());
         model.addAttribute("activeMenu", "lessons");
         return "admin/add-lesson";
+    }
+
+    @GetMapping("/course/{courseId}/select-lessons")
+    public String selectLessonsForSection(@PathVariable("courseId") Long courseId,
+                                          @RequestParam("sectionId") Long sectionId,
+                                          Model model) {
+        Course course = courseService.findByIdWithLessons(courseId);
+        if (course == null) {
+            return "redirect:/admin/course-list";
+        }
+        CourseSection section = courseSectionRepository.findById(sectionId).orElse(null);
+        if (section == null || !section.getCourse().getId().equals(courseId)) {
+            return "redirect:/admin/" + courseId;
+        }
+
+        // Get all lessons of the course
+        List<Lesson> allLessons = course.getLessons();
+
+        // Get lessons already in this section
+        List<Long> assignedLessonIds = section.getLessons().stream()
+                .map(Lesson::getId)
+                .collect(Collectors.toList());
+
+        model.addAttribute("course", course);
+        model.addAttribute("section", section);
+        model.addAttribute("allLessons", allLessons);
+        model.addAttribute("assignedLessonIds", assignedLessonIds);
+        model.addAttribute("activeMenu", "courses");
+        return "admin/select-lessons";
+    }
+
+    @PostMapping("/course/{courseId}/assign-lessons")
+    public String assignLessonsToSection(@PathVariable("courseId") Long courseId,
+                                         @RequestParam("sectionId") Long sectionId,
+                                         @RequestParam(value = "lessonIds", required = false) List<Long> lessonIds,
+                                         RedirectAttributes redirectAttributes) {
+        Course course = courseService.findByIdWithLessons(courseId);
+        if (course == null) {
+            return "redirect:/admin/course-list";
+        }
+        CourseSection section = courseSectionRepository.findById(sectionId).orElse(null);
+        if (section == null || !section.getCourse().getId().equals(courseId)) {
+            return "redirect:/admin/" + courseId;
+        }
+
+        // Get all lessons of the course
+        List<Lesson> allLessons = course.getLessons();
+
+        // First, remove all lessons from this section
+        for (Lesson lesson : allLessons) {
+            if (lesson.getSection() != null && lesson.getSection().getId().equals(sectionId)) {
+                lesson.setSection(null);
+                lessonService.save(lesson);
+            }
+        }
+
+        // Then, assign selected lessons to this section
+        if (lessonIds != null && !lessonIds.isEmpty()) {
+            for (Long lessonId : lessonIds) {
+                Lesson lesson = lessonService.findById(lessonId);
+                if (lesson != null && lesson.getCourse().getId().equals(courseId)) {
+                    lesson.setSection(section);
+                    lessonService.save(lesson);
+                }
+            }
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật bài học cho chương thành công.");
+        return "redirect:/admin/" + courseId;
     }
 }
