@@ -74,6 +74,13 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public List<Course> searchCoursesByKeyword(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return courseRepository.findAll();
+        }
+        return courseRepository.searchCourses(keyword.trim(), Pageable.unpaged()).getContent();
+    }
+
     public Page<Course> findCoursesPaged(String keyword, int page, int size) {
         int normalizedPage = Math.max(page - 1, 0);
         int normalizedSize = normalizePageSize(size);
