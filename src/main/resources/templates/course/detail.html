@@ -307,6 +307,21 @@
             color: #fff !important;
         }
 
+        /* LESSON COMPLETION STYLES */
+        .lesson-status-box {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .lesson-status-box:hover { transform: scale(1.2); }
+        .status-icon { font-size: 18px; color: #d1d5db; transition: color 0.3s; }
+        .cd-lesson-row.completed .status-icon { color: #10b981; }
+        .cd-lesson-row.completed .lesson-left span { color: #9ca3af; text-decoration: line-through; }
+
         /* ========== REVIEWS ========== */
         .review-summary {
             display: flex;
@@ -662,9 +677,10 @@
                                         </div>
                                         <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
                                             <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row" 
-                                                 th:classappend="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'playable' : 'locked'"
+                                                 th:data-lesson-id="${lesson.id}"
                                                  th:data-video-url="${lesson.videoUrl}"
                                                  th:data-lesson-title="${lesson.title}"
+                                                 th:classappend="${((isEnrolled or (sStat.index == 0 and lStat.index == 0)) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
                                                  onclick="if(this.classList.contains('playable')) playLesson(this)">
                                                 <div class="lesson-left">
                                                     <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'" 
@@ -676,7 +692,10 @@
                                                     <span class="lesson-duration">
                                                         <i class="far fa-clock"></i> --
                                                     </span>
-                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter" onclick="event.stopPropagation()">Vào học</a>
+                                                    <div th:if="${isEnrolled}" class="lesson-status-box" 
+                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                    </div>
                                                     <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
                                                         <i class="fas fa-lock"></i>
                                                     </span>
@@ -702,9 +721,10 @@
                                         </div>
                                         <div class="cd-acc-body open" id="section-0">
                                             <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
-                                                 th:classappend="${isEnrolled or lStat.index == 0} ? 'playable' : 'locked'"
+                                                 th:data-lesson-id="${lesson.id}"
                                                  th:data-video-url="${lesson.videoUrl}"
                                                  th:data-lesson-title="${lesson.title}"
+                                                 th:classappend="${((isEnrolled or lStat.index == 0) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
                                                  onclick="if(this.classList.contains('playable')) playLesson(this)">
                                                 <div class="lesson-left">
                                                     <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
@@ -716,7 +736,10 @@
                                                     <span class="lesson-duration">
                                                         <i class="far fa-clock"></i> --
                                                     </span>
-                                                    <a th:if="${isEnrolled}" th:href="@{'/lessons/' + ${lesson.id}}" class="btn-lesson-enter" onclick="event.stopPropagation()">Vào học</a>
+                                                    <div th:if="${isEnrolled}" class="lesson-status-box" 
+                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                    </div>
                                                     <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
                                                         <i class="fas fa-lock"></i>
                                                     </span>
@@ -971,30 +994,95 @@
     });
 
     // ===== VIDEO ENGINE =====
+    let currentActiveLessonId = null;
+    let ytPlayer = null;
+    let isYtApiReady = false;
+
+    // Load YouTube API
+    (function() {
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    })();
+
+    window.onYouTubeIframeAPIReady = function() {
+        console.log("YouTube API Ready");
+        isYtApiReady = true;
+    };
+
     function playCoursePreview(element) {
+        currentActiveLessonId = null; 
         const videoUrl = element.getAttribute('data-video-url');
         if (!videoUrl) return;
-
-        // Clear any active lesson highlights when playing intro
         document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
+        renderVideoPlayer(videoUrl);
+    }
 
+    function playCoursePreview(element) {
+        currentActiveLessonId = null; // Re-zero lesson tracking
+        const videoUrl = element.getAttribute('data-video-url');
+        if (!videoUrl) return;
+        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
         renderVideoPlayer(videoUrl);
     }
 
     function playLesson(element) {
+        currentActiveLessonId = element.getAttribute('data-lesson-id');
         const videoUrl = element.getAttribute('data-video-url');
         const title = element.getAttribute('data-lesson-title');
         if (!videoUrl) return;
-
-        // Visual Highlight: Remove active from all, add to current
         document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
         element.classList.add('active-lesson');
-
         renderVideoPlayer(videoUrl);
-        // Scroll to player for mobile
         if (window.innerWidth < 992) {
             document.getElementById('mainPlayerContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }
+
+    // Auto-complete logic when video ends
+    function markActiveLessonComplete() {
+        if (!currentActiveLessonId) return;
+        const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${currentActiveLessonId}"]`);
+        if (row && !row.classList.contains('completed')) {
+            const statusBox = row.querySelector('.lesson-status-box');
+            if (statusBox) toggleLessonStatus(currentActiveLessonId, statusBox);
+        }
+    }
+
+    function toggleLessonStatus(lessonId, element) {
+        if (!lessonId) return;
+        console.log("Progress Toggle triggered for Lesson ID:", lessonId);
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+        if (csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch(`/lessons/${lessonId}/toggle-progress`, {
+            method: 'POST',
+            headers: headers
+        })
+        .then(response => {
+            if (response.status === 401) { window.location.href = '/auth/login'; return; }
+            return response.text();
+        })
+        .then(status => {
+            console.log("Toggle Result from Server:", status);
+            const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
+            if (!row) return;
+            
+            const icon = row.querySelector('.status-icon');
+            if (status === 'COMPLETED') {
+                row.classList.add('completed');
+                if (icon) icon.className = 'fas fa-check-circle status-icon';
+            } else if (status === 'REMOVED') {
+                row.classList.remove('completed');
+                if (icon) icon.className = 'far fa-circle status-icon';
+            }
+        })
+        .catch(err => console.error('Error toggling progress:', err));
     }
 
     function handleWishlistClick(element, event) {
@@ -1008,31 +1096,49 @@
         const wrapper = document.getElementById('videoEmbedWrapper');
         const placeholder = document.getElementById('playerPlaceholder');
         if (!wrapper || !placeholder) return;
-        
         wrapper.style.display = 'block';
         
-        let embedHtml = "";
-        // Improved Regex for YouTube and Vimeo
         const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
         const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/|vimeo\.com\/channels\/.+\/|vimeo\.com\/groups\/.+\/videos\/)(\d+)(?:[#?].*)?/;
-        
         const ytMatch = url.match(youtubeRegex);
         const vimeoMatch = url.match(vimeoRegex);
         
-        if (ytMatch) {
+        // Clean existing player
+        placeholder.innerHTML = '<div id="ytPlayerContainer"></div>';
+        ytPlayer = null;
+
+        if (ytMatch && isYtApiReady) {
             const videoId = ytMatch[1];
-            embedHtml = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            ytPlayer = new YT.Player('ytPlayerContainer', {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: { 
+                    'autoplay': 1,
+                    'modestbranding': 1,
+                    'rel': 0
+                },
+                events: {
+                    'onStateChange': function(event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            console.log("YouTube Video Ended (API)");
+                            markActiveLessonComplete();
+                        }
+                    }
+                }
+            });
+        } else if (ytMatch && !isYtApiReady) {
+            // Fallback if API not loaded yet
+            const videoId = ytMatch[1];
+            placeholder.innerHTML = `<iframe id="mainIframePlayer" width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allowfullscreen></iframe>`;
         } else if (vimeoMatch) {
             const videoId = vimeoMatch[1];
-            embedHtml = `<iframe src="https://player.vimeo.com/video/${videoId}?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+            placeholder.innerHTML = `<iframe id="mainIframePlayer" src="https://player.vimeo.com/video/${videoId}?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         } else if (url.toLowerCase().endsWith('.mp4') || url.includes('.mp4?') || url.includes('.mp4#')) {
-            embedHtml = `<video width="100%" height="100%" controls autoplay style="background:#000;"><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+            placeholder.innerHTML = `<video id="mainVideoPlayer" width="100%" height="100%" controls autoplay style="background:#000;" onended="markActiveLessonComplete()"><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
         } else {
-            // Fallback for direct links
-            embedHtml = `<iframe width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+            placeholder.innerHTML = `<iframe id="mainIframePlayer" width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`;
         }
-        
-        placeholder.innerHTML = embedHtml;
     }
 
     function closePlayer() {
