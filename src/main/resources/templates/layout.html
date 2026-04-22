@@ -47,6 +47,24 @@
             <!-- Actions (Search | Login | Cart) -->
             <div class="header-actions">
                 <a href="#" class="search-trigger"><i class="fas fa-search"></i></a>
+
+                <!-- Notification Bell -->
+                <div class="notification-dropdown-container" sec:authorize="isAuthenticated()">
+                    <a href="javascript:void(0)" class="notification-trigger" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
+                    </a>
+                    <div class="notification-dropdown-menu">
+                        <div class="notification-header">
+                            <span>Thông báo</span>
+                            <a href="javascript:void(0)" id="markAllReadBtn">Đánh dấu tất cả là đã đọc</a>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-item empty">Đang tải thông báo...</div>
+                        </div>
+                        <a th:href="@{/notifications}" class="notification-footer">Xem tất cả thông báo</a>
+                    </div>
+                </div>
                 
                 <!-- Auth Section -->
                 <th:block sec:authorize="isAnonymous()">
@@ -319,6 +337,140 @@
                 }
             });
         }
+
+        // Notification Logic
+        $(document).ready(function() {
+            function updateNotifications() {
+                $.ajax({
+                    url: '/api/notifications',
+                    type: 'GET',
+                    success: function(data) {
+                        const count = data.unreadCount;
+                        const $badge = $('#notificationCount');
+                        if (count > 0) {
+                            $badge.text(count > 99 ? '99+' : count).show();
+                        } else {
+                            $badge.hide();
+                        }
+
+                        const $list = $('#notificationList');
+                        $list.empty();
+
+                        if (data.notifications.length === 0) {
+                            $list.append('<div class="notification-item empty">Không có thông báo mới</div>');
+                        } else {
+                            data.notifications.forEach(function(n) {
+                                const unreadClass = n.isRead ? '' : 'unread';
+                                const timeStr = formatTime(n.createdAt);
+                                const iconClass = getIconByType(n.type);
+                                
+                                const html = `
+                                    <a href="${n.link || 'javascript:void(0)'}" class="notification-item ${unreadClass}" data-id="${n.id}">
+                                        <div class="notification-icon-box noti-type-${n.type}">
+                                            <i class="${iconClass}"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <span class="notification-title">${n.title}</span>
+                                            <span class="notification-message">${n.message}</span>
+                                            <span class="notification-time">${timeStr}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                $list.append(html);
+                            });
+                        }
+                    }
+                });
+            }
+
+            function formatTime(dateStr) {
+                const date = new Date(dateStr);
+                const now = new Date();
+                const diff = (now - date) / 1000; // seconds
+
+                if (diff < 60) return 'Vừa xong';
+                if (diff < 3600) return Math.floor(diff / 60) + ' phút trước';
+                if (diff < 86400) return Math.floor(diff / 3600) + ' giờ trước';
+                return date.toLocaleDateString('vi-VN');
+            }
+
+            function getIconByType(type) {
+                switch(type) {
+                    case 'SUCCESS': return 'fas fa-check-circle';
+                    case 'DANGER': return 'fas fa-exclamation-circle';
+                    case 'WARNING': return 'fas fa-exclamation-triangle';
+                    default: return 'fas fa-info-circle';
+                }
+            }
+
+            // Click trigger to fetch and show
+            $('#notificationBtn').on('click', function(e) {
+                e.stopPropagation();
+                $('.notification-dropdown-container').toggleClass('active');
+                if ($('.notification-dropdown-container').hasClass('active')) {
+                    updateNotifications();
+                }
+            });
+
+            $(document).on('click', function() {
+                $('.notification-dropdown-container').removeClass('active');
+            });
+
+            $('.notification-dropdown-menu').on('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Mark single as read - Attach to the list instead of document to avoid propagation issues
+            $('#notificationList').on('click', '.notification-item', function(e) {
+                const id = $(this).data('id');
+                const $item = $(this);
+                const link = $item.attr('href');
+
+                if (id && $item.hasClass('unread')) {
+                    e.preventDefault(); // Stop navigation temporarily
+                    
+                    // Optimistic UI Update: Giảm số lượng ngay lập tức trên giao diện
+                    $item.removeClass('unread');
+                    const $badge = $('#notificationCount');
+                    let count = parseInt($badge.text()) || 0;
+                    if (count > 0) {
+                        count--;
+                        if (count > 0) {
+                            $badge.text(count > 99 ? '99+' : count);
+                        } else {
+                            $badge.hide();
+                        }
+                    }
+
+                    // Gửi request ngầm và chuyển trang
+                    $.post('/api/notifications/mark-read/' + id).always(function() {
+                        if (link && link !== 'javascript:void(0)') {
+                            window.location.href = link;
+                        } else {
+                            updateNotifications();
+                        }
+                    });
+                }
+            });
+
+            // Mark all as read
+            $('#markAllReadBtn').on('click', function() {
+                // Optimistic UI: Hide badge and remove unread classes instantly
+                $('#notificationCount').hide();
+                $('.notification-item').removeClass('unread');
+                
+                $.post('/api/notifications/mark-all-read', function() {
+                    updateNotifications();
+                });
+            });
+
+            // Initial fetch if logged in
+            if ($('#notificationBtn').length) {
+                updateNotifications();
+                // Optional: Poll every 30 seconds
+                // setInterval(updateNotifications, 30000);
+            }
+        });
     </script>
 </th:block>
 
