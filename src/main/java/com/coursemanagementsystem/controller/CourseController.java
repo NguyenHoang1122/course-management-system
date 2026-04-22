@@ -53,8 +53,9 @@ public class CourseController {
     public String findAllCourse(@RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size,
                                 @RequestParam(value = "sortBy", defaultValue = "newest") String sortBy,
+                                @RequestParam(value = "keyword", required = false) String keyword,
                                 Model model, Principal principal) {
-        Page<Course> coursePage = courseService.findCoursesFiltered(null, null, null, sortBy, page, size);
+        Page<Course> coursePage = courseService.findCoursesFiltered(keyword, null, null, sortBy, page, size);
 
         // Calculate total value
         long totalValue = coursePage.getContent().stream()
@@ -96,6 +97,7 @@ public class CourseController {
         model.addAttribute("totalLessons", totalLessons);
         model.addAttribute("size", size);
         model.addAttribute("sortBy", sortBy);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("pageTitle", "Course List");
         return "course/list";
     }
