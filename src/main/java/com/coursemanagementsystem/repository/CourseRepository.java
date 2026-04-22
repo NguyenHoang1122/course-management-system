@@ -19,6 +19,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where lower(c.title) like lower(concat('%', :keyword, '%'))
                or lower(c.description) like lower(concat('%', :keyword, '%'))
                or lower(i.fullName) like lower(concat('%', :keyword, '%'))
+            order by 
+                case when lower(c.title) = lower(:keyword) then 0
+                     when lower(c.title) like lower(concat(:keyword, '%')) then 1
+                     when lower(c.title) like lower(concat('%', :keyword, '%')) then 2
+                     else 3
+                end,
+                c.title asc
             """)
     Page<Course> searchCourses(@Param("keyword") String keyword, Pageable pageable);
 

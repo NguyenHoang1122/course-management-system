@@ -102,12 +102,19 @@ public class CourseService {
 
         List<Course> courses;
 
-        // Get base courses
-        courses = courseRepository.findAll();
+        // Get base courses - apply keyword filter first if provided
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // searchCourses already returns results ordered by relevance
+            courses = courseRepository.searchCourses(keyword.trim(), Pageable.unpaged()).getContent();
+        } else {
+            courses = courseRepository.findAll();
+        }
 
-
-        // Apply sort
-        if (sortBy != null && !sortBy.isEmpty()) {
+        // Apply sort (only if it's not the default relevance-based sort from search)
+        if (sortBy != null && !sortBy.isEmpty() && !(keyword != null && !keyword.trim().isEmpty())) {
+            courses = sortCourses(courses, sortBy);
+        } else if (sortBy != null && !sortBy.isEmpty() && !"newest".equals(sortBy)) {
+            // If keyword exists and user selected a sort, apply that sort
             courses = sortCourses(courses, sortBy);
         }
 

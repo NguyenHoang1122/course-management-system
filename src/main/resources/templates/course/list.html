@@ -35,6 +35,7 @@
                 <p class="mb-0" th:text="'Showing ' + ${courses.size()} + ' of ' + ${totalItems} + ' results'">Showing 6 of 20 results</p>
                 <div class="sort-dropdown">
                     <form th:action="@{/courses}" method="get" style="display: flex; gap: 10px; align-items: center;">
+                        <input type="hidden" name="keyword" th:value="${keyword}">
                         <label for="sortBy" style="margin: 0; font-weight: 600;">Sort by:</label>
                         <select class="form-control" id="sortBy" name="sortBy"
                                 style="border-radius: 20px; padding: 8px 15px; width: auto; display: inline-block;"
@@ -110,15 +111,15 @@
             <nav th:if="${totalPages > 1}" aria-label="Course pagination" class="premium-pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}"><i class="fas fa-chevron-left"></i></a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}"><i class="fas fa-chevron-left"></i></a>
                     </li>
 
                     <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}" th:text="${i}">1</a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}" th:text="${i}">1</a>
                     </li>
 
                     <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage + 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy}}"><i class="fas fa-chevron-right"></i></a>
+                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage + 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}"><i class="fas fa-chevron-right"></i></a>
                     </li>
                 </ul>
             </nav>
