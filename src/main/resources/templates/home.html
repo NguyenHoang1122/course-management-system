@@ -1,5 +1,6 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Courses | Education Management System</title>
@@ -16,10 +17,10 @@
     <link rel="stylesheet" th:href="@{/css/themify-icons.css}">
     <link rel="stylesheet" th:href="@{/css/slick.css}">
     <link rel="stylesheet" th:href="@{/css/nice-select.css}">
-    
+
     <!-- Add fontawesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom Home Styles -->
     <link rel="stylesheet" th:href="@{/css/home-custom.css}">
     <style>
@@ -43,6 +44,7 @@
                 transform: translateY(0px) translateX(0px) rotate(0deg);
                 opacity: 1;
             }
+
             to {
                 transform: translateY(100vh) translateX(100px) rotate(360deg);
                 opacity: 0;
@@ -50,8 +52,15 @@
         }
 
         @keyframes sway {
-            0%, 100% { transform: translateX(0px); }
-            50% { transform: translateX(20px); }
+
+            0%,
+            100% {
+                transform: translateX(0px);
+            }
+
+            50% {
+                transform: translateX(20px);
+            }
         }
 
         .snowflake.sway {
@@ -62,499 +71,551 @@
 
 <body>
 
-<div th:replace="~{layout :: siteHeader(isTransparent=true)}"></div>
+    <div th:replace="~{layout :: siteHeader(isTransparent=true)}"></div>
 
-<!-- Hero area -->
-<section class="custom-hero">
-    <!-- Snowflake Container -->
-    <div id="snowflake-container" style="position: fixed; top: 0; left: 0; right: 0; height: 100vh; pointer-events: none; z-index: 1;"></div>
+    <!-- Hero area -->
+    <section class="custom-hero">
+        <!-- Snowflake Container -->
+        <div id="snowflake-container"
+            style="position: fixed; top: 0; left: 0; right: 0; height: 100vh; pointer-events: none; z-index: 1;"></div>
 
-    <div class="container" style="position:relative; z-index:5;">
-        <h1 class="display-3 font-weight-bold mb-3" style="font-size: 60px;">50% Discount on Popular Courses</h1>
-        <p class="lead mb-4" style="font-size: 18px; opacity: 0.9;">Take the first step to your journey to success with us</p>
-        
-        <a href="#courses" class="hero-btn">Ready to get started?</a>
-        
-        <div class="glassy-categories">
-            <div class="glassy-box">Analysis of Algorithms</div>
-            <div class="glassy-box">Management Course</div>
-            <div class="glassy-box">Administrator</div>
-            <div class="glassy-box">Engineering</div>
+        <div class="container" style="position:relative; z-index:5;">
+            <h1 class="display-3 font-weight-bold mb-3" style="font-size: 60px;">50% Discount on Popular Courses</h1>
+            <p class="lead mb-4" style="font-size: 18px; opacity: 0.9;">Take the first step to your journey to success
+                with us</p>
+
+            <a href="#courses" class="hero-btn">Ready to get started?</a>
+
+            <div class="glassy-categories">
+                <div class="glassy-box">Analysis of Algorithms</div>
+                <div class="glassy-box">Management Course</div>
+                <div class="glassy-box">Administrator</div>
+                <div class="glassy-box">Engineering</div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Wavy bottom curve using SVG -->
-    <div class="wavy-bottom">
-        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,123.67,203.2,112.5,243.68,106.2,283.47,95.53,321.39,56.44Z" fill="#ffffff"></path>
-        </svg>
-    </div>
-    
-    <!-- Bounce Arrow -->
-    <a href="#courses" class="scroll-down-btn">
-        <i class="fas fa-arrow-down" style="font-size:16px;"></i>
-    </a>
-</section>
 
-<!-- Featured Courses -->
-<section id="courses" class="py-5" style="background: #ffffff; padding-top: 100px !important;">
-    <div class="container">
-        <div class="section-title">
-            <span style="color:#333;">Our Courses</span>
-            <h2>Featured Courses</h2>
+        <!-- Wavy bottom curve using SVG -->
+        <div class="wavy-bottom">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
+                preserveAspectRatio="none">
+                <path
+                    d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.08,130.83,123.67,203.2,112.5,243.68,106.2,283.47,95.53,321.39,56.44Z"
+                    fill="#ffffff"></path>
+            </svg>
         </div>
-        
-        <div class="row">
-            <!-- Dynamic Courses from DB -->
-            <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
-                <div class="course-card" th:onclick="|window.location.href='/courses/' + ${course.id}|">
-                    <!-- Wishlist Heart Button -->
-                    <button class="wishlist-heart-btn" 
+
+        <!-- Bounce Arrow -->
+        <a href="#courses" class="scroll-down-btn">
+            <i class="fas fa-arrow-down" style="font-size:16px;"></i>
+        </a>
+    </section>
+
+    <!-- Featured Courses -->
+    <section id="courses" class="py-5" style="background: #ffffff; padding-top: 100px !important;">
+        <div class="container">
+            <div class="section-title">
+                <span style="color:#333;">Our Courses</span>
+                <h2>Featured Courses</h2>
+            </div>
+
+            <div class="row">
+                <!-- Dynamic Courses from DB -->
+                <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
+                    <div class="course-card" th:onclick="|window.location.href='/courses/' + ${course.id}|">
+                        <!-- Wishlist Heart Button -->
+                        <button class="wishlist-heart-btn"
                             th:classappend="${wishlistedCourseIds.contains(course.id)} ? 'active' : ''"
                             th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'"
-                            onclick="event.stopPropagation();"
-                            title="Thêm vào Wishlist">
-                        <i th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
-                    </button>
+                            onclick="event.stopPropagation();" title="Thêm vào Wishlist">
+                            <i
+                                th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
 
-                    <div class="course-badge" th:classappend="${course.category == 'Development' ? 'dev' : ''}" th:text="${course.category}">Category</div>
-                    <div class="course-card-img" th:style="'background-image: url(' + (${course.imageUrl != null and !course.imageUrl.isEmpty()} ? (${course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)}) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop') + '); background-size: cover; background-position: center;'">
+                        <div class="course-badge" th:classappend="${course.category == 'Development' ? 'dev' : ''}"
+                            th:text="${course.category}">Category</div>
+                        <div class="course-card-img"
+                            th:style="'background-image: url(' + (${course.imageUrl != null and !course.imageUrl.isEmpty()} ? (${course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)}) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop') + '); background-size: cover; background-position: center;'">
+                        </div>
+                        <div class="course-card-body">
+                            <div class="course-rating">
+                                <th:block
+                                    th:with="rating=${averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
+                                    <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                        th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                </th:block>
+                                <span class="text-muted ml-2"
+                                    th:text="'(' + ${averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'">(0.0)</span>
+                            </div>
+                            <h3 class="course-title">
+                                <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}"
+                                    style="color: inherit; text-decoration: none;">Course Title</a>
+                            </h3>
+                            <div class="course-meta">
+                                <img th:if="${course.instructor != null and course.instructor.avatar != null}"
+                                    th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
+                                    alt="author" style="width:25px; height:25px; object-fit: cover;">
+                                <i th:unless="${course.instructor != null and course.instructor.avatar != null}"
+                                    class="fas fa-user-circle mr-2" style="font-size: 25px; color: #ddd;"></i>
+                                <span>By <strong
+                                        th:text="${course.instructor != null ? course.instructor.fullName : 'Admin'}">Admin</strong></span>
+                            </div>
+                            <div class="course-price-row">
+                                <div>
+                                    <span class="course-price text-primary">
+                                        <th:block th:if="${course.price != null and course.price > 0}"
+                                            th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
+                                        </th:block>
+                                        <th:block th:if="${course.price == null or course.price == 0}">Free</th:block>
+                                    </span>
+                                </div>
+                                <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary view-btn">Xem</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="course-card-body">
-                        <div class="course-rating">
-                            <th:block th:with="rating=${averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
-                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
-                                   th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
-                            </th:block>
-                            <span class="text-muted ml-2" th:text="'(' + ${averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'">(0.0)</span>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a th:href="@{/courses}" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold"
+                    style="background:#1e88e5; border-color:#1e88e5;">VIEW ALL COURSES</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facilities -->
+    <section class="py-5 mt-4" style="background: #fafafa;">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-4 mb-5 mb-lg-0 pr-lg-5">
+                    <span
+                        style="color:#1e88e5; font-weight:bold; letter-spacing:1px; font-size:14px; text-transform:uppercase;">Facilities</span>
+                    <h2 class="font-weight-bold mb-4 mt-2" style="color:#222; font-size:36px;">Our Facilities</h2>
+                    <p class="text-muted mb-4" style="line-height:1.8;">Lorem ipsum gravida nibh vel velit auctor
+                        aliquetenean sollicitudin lorem quis bibendum auctor nisi elit consequat ipsum nec sagittis sem
+                        nibh id elit.</p>
+                    <p class="text-muted mb-5" style="line-height:1.8;">Duis sed odio sit amet nibh vulputate cursus a
+                        sit amet mauris morbi accumsan ipsum velit nam nec tellus a odio tincidunt auctor.</p>
+                    <a href="#" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold"
+                        style="background:#1e88e5; border-color:#1e88e5;">READ MORE</a>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="facility-item">
+                                <div class="facility-icon"><i class="fas fa-globe"></i></div>
+                                <h4 class="font-weight-bold" style="font-size:18px;">Global Certificate</h4>
+                                <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius
+                                    aliquam ac vero accumsan sit etu egeo.</p>
+                            </div>
                         </div>
-                        <h3 class="course-title">
-                            <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}" style="color: inherit; text-decoration: none;">Course Title</a>
-                        </h3>
-                        <div class="course-meta">
-                            <img th:if="${course.instructor != null and course.instructor.avatar != null}" 
-                                 th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}" 
-                                 alt="author" style="width:25px; height:25px; object-fit: cover;">
-                            <i th:unless="${course.instructor != null and course.instructor.avatar != null}" class="fas fa-user-circle mr-2" style="font-size: 25px; color: #ddd;"></i>
-                            <span>By <strong th:text="${course.instructor != null ? course.instructor.fullName : 'Admin'}">Admin</strong></span>
+                        <div class="col-md-6 mb-4">
+                            <div class="facility-item">
+                                <div class="facility-icon"><i class="fas fa-headset"></i></div>
+                                <h4 class="font-weight-bold" style="font-size:18px;">Student Support</h4>
+                                <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius
+                                    aliquam ac vero accumsan sit etu egeo.</p>
+                            </div>
                         </div>
-                        <div class="course-price-row">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <div class="facility-item">
+                                <div class="facility-icon"><i class="fas fa-book"></i></div>
+                                <h4 class="font-weight-bold" style="font-size:18px;">Books & Library</h4>
+                                <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius
+                                    aliquam ac vero accumsan sit etu egeo.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="facility-item">
+                                <div class="facility-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <h4 class="font-weight-bold" style="font-size:18px;">Scholarship</h4>
+                                <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius
+                                    aliquam ac vero accumsan sit etu egeo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest News -->
+    <section class="py-5 my-5">
+        <div class="container py-3">
+            <div class="section-title">
+                <span>From Our News</span>
+                <h2>Latest News</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="news-card h-100">
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800"
+                            alt="News" style="height:100%; min-height: 400px;">
+                        <div class="news-tag">BUSINESS</div>
+                        <div class="news-overlay">
+                            <h3>Learn 7 Exactly How I Improved Education</h3>
+                            <p class="mb-0 text-sm" style="color:#ddd;">October 1, 2021 | By Admin | 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="row h-100">
+                        <div class="col-12 mb-4" style="height: 48%;">
+                            <div class="news-card h-100">
+                                <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800"
+                                    alt="News" style="height:100%;">
+                                <div class="news-tag bg-danger">UI/UX</div>
+                                <div class="news-overlay" style="padding: 20px;">
+                                    <h3 style="font-size:18px;">Teamwork Video</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12" style="height: 48%;">
+                            <div class="news-card h-100">
+                                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800"
+                                    alt="News" style="height:100%;">
+                                <div class="news-tag" style="background:#28a745;">PROGRAMMING</div>
+                                <div class="news-overlay" style="padding: 20px;">
+                                    <h3 style="font-size:18px;">It's Really True - Technical Education</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="#" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold"
+                    style="background:#1e88e5; border-color:#1e88e5;">SEE MORE POSTS</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <div class="container">
+            <p class="text-uppercase mb-2 font-weight-bold" style="letter-spacing: 2px;">Starting Online Learning</p>
+            <h2>Enhance your skills with best online courses</h2>
+            <a href="#" class="cta-btn mt-3 d-inline-block">GET STARTED NOW</a>
+        </div>
+    </section>
+
+    <!-- Teachers -->
+    <section class="py-5" style="background:#fdfdfd; padding-top: 100px !important;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-3 mb-5 mb-lg-0">
+                    <span
+                        style="color:#1e88e5; font-weight:bold; letter-spacing:1px; font-size:14px; text-transform:uppercase;">Teachers</span>
+                    <h2 class="font-weight-bold mb-4 mt-2" style="color:#222; font-size:36px;">Meet our Teachers</h2>
+                    <p class="text-muted mb-4" style="line-height:1.8;">Lorem ipsum gravida nibh vel velit auctor
+                        aliquetenean sollicitudin lorem quis bibendum auctor nisi elit consequat ipsum nec sagittis sem
+                        nibh id elit.</p>
+                    <p class="text-muted mb-5" style="line-height:1.8;">Duis sed odio sit amet nibh vulputate cursus a
+                        sit.</p>
+                    <a href="#" class="btn btn-primary rounded-pill px-4 py-3 font-weight-bold"
+                        style="background:#1e88e5; border-color:#1e88e5;">CONNECT WITH US</a>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="teacher-card">
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
+                                    alt="Teacher">
+                                <div class="teacher-info">
+                                    <h4>Richard Peterson</h4>
+                                    <p>UI/UX Design</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="teacher-card">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400"
+                                    alt="Teacher">
+                                <div class="teacher-info">
+                                    <h4>Maria Jane</h4>
+                                    <p>Web Developer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="teacher-card">
+                                <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&q=80&w=400"
+                                    alt="Teacher">
+                                <div class="teacher-info">
+                                    <h4>Emma Smith</h4>
+                                    <p>English Tutor</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="teacher-card">
+                                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400"
+                                    alt="Teacher">
+                                <div class="teacher-info">
+                                    <h4>John Doe</h4>
+                                    <p>Marketing</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download App -->
+    <section class="app-download position-relative overflow-hidden mt-5">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-6 z-index-2 position-relative" style="z-index: 10;">
+                    <h2 style="font-size: 36px;">Download & Enjoy</h2>
+                    <p style="font-size:16px; opacity: 0.9; max-width: 80%; line-height: 1.8;">Lorem ipsum dolor sit
+                        amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar
+                        dapibus leo.</p>
+                    <div class="app-btns">
+                        <a href="#" class="app-btn">
+                            <i class="fab fa-apple"></i>
                             <div>
-                                <span class="course-price text-primary">
-                                    <th:block th:if="${course.price != null and course.price > 0}"
-                                              th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></th:block>
-                                    <th:block th:if="${course.price == null or course.price == 0}">Free</th:block>
-                                </span>
+                                <div style="font-size:10px; text-transform:uppercase;">Download on the</div>
+                                <div style="font-size:16px; font-weight:bold;">App Store</div>
                             </div>
-                            <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary view-btn">Xem</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center mt-5">
-            <a th:href="@{/courses}" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold" style="background:#1e88e5; border-color:#1e88e5;">VIEW ALL COURSES</a>
-        </div>
-    </div>
-</section>
-
-<!-- Facilities -->
-<section class="py-5 mt-4" style="background: #fafafa;">
-    <div class="container py-4">
-        <div class="row align-items-center">
-            <div class="col-lg-4 mb-5 mb-lg-0 pr-lg-5">
-                <span style="color:#1e88e5; font-weight:bold; letter-spacing:1px; font-size:14px; text-transform:uppercase;">Facilities</span>
-                <h2 class="font-weight-bold mb-4 mt-2" style="color:#222; font-size:36px;">Our Facilities</h2>
-                <p class="text-muted mb-4" style="line-height:1.8;">Lorem ipsum gravida nibh vel velit auctor aliquetenean sollicitudin lorem quis bibendum auctor nisi elit consequat ipsum nec sagittis sem nibh id elit.</p>
-                <p class="text-muted mb-5" style="line-height:1.8;">Duis sed odio sit amet nibh vulputate cursus a sit amet mauris morbi accumsan ipsum velit nam nec tellus a odio tincidunt auctor.</p>
-                <a href="#" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold" style="background:#1e88e5; border-color:#1e88e5;">READ MORE</a>
-            </div>
-            <div class="col-lg-8">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="facility-item">
-                            <div class="facility-icon"><i class="fas fa-globe"></i></div>
-                            <h4 class="font-weight-bold" style="font-size:18px;">Global Certificate</h4>
-                            <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius aliquam ac vero accumsan sit etu egeo.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                         <div class="facility-item">
-                            <div class="facility-icon"><i class="fas fa-headset"></i></div>
-                            <h4 class="font-weight-bold" style="font-size:18px;">Student Support</h4>
-                            <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius aliquam ac vero accumsan sit etu egeo.</p>
-                        </div>
-                    </div>
-                     <div class="col-md-6 mb-4 mb-md-0">
-                         <div class="facility-item">
-                            <div class="facility-icon"><i class="fas fa-book"></i></div>
-                            <h4 class="font-weight-bold" style="font-size:18px;">Books & Library</h4>
-                            <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius aliquam ac vero accumsan sit etu egeo.</p>
-                        </div>
-                    </div>
-                     <div class="col-md-6">
-                         <div class="facility-item">
-                            <div class="facility-icon"><i class="fas fa-graduation-cap"></i></div>
-                            <h4 class="font-weight-bold" style="font-size:18px;">Scholarship</h4>
-                            <p class="text-muted text-sm mt-3 mb-0">Curabitur fermentum est in idm porttitor varius aliquam ac vero accumsan sit etu egeo.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Latest News -->
-<section class="py-5 my-5">
-    <div class="container py-3">
-        <div class="section-title">
-            <span>From Our News</span>
-            <h2>Latest News</h2>
-        </div>
-        
-        <div class="row">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <div class="news-card h-100">
-                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800" alt="News" style="height:100%; min-height: 400px;">
-                    <div class="news-tag">BUSINESS</div>
-                    <div class="news-overlay">
-                        <h3>Learn 7 Exactly How I Improved Education</h3>
-                        <p class="mb-0 text-sm" style="color:#ddd;">October 1, 2021 | By Admin | 0</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-6">
-                <div class="row h-100">
-                    <div class="col-12 mb-4" style="height: 48%;">
-                        <div class="news-card h-100">
-                            <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=800" alt="News" style="height:100%;">
-                            <div class="news-tag bg-danger">UI/UX</div>
-                             <div class="news-overlay" style="padding: 20px;">
-                                <h3 style="font-size:18px;">Teamwork Video</h3>
+                        </a>
+                        <a href="#" class="app-btn">
+                            <i class="fab fa-google-play"></i>
+                            <div>
+                                <div style="font-size:10px; text-transform:uppercase;">Get it on</div>
+                                <div style="font-size:16px; font-weight:bold;">Google Play</div>
                             </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block position-relative">
+                    <div
+                        style="background: white; border-radius: 40px; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 280px; margin: 0 auto; position: absolute; right: 80px; top: -140px; border: 8px solid #333;">
+                        <!-- A simple representation of a phone screen -->
+                        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=400"
+                            alt="App UI" style="width: 100%; border-radius: 20px; height: 500px; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-5" style="margin-top: 100px; padding-bottom: 80px !important;">
+        <div class="container">
+            <div class="section-title">
+                <span>Feedback</span>
+                <h2>What Students Say</h2>
+            </div>
+
+            <div class="row mt-5 pt-3">
+                <div class="col-md-4 mb-5 pb-5">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Proin a euismod tellus, ac ultrices urna. Donec tristique eget diam
+                            non tristique. Donec lobortis id odio hendrerit pulvinar. Curabitur vel leo lectus."</p>
+                        <div class="testimonial-author">
+                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
+                            <div class="testimonial-name">Christian Smith</div>
+                            <div class="testimonial-role">Student</div>
+                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
-                    <div class="col-12" style="height: 48%;">
-                         <div class="news-card h-100">
-                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800" alt="News" style="height:100%;">
-                            <div class="news-tag" style="background:#28a745;">PROGRAMMING</div>
-                             <div class="news-overlay" style="padding: 20px;">
-                                <h3 style="font-size:18px;">It's Really True - Technical Education</h3>
-                            </div>
+                </div>
+                <div class="col-md-4 mb-5 pb-5">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Nulla auctor, nisl vitae viverra vulputate, neque ante dapibus
+                            nunc, nec tincidunt mauris nulla sed urna. Proin a euismod tellus, ac ultrices urna."</p>
+                        <div class="testimonial-author">
+                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
+                            <div class="testimonial-name">Olivia Diego</div>
+                            <div class="testimonial-role">Student</div>
+                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-5 pb-5">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">"Vestibulum id leo et nunc tempor hendrerit. Aenean vel est
+                            vehicula, ullamcorper sem sit amet, consequat libero. Proin a euismod tellus."</p>
+                        <div class="testimonial-author">
+                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
+                            <div class="testimonial-name">Margot Linsley</div>
+                            <div class="testimonial-role">Student</div>
+                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="text-center mt-5">
-            <a href="#" class="btn btn-primary rounded-pill px-5 py-3 font-weight-bold" style="background:#1e88e5; border-color:#1e88e5;">SEE MORE POSTS</a>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- CTA Banner -->
-<section class="cta-banner">
-    <div class="container">
-        <p class="text-uppercase mb-2 font-weight-bold" style="letter-spacing: 2px;">Starting Online Learning</p>
-        <h2>Enhance your skills with best online courses</h2>
-        <a href="#" class="cta-btn mt-3 d-inline-block">GET STARTED NOW</a>
-    </div>
-</section>
+    <!-- Stats -->
+    <section class="stats-section mt-5 mx-0">
+        <div class="container position-relative" style="z-index: 2;">
+            <p class="text-uppercase mb-2 font-weight-bold" style="letter-spacing: 2px;">Welcome To</p>
+            <h2 class="text-white mb-5 pb-3">Our Progress Never End</h2>
 
-<!-- Teachers -->
-<section class="py-5" style="background:#fdfdfd; padding-top: 100px !important;">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-3 mb-5 mb-lg-0">
-                <span style="color:#1e88e5; font-weight:bold; letter-spacing:1px; font-size:14px; text-transform:uppercase;">Teachers</span>
-                <h2 class="font-weight-bold mb-4 mt-2" style="color:#222; font-size:36px;">Meet our Teachers</h2>
-                <p class="text-muted mb-4" style="line-height:1.8;">Lorem ipsum gravida nibh vel velit auctor aliquetenean sollicitudin lorem quis bibendum auctor nisi elit consequat ipsum nec sagittis sem nibh id elit.</p>
-                <p class="text-muted mb-5" style="line-height:1.8;">Duis sed odio sit amet nibh vulputate cursus a sit.</p>
-                <a href="#" class="btn btn-primary rounded-pill px-4 py-3 font-weight-bold" style="background:#1e88e5; border-color:#1e88e5;">CONNECT WITH US</a>
+            <div class="row text-center mt-4">
+                <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
+                    <i class="fas fa-users" style="font-size: 50px;"></i>
+                    <h3>3999+</h3>
+                    <p>Students Learning</p>
+                </div>
+                <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
+                    <i class="fas fa-graduation-cap" style="font-size: 50px;"></i>
+                    <h3>50000+</h3>
+                    <p>Graduates</p>
+                </div>
+                <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
+                    <i class="fas fa-book" style="font-size: 50px;"></i>
+                    <h3>2999+</h3>
+                    <p>Free courses</p>
+                </div>
+                <div class="col-md-3 stat-item">
+                    <i class="fas fa-laptop-code" style="font-size: 50px;"></i>
+                    <h3>7000+</h3>
+                    <p>Active courses</p>
+                </div>
             </div>
-            <div class="col-lg-9">
-                <div class="row">
-                    <div class="col-md-6 col-lg-3 mb-4">
-                        <div class="teacher-card">
-                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" alt="Teacher">
-                            <div class="teacher-info">
-                                <h4>Richard Peterson</h4>
-                                <p>UI/UX Design</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
-                        <div class="teacher-card">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" alt="Teacher">
-                            <div class="teacher-info">
-                                <h4>Maria Jane</h4>
-                                <p>Web Developer</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
-                        <div class="teacher-card">
-                            <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&q=80&w=400" alt="Teacher">
-                            <div class="teacher-info">
-                                <h4>Emma Smith</h4>
-                                <p>English Tutor</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-4">
-                        <div class="teacher-card">
-                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" alt="Teacher">
-                            <div class="teacher-info">
-                                <h4>John Doe</h4>
-                                <p>Marketing</p>
-                            </div>
-                        </div>
-                    </div>
+        </div>
+    </section>
+
+    <!-- Partners Strip -->
+    <div class="partners-strip pt-5 pb-5">
+        <div class="container position-relative">
+            <div class="row align-items-center justify-content-center pt-3 pb-3">
+                <div class="col-auto px-4">
+                    <div class="partner-logo"><i class="fab fa-aws"></i> WAZZY</div>
+                </div>
+                <div class="col-auto px-4">
+                    <div class="partner-logo"><i class="fab fa-hooli"></i> INSULER</div>
+                </div>
+                <div class="col-auto px-4">
+                    <div class="partner-logo"><i class="fab fa-angular"></i> ZOOIOO</div>
+                </div>
+                <div class="col-auto px-4">
+                    <div class="partner-logo"><i class="fab fa-cpanel"></i> CR1EAL</div>
                 </div>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Download App -->
-<section class="app-download position-relative overflow-hidden mt-5">
-    <div class="container py-4">
-        <div class="row align-items-center">
-            <div class="col-lg-6 z-index-2 position-relative" style="z-index: 10;">
-                <h2 style="font-size: 36px;">Download & Enjoy</h2>
-                <p style="font-size:16px; opacity: 0.9; max-width: 80%; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
-                <div class="app-btns">
-                    <a href="#" class="app-btn">
-                        <i class="fab fa-apple"></i>
-                        <div>
-                            <div style="font-size:10px; text-transform:uppercase;">Download on the</div>
-                            <div style="font-size:16px; font-weight:bold;">App Store</div>
-                        </div>
-                    </a>
-                    <a href="#" class="app-btn">
-                        <i class="fab fa-google-play"></i>
-                        <div>
-                            <div style="font-size:10px; text-transform:uppercase;">Get it on</div>
-                            <div style="font-size:16px; font-weight:bold;">Google Play</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-6 d-none d-lg-block position-relative">
-                <div style="background: white; border-radius: 40px; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 280px; margin: 0 auto; position: absolute; right: 80px; top: -140px; border: 8px solid #333;">
-                    <!-- A simple representation of a phone screen -->
-                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=400" alt="App UI" style="width: 100%; border-radius: 20px; height: 500px; object-fit: cover;">
+    <!-- Custom Footer with Newsletter -->
+    <div style="background: var(--secondary-color); position: relative;">
+        <div class="container position-relative">
+            <div class="newsletter-box">
+                <h3>Get Newsletter</h3>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Your email address">
+                    <button>SUBSCRIBE</button>
                 </div>
             </div>
         </div>
     </div>
-</section>
+    <div th:replace="~{layout :: siteFooter}"></div>
+    <th:block th:replace="~{layout :: coreScripts}"></th:block>
+    <!-- JS -->
+    <script th:src="@{/js/vendor/modernizr-3.5.0.min.js}"></script>
+    <th:block th:replace="~{layout :: coreScripts}"></th:block>
+    <script th:src="@{/js/popper.min.js}"></script>
+    <script th:src="@{/js/jquery.slicknav.min.js}"></script>
+    <script th:src="@{/js/owl.carousel.min.js}"></script>
+    <script th:src="@{/js/slick.min.js}"></script>
+    <script th:src="@{/js/wow.min.js}"></script>
+    <script th:src="@{/js/animated.headline.js}"></script>
+    <script th:src="@{/js/jquery.magnific-popup.js}"></script>
+    <script th:src="@{/js/gijgo.min.js}"></script>
+    <script th:src="@{/js/jquery.nice-select.min.js}"></script>
+    <script th:src="@{/js/jquery.sticky.js}"></script>
+    <script th:src="@{/js/jquery.barfiller.js}"></script>
+    <script th:src="@{/js/jquery.counterup.min.js}"></script>
+    <script th:src="@{/js/waypoints.min.js}"></script>
+    <script th:src="@{/js/jquery.countdown.min.js}"></script>
+    <script th:src="@{/js/hover-direction-snake.min.js}"></script>
+    <script th:src="@{/js/contact.js}"></script>
+    <script th:src="@{/js/jquery.form.js}"></script>
+    <script th:src="@{/js/jquery.validate.min.js}"></script>
+    <script th:src="@{/js/mail-script.js}"></script>
+    <script th:src="@{/js/jquery.ajaxchimp.min.js}"></script>
+    <script th:src="@{/js/plugins.js}"></script>
 
-<!-- Testimonials -->
-<section class="py-5" style="margin-top: 100px; padding-bottom: 80px !important;">
-    <div class="container">
-        <div class="section-title">
-            <span>Feedback</span>
-            <h2>What Students Say</h2>
-        </div>
-        
-        <div class="row mt-5 pt-3">
-            <div class="col-md-4 mb-5 pb-5">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Proin a euismod tellus, ac ultrices urna. Donec tristique eget diam non tristique. Donec lobortis id odio hendrerit pulvinar. Curabitur vel leo lectus."</p>
-                    <div class="testimonial-author">
-                        <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                        <div class="testimonial-name">Christian Smith</div>
-                        <div class="testimonial-role">Student</div>
-                        <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-5 pb-5">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Nulla auctor, nisl vitae viverra vulputate, neque ante dapibus nunc, nec tincidunt mauris nulla sed urna. Proin a euismod tellus, ac ultrices urna."</p>
-                    <div class="testimonial-author">
-                        <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                        <div class="testimonial-name">Olivia Diego</div>
-                        <div class="testimonial-role">Student</div>
-                        <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-5 pb-5">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Vestibulum id leo et nunc tempor hendrerit. Aenean vel est vehicula, ullamcorper sem sit amet, consequat libero. Proin a euismod tellus."</p>
-                    <div class="testimonial-author">
-                        <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                        <div class="testimonial-name">Margot Linsley</div>
-                        <div class="testimonial-role">Student</div>
-                        <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    <script>
+        // Sticky Header & Scroll Effect Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const header = document.getElementById('mainHeader');
+            if (!header) return;
+            const isTransparentInitial = header.classList.contains('header-transparent');
 
-<!-- Stats -->
-<section class="stats-section mt-5 mx-0">
-    <div class="container position-relative" style="z-index: 2;">
-        <p class="text-uppercase mb-2 font-weight-bold" style="letter-spacing: 2px;">Welcome To</p>
-        <h2 class="text-white mb-5 pb-3">Our Progress Never End</h2>
-        
-        <div class="row text-center mt-4">
-            <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
-                <i class="fas fa-users" style="font-size: 50px;"></i>
-                <h3>3999+</h3>
-                <p>Students Learning</p>
-            </div>
-            <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
-                 <i class="fas fa-graduation-cap" style="font-size: 50px;"></i>
-                <h3>50000+</h3>
-                <p>Graduates</p>
-            </div>
-            <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
-                 <i class="fas fa-book" style="font-size: 50px;"></i>
-                <h3>2999+</h3>
-                <p>Free courses</p>
-            </div>
-            <div class="col-md-3 stat-item">
-                 <i class="fas fa-laptop-code" style="font-size: 50px;"></i>
-                <h3>7000+</h3>
-                <p>Active courses</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Partners Strip -->
-<div class="partners-strip pt-5 pb-5">
-    <div class="container position-relative">
-        <div class="row align-items-center justify-content-center pt-3 pb-3">
-            <div class="col-auto px-4"><div class="partner-logo"><i class="fab fa-aws"></i> WAZZY</div></div>
-            <div class="col-auto px-4"><div class="partner-logo"><i class="fab fa-hooli"></i> INSULER</div></div>
-            <div class="col-auto px-4"><div class="partner-logo"><i class="fab fa-angular"></i> ZOOIOO</div></div>
-            <div class="col-auto px-4"><div class="partner-logo"><i class="fab fa-cpanel"></i> CR1EAL</div></div>
-        </div>
-    </div>
-</div>
-
-<!-- Custom Footer with Newsletter -->
-<div style="background: var(--secondary-color); position: relative;">
-    <div class="container position-relative">
-        <div class="newsletter-box">
-            <h3>Get Newsletter</h3>
-            <div class="newsletter-form">
-                <input type="email" placeholder="Your email address">
-                <button>SUBSCRIBE</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div th:replace="~{layout :: siteFooter}"></div>
-<th:block th:replace="~{layout :: coreScripts}"></th:block>
-<!-- JS -->
-<script th:src="@{/js/vendor/modernizr-3.5.0.min.js}"></script>
-<th:block th:replace="~{layout :: coreScripts}"></th:block>
-<script th:src="@{/js/popper.min.js}"></script>
-<script th:src="@{/js/jquery.slicknav.min.js}"></script>
-<script th:src="@{/js/owl.carousel.min.js}"></script>
-<script th:src="@{/js/slick.min.js}"></script>
-<script th:src="@{/js/wow.min.js}"></script>
-<script th:src="@{/js/animated.headline.js}"></script>
-<script th:src="@{/js/jquery.magnific-popup.js}"></script>
-<script th:src="@{/js/gijgo.min.js}"></script>
-<script th:src="@{/js/jquery.nice-select.min.js}"></script>
-<script th:src="@{/js/jquery.sticky.js}"></script>
-<script th:src="@{/js/jquery.barfiller.js}"></script>
-<script th:src="@{/js/jquery.counterup.min.js}"></script>
-<script th:src="@{/js/waypoints.min.js}"></script>
-<script th:src="@{/js/jquery.countdown.min.js}"></script>
-<script th:src="@{/js/hover-direction-snake.min.js}"></script>
-<script th:src="@{/js/contact.js}"></script>
-<script th:src="@{/js/jquery.form.js}"></script>
-<script th:src="@{/js/jquery.validate.min.js}"></script>
-<script th:src="@{/js/mail-script.js}"></script>
-<script th:src="@{/js/jquery.ajaxchimp.min.js}"></script>
-<script th:src="@{/js/plugins.js}"></script>
-
-<script>
-    // Sticky Header & Scroll Effect Logic
-    document.addEventListener('DOMContentLoaded', function() {
-        const header = document.getElementById('mainHeader');
-        if (!header) return;
-        const isTransparentInitial = header.classList.contains('header-transparent');
-
-        function handleScroll() {
-            if (window.scrollY > 50) {
-                header.classList.add('header-sticky');
-                if (isTransparentInitial) {
-                    header.classList.remove('header-transparent');
-                    header.classList.add('header-solid');
-                }
-            } else {
-                header.classList.remove('header-sticky');
-                if (isTransparentInitial) {
-                    header.classList.add('header-transparent');
-                    header.classList.remove('header-solid');
+            function handleScroll() {
+                if (window.scrollY > 50) {
+                    header.classList.add('header-sticky');
+                    if (isTransparentInitial) {
+                        header.classList.remove('header-transparent');
+                        header.classList.add('header-solid');
+                    }
+                } else {
+                    header.classList.remove('header-sticky');
+                    if (isTransparentInitial) {
+                        header.classList.add('header-transparent');
+                        header.classList.remove('header-solid');
+                    }
                 }
             }
-        }
 
-        window.addEventListener('scroll', handleScroll);
-        handleScroll();
-    });
+            window.addEventListener('scroll', handleScroll);
+            handleScroll();
+        });
 
-    // Snowflake Effect
-    function createSnowflakes() {
-        const container = document.getElementById('snowflake-container');
-        const snowflakeCount = 50;
-        const snowflakeSymbols = ['❅', '❆', '❇', '✿', '✻'];
+        // Snowflake Effect
+        function createSnowflakes() {
+            const container = document.getElementById('snowflake-container');
+            const snowflakeCount = 50;
+            const snowflakeSymbols = ['❅', '❆', '❇', '✿', '✻'];
 
-        function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.classList.add('snowflake');
-            snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
-            snowflake.style.left = Math.random() * window.innerWidth + 'px';
-            snowflake.style.fontSize = (Math.random() * 1 + 0.5) + 'em';
-            snowflake.style.opacity = Math.random() * 0.5 + 0.5;
+            function createSnowflake() {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+                snowflake.style.left = Math.random() * window.innerWidth + 'px';
+                snowflake.style.fontSize = (Math.random() * 1 + 0.5) + 'em';
+                snowflake.style.opacity = Math.random() * 0.5 + 0.5;
 
-            const duration = Math.random() * 10 + 10;
-            const swayChance = Math.random();
+                const duration = Math.random() * 10 + 10;
+                const swayChance = Math.random();
 
-            if (swayChance > 0.5) {
-                snowflake.classList.add('sway');
-                snowflake.style.setProperty('--sway-distance', (Math.random() * 100 - 50) + 'px');
+                if (swayChance > 0.5) {
+                    snowflake.classList.add('sway');
+                    snowflake.style.setProperty('--sway-distance', (Math.random() * 100 - 50) + 'px');
+                }
+
+                snowflake.style.animation = `fall ${duration}s linear forwards`;
+
+                container.appendChild(snowflake);
+
+                setTimeout(() => snowflake.remove(), duration * 1000);
             }
 
-            snowflake.style.animation = `fall ${duration}s linear forwards`;
+            // Create initial snowflakes
+            for (let i = 0; i < snowflakeCount; i++) {
+                setTimeout(() => {
+                    createSnowflake();
+                }, i * 100);
+            }
 
-            container.appendChild(snowflake);
-
-            setTimeout(() => snowflake.remove(), duration * 1000);
-        }
-
-        // Create initial snowflakes
-        for (let i = 0; i < snowflakeCount; i++) {
-            setTimeout(() => {
+            // Keep creating snowflakes continuously
+            setInterval(() => {
                 createSnowflake();
-            }, i * 100);
+            }, 200);
         }
 
-        // Keep creating snowflakes continuously
-        setInterval(() => {
-            createSnowflake();
-        }, 200);
-    }
-
-    document.addEventListener('DOMContentLoaded', createSnowflakes);
-</script>
+        document.addEventListener('DOMContentLoaded', createSnowflakes);
+    </script>
 
 </body>
+
 </html>
-
-
-
