@@ -97,7 +97,7 @@ public class CourseService {
 
     public Page<Course> findCoursesFiltered(String keyword, Double minPrice, Double maxPrice, String sortBy, int page, int size) {
         int normalizedPage = Math.max(page - 1, 0);
-        int normalizedSize = normalizePageSize(size);
+        int normalizedSize = size; // Honor the size passed from controller
         Pageable pageable = PageRequest.of(normalizedPage, normalizedSize);
 
         List<Course> courses;
