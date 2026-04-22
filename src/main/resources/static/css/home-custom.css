@@ -628,6 +628,7 @@ body, html {
 }
 
 .view-btn:hover {
-    background-color: #1e88e5 !important;
-    color: red !important;
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
 }

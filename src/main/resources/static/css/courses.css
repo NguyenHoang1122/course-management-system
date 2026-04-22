@@ -345,6 +345,34 @@
     box-shadow: 0 5px 15px rgba(54, 127, 255, 0.4);
 }
 
+/* View Button Styles */
+.view-btn {
+    min-width: 54px !important;
+    height: 38px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+    color: white !important;
+    background-color: #1e88e5 !important;
+    border-color: #1e88e5 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    text-align: center !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.view-btn:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
 @media (max-width: 991px) {
     .newsletter-card {
         flex-direction: column;
