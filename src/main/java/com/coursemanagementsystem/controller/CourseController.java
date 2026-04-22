@@ -256,19 +256,41 @@ public class CourseController {
                                 @RequestParam("reason") String reason,
                                 Principal principal, RedirectAttributes redirectAttributes,
                                 HttpServletRequest request) {
-        if (principal != null) {
-            User user = userService.findByUsername(principal.getName());
-            if (user != null) {
-                reviewService.reportReview(user, reviewId, reason);
-                
-                String requestedWith = request.getHeader("X-Requested-With");
-                if ("XMLHttpRequest".equals(requestedWith)) {
-                    return ResponseEntity.ok("Report submitted successfully");
-                }
-                
-                redirectAttributes.addFlashAttribute("reviewSuccess", "Báo cáo thành công! Cảm ơn bạn đã phản hồi.");
-            }
+        if (principal == null) {
+            return "redirect:/auth/login";
         }
+
+        User user = userService.findByUsername(principal.getName());
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+
+        // Get the review to check if user is the author
+        Optional<Review> reviewOptional = reviewService.getReviewById(reviewId);
+        if (reviewOptional.isEmpty()) {
+            redirectAttributes.addFlashAttribute("reviewError", "Đánh giá không tồn tại.");
+            return "redirect:/courses/" + id + "#tab-reviews";
+        }
+
+        Review review = reviewOptional.get();
+        // Prevent user from reporting their own review
+        if (review.getUser().getId().equals(user.getId())) {
+            String requestedWith = request.getHeader("X-Requested-With");
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                return ResponseEntity.badRequest().body("Bạn không thể báo cáo đánh giá của chính mình");
+            }
+            redirectAttributes.addFlashAttribute("reviewError", "Bạn không thể báo cáo đánh giá của chính mình.");
+            return "redirect:/courses/" + id + "#tab-reviews";
+        }
+
+        reviewService.reportReview(user, reviewId, reason);
+
+        String requestedWith = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(requestedWith)) {
+            return ResponseEntity.ok("Report submitted successfully");
+        }
+
+        redirectAttributes.addFlashAttribute("reviewSuccess", "Báo cáo thành công! Cảm ơn bạn đã phản hồi.");
         return "redirect:/courses/" + id + "#tab-reviews";
     }
 
