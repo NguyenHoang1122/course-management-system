@@ -22,6 +22,7 @@
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: relative;
         }
         .notification-page-item:hover {
             transform: translateX(5px);
@@ -30,6 +31,34 @@
         .notification-page-item.unread {
             background: #f0f7ff;
             border-left-color: var(--primary-color);
+        }
+        .noti-page-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f8fafc;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .notification-page-item:hover .noti-page-delete-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+        .noti-page-delete-btn:hover {
+            background: #ef4444;
+            color: #fff;
+            transform: rotate(90deg);
         }
         .noti-icon {
             width: 48px;
@@ -99,7 +128,10 @@
         <main class="dashboard-main-content">
             <div class="course-section-header">
                 <h3>Tất cả thông báo</h3>
-                <button id="pageMarkAllRead" class="btn btn-sm btn-primary rounded-pill px-4">Đánh dấu đã đọc hết</button>
+                <div class="d-flex gap-2">
+                    <button id="pageMarkAllRead" class="btn btn-sm btn-outline-primary rounded-pill px-3">Đánh dấu đã đọc hết</button>
+                    <button id="pageDeleteAll" class="btn btn-sm btn-outline-danger rounded-pill px-3">Xóa tất cả</button>
+                </div>
             </div>
 
             <div class="notification-page-list" th:if="${notifications != null and !notifications.isEmpty()}">
@@ -119,6 +151,9 @@
                         <span class="noti-message" th:utext="${n.message}">Nội dung</span>
                         <span class="noti-time" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">Thời gian</span>
                     </div>
+                    <button class="noti-page-delete-btn" th:onclick="'deleteFromPage(' + ${n.id} + ', event)'" title="Xóa thông báo">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </a>
             </div>
 
@@ -161,9 +196,43 @@
                 $item.find('.mark-read-badge').remove();
                 
                 $.post('/api/notifications/mark-read/' + id).always(function() {
-                    window.location.href = link;
+                    if (link && link !== 'javascript:void(0)') {
+                        window.location.href = link;
+                    }
                 });
             }
+        });
+
+        // Individual delete from page
+        window.deleteFromPage = function(id, e) {
+            if (e) e.stopPropagation();
+            if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;
+
+            const $item = $(`.notification-page-item[data-id="${id}"]`);
+            $item.fadeOut(300, function() {
+                $(this).remove();
+                if ($('.notification-page-item').length === 0) {
+                    location.reload(); // Show empty state
+                }
+            });
+
+            $.ajax({
+                url: '/api/notifications/' + id,
+                type: 'DELETE'
+            });
+        }
+
+        // Delete all
+        $('#pageDeleteAll').on('click', function() {
+            if (!confirm('Bạn có chắc muốn xóa TOÀN BỘ thông báo không? Hành động này không thể hoàn tác.')) return;
+            
+            $.ajax({
+                url: '/api/notifications/all',
+                type: 'DELETE',
+                success: function() {
+                    location.reload();
+                }
+            });
         });
     });
 </script>

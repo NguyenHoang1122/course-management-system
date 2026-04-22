@@ -365,16 +365,21 @@
                                 const iconClass = getIconByType(n.type);
                                 
                                 const html = `
-                                    <a href="${n.link || 'javascript:void(0)'}" class="notification-item ${unreadClass}" data-id="${n.id}">
-                                        <div class="notification-icon-box noti-type-${n.type}">
-                                            <i class="${iconClass}"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <span class="notification-title">${n.title}</span>
-                                            <span class="notification-message">${n.message}</span>
-                                            <span class="notification-time">${timeStr}</span>
-                                        </div>
-                                    </a>
+                                    <div class="notification-item-wrapper" style="position: relative;">
+                                        <a href="${n.link || 'javascript:void(0)'}" class="notification-item ${unreadClass}" data-id="${n.id}">
+                                            <div class="notification-icon-box noti-type-${n.type}">
+                                                <i class="${iconClass}"></i>
+                                            </div>
+                                            <div class="notification-content">
+                                                <span class="notification-title">${n.title}</span>
+                                                <span class="notification-message">${n.message}</span>
+                                                <span class="notification-time">${timeStr}</span>
+                                            </div>
+                                        </a>
+                                        <button class="noti-delete-btn" data-id="${n.id}" onclick="deleteNotification(${n.id}, event)" title="Xóa thông báo">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 `;
                                 $list.append(html);
                             });
@@ -463,6 +468,31 @@
                     updateNotifications();
                 });
             });
+
+            // Delete notification logic
+            window.deleteNotification = function(id, e) {
+                if (e) e.stopPropagation();
+                
+                const $itemWrapper = $(`[data-id="${id}"]`).closest('.notification-item-wrapper');
+                $itemWrapper.fadeOut(300, function() {
+                    $(this).remove();
+                    // If no items left
+                    if ($('#notificationList').children().length === 0) {
+                        $('#notificationList').append('<div class="notification-item empty">Không có thông báo mới</div>');
+                        $('#notificationCount').hide();
+                    }
+                });
+
+                $.ajax({
+                    url: '/api/notifications/' + id,
+                    type: 'DELETE',
+                    success: function() {
+                        // Success - count already updated optimistically if we wanted, 
+                        // but let's refresh to be sure of the state
+                        updateNotifications();
+                    }
+                });
+            }
 
             // Initial fetch if logged in
             if ($('#notificationBtn').length) {
