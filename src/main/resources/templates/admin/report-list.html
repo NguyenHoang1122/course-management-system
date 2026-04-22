@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Quản Lý Báo Cáo - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .report-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            border-left: 5px solid #ef4444;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .report-card:hover {
+            transform: translateY(-2px);
+        }
+        .report-header {
+            padding: 16px 24px;
+            background: #fef2f2;
+            border-bottom: 1px solid #fee2e2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-reason {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .report-meta {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .report-body {
+            padding: 24px;
+        }
+        .review-quote {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #cbd5e1;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .review-quote::before {
+            content: '\f10d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #e2e8f0;
+            z-index: 0;
+        }
+        .review-text {
+            position: relative;
+            z-index: 1;
+            font-style: italic;
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .review-author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .report-actions {
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #f1f5f9;
+            padding: 16px 24px;
+            background: #fafafa;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: #fff;
+            border-radius: 12px;
+            border: 2px dashed #e2e8f0;
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="admin-shell-main">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-flag"></i> Quản Lý Báo Cáo</h1>
+                <p>Xử lý các báo cáo vi phạm từ người dùng về các đánh giá khóa học</p>
+            </div>
+
+            <div class="admin-content">
+                <div th:if="${successMessage}" class="alert alert-success mb-4">
+                    <i class="fas fa-check-circle mr-2"></i> <span th:text="${successMessage}"></span>
+                </div>
+
+                <div th:if="${reports != null and !reports.isEmpty()}">
+                    <div th:each="report : ${reports}" class="report-card">
+                        <div class="report-header">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="report-reason" th:text="${report.reason}">Lý do</span>
+                                <span class="report-meta">
+                                    <i class="far fa-user"></i> Người báo cáo: <strong th:text="${report.user != null ? report.user.fullName : 'Học viên'}"></strong>
+                                </span>
+                            </div>
+                            <span class="report-meta">
+                                <i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(report.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            </span>
+                        </div>
+                        <div class="report-body">
+                            <div class="review-author-info">
+                                <div class="author-avatar" th:text="${report.review.user != null ? #strings.substring(report.review.user.fullName, 0, 1).toUpperCase() : 'U'}">U</div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 14px;" th:text="${report.review.user != null ? report.review.user.fullName : 'Học viên'}">Tác giả review</div>
+                                    <div style="color: #f59e0b; font-size: 11px;">
+                                        <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                                            <i th:class="${i <= report.review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <div style="margin-left: auto;">
+                                    <span class="report-meta">Thuộc khóa học: </span>
+                                    <a th:href="@{/courses/{id}(id=${report.review.course.id})}" target="_blank" 
+                                       style="font-weight: 600; color: #6d28d9; text-decoration: none;" th:text="${report.review.course.title}">Khóa học</a>
+                                </div>
+                            </div>
+                            <div class="review-quote">
+                                <div class="review-text" th:text="${report.review.comment}">Nội dung review...</div>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <form th:action="@{/admin/reviews/{id}/delete(id=${report.review.id})}" method="post" 
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này sẽ xóa luôn tất cả báo cáo liên quan.')">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt"></i> Xóa Đánh Giá
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/reports/{id}/dismiss(id=${report.id})}" method="post">
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Bác Bỏ Báo Cáo
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${reports == null or reports.isEmpty()}" class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Tuyệt vời! Không có báo cáo nào.</h2>
+                    <p>Hệ thống hiện tại chưa có đánh giá nào bị báo cáo vi phạm.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+</body>
+</html>

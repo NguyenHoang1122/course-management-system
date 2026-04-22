@@ -615,6 +615,150 @@
             .hero-title { font-size: 1.6rem; }
             .learn-grid { grid-template-columns: 1fr; }
         }
+
+        /* ========== PREMIUM REVIEWS STYLES ========== */
+        .review-analytics {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 24px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .avg-rating-box { text-align: center; }
+        .avg-rating-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .avg-rating-stars { color: #f59e0b; font-size: 18px; margin-bottom: 8px; }
+        .avg-rating-label { color: #64748b; font-size: 14px; font-weight: 600; }
+
+        .rating-bars { display: flex; flex-direction: column; gap: 10px; }
+        .rating-bar-item { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: opacity 0.2s; }
+        .rating-bar-item:hover { opacity: 0.8; }
+        .rating-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .rating-bar-fill {
+            height: 100%;
+            background: #64748b;
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .rating-star-count {
+            width: 80px;
+            font-size: 13px;
+            color: #1e293b;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .rating-percent { width: 40px; font-size: 13px; color: #6d28d9; font-weight: 700; text-align: right; }
+
+        .review-filter-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+        .review-search-wrap { flex: 1; position: relative; }
+        .review-search-wrap i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .review-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .review-input:focus { border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1); }
+        .review-select {
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .review-item-premium {
+            padding: 30px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            gap: 20px;
+        }
+        .review-item-premium:last-child { border-bottom: none; }
+        .reviewer-avatar-circle {
+            width: 48px;
+            height: 48px;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .review-content-main { flex: 1; }
+        .reviewer-info-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .reviewer-name-premium { font-weight: 700; color: #1e293b; font-size: 15px; }
+        .review-date { color: #64748b; font-size: 13px; }
+        .review-stars-premium { color: #f59e0b; font-size: 13px; margin-bottom: 10px; }
+        .review-text-premium { color: #334155; font-size: 14.5px; line-height: 1.6; margin-bottom: 16px; }
+        
+        .review-actions-premium { display: flex; align-items: center; gap: 20px; }
+        .helpful-text { font-size: 12px; color: #64748b; font-weight: 600; }
+        .helpful-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .helpful-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .helpful-btn.active { color: #6d28d9; border-color: #6d28d9; background: #f5f3ff; }
+        .report-link { font-size: 12px; color: #64748b; text-decoration: none; cursor: pointer; }
+        .report-link:hover { color: #ef4444; text-decoration: underline; }
+
+        .load-more-container { text-align: center; margin-top: 30px; }
+        .btn-load-more {
+            padding: 12px 30px;
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #1e293b;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-load-more:hover { border-color: #6d28d9; color: #6d28d9; }
+        
+        @media (max-width: 768px) {
+            .review-analytics { grid-template-columns: 1fr; gap: 24px; }
+            .review-filter-row { flex-direction: column; align-items: stretch; }
+        }
     </style>
 </head>
 <body>
@@ -846,71 +990,140 @@
 
                     <!-- TAB: REVIEWS -->
                     <div id="tab-reviews" class="cd-tab-content">
-                        <!-- Rating Summary -->
-                        <div class="review-summary">
-                            <div class="review-big-score" th:text="${#numbers.formatDecimal(averageRating,1,1)}">0.0</div>
-                            <div>
-                                <div class="review-stars-row">
-                                    <th:block th:each="i : ${#numbers.sequence(1,5)}">
-                                        <i th:class="${i <= averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
-                                    </th:block>
-                                </div>
-                                <div class="review-count" th:text="${reviews.size()} + ' đánh giá'">0 đánh giá</div>
-                            </div>
-                        </div>
-
-                        <!-- Review List -->
-                        <div th:if="${reviews != null and !reviews.isEmpty()}">
-                            <div th:each="review : ${reviews}" class="review-item">
-                                <div class="reviewer-avatar"
-                                     th:text="${review.user != null ? #strings.substring(review.user.fullName, 0, 1).toUpperCase() : 'U'}">U</div>
-                                <div class="review-body">
-                                    <div class="reviewer-name" th:text="${review.user != null ? review.user.fullName : 'Học viên'}">Học viên</div>
-                                    <div class="reviewer-stars">
+                        <div id="reviews-list-container" th:fragment="reviews-list-fragment">
+                            <!-- Rating Analytics Summary -->
+                            <div class="review-analytics">
+                                <div class="avg-rating-box">
+                                    <div class="avg-rating-number" th:text="${#numbers.formatDecimal(averageRating,1,1)}">0.0</div>
+                                    <div class="avg-rating-stars">
                                         <th:block th:each="i : ${#numbers.sequence(1,5)}">
-                                            <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                            <i th:class="${i <= averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
                                         </th:block>
                                     </div>
-                                    <div class="reviewer-text" th:text="${review.comment}">Nhận xét...</div>
+                                    <div class="avg-rating-label">Xếp hạng khóa học</div>
+                                </div>
+                                
+                                <div class="rating-bars">
+                                    <div th:each="i : ${#numbers.sequence(5, 1)}" class="rating-bar-item" 
+                                         th:with="count=${starDistribution.get(i)}, percent=${totalReviews > 0 ? (count * 100 / totalReviews) : 0}">
+                                        <div class="rating-bar-bg">
+                                            <div class="rating-bar-fill" th:style="'width: ' + ${percent} + '%'"></div>
+                                        </div>
+                                        <div class="rating-star-count">
+                                            <th:block th:each="s : ${#numbers.sequence(1,5)}">
+                                                <i th:class="${s <= i} ? 'fas fa-star' : 'far fa-star'" style="font-size: 10px; color: #f59e0b;"></i>
+                                            </th:block>
+                                        </div>
+                                        <div class="rating-percent" th:text="${percent} + '%'">0%</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div th:if="${reviews == null or reviews.isEmpty()}"
-                             style="text-align:center;padding:40px 0;color:#9ca3af;">
-                            <i class="far fa-comment-alt" style="font-size:2.5rem;margin-bottom:10px;display:block;"></i>
-                            <p>Chưa có đánh giá. Hãy là người đầu tiên đánh giá!</p>
+
+                            <!-- Filter Row -->
+                            <form id="reviewFilterForm" th:action="@{'/courses/' + ${course.id}}" method="get" class="review-filter-row" onsubmit="return handleReviewFilter(event)">
+                                <input type="hidden" name="reviewSize" id="reviewSizeInput" th:value="${reviewSize}">
+                                <div class="review-search-wrap">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" name="keyword" th:value="${keyword}" class="review-input" placeholder="Tìm kiếm trong các đánh giá..." oninput="debounceFilter()">
+                                </div>
+                                <select name="ratingFilter" class="review-select" onchange="handleReviewFilter(event)">
+                                    <option value="">Tất cả xếp hạng</option>
+                                    <option th:each="i : ${#numbers.sequence(5, 1)}" th:value="${i}" th:text="${i} + ' sao'" th:selected="${ratingFilter == i}"></option>
+                                </select>
+                            </form>
+
+                            <!-- Review List -->
+                            <div th:if="${reviews != null and !reviews.isEmpty()}" class="reviews-container-premium">
+                                <div th:each="review : ${reviews}" class="review-item-premium">
+                                    <div class="reviewer-avatar-circle"
+                                         th:text="${review.user != null ? #strings.substring(review.user.fullName, 0, 1).toUpperCase() : 'U'}">U</div>
+                                    <div class="review-content-main">
+                                        <div class="reviewer-info-header">
+                                            <div class="reviewer-name-premium" th:text="${review.user != null ? review.user.fullName : 'Học viên'}">Học viên</div>
+                                            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}">1 tuần trước</div>
+                                        </div>
+                                        <div class="review-stars-premium">
+                                            <th:block th:each="i : ${#numbers.sequence(1,5)}">
+                                                <i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                            </th:block>
+                                        </div>
+                                        <div class="review-text-premium" th:text="${review.comment}">Nhận xét...</div>
+                                        
+                                        <div class="review-actions-premium">
+                                            <span class="helpful-text">Đánh giá này có hữu ích không?</span>
+                                            <div class="helpful-action-wrap">
+                                                <button type="button" class="helpful-btn" 
+                                                        th:classappend="${userHelpfulStates.get(review.id) ? 'active' : ''}" 
+                                                        th:onclick="'toggleHelpful(' + ${course.id} + ', ' + ${review.id} + ', this)'"
+                                                        sec:authorize="isAuthenticated()">
+                                                    <i class="far fa-thumbs-up" th:if="${!userHelpfulStates.get(review.id)}"></i>
+                                                    <i class="fas fa-thumbs-up" th:if="${userHelpfulStates.get(review.id)}"></i>
+                                                    <span class="helpful-count" th:text="${helpfulCounts.get(review.id)}">0</span>
+                                                </button>
+                                                <button type="button" class="helpful-btn" onclick="window.location.href='/auth/login'" 
+                                                        sec:authorize="isAnonymous()">
+                                                    <i class="far fa-thumbs-up"></i>
+                                                    <span th:text="${helpfulCounts.get(review.id)}">0</span>
+                                                </button>
+                                            </div>
+                                            <a href="javascript:void(0)" class="report-link" th:onclick="'showReportModal(' + ${review.id} + ')'">Báo cáo</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Load More -->
+                            <div class="load-more-container" th:if="${totalFiltered > reviews.size()}">
+                                <button type="button" class="btn-load-more" th:onclick="'loadMoreReviews(' + ${reviewSize + 5} + ')'">
+                                    Xem thêm đánh giá
+                                </button>
+                            </div>
+
+                            <div th:if="${reviews == null or reviews.isEmpty()}"
+                                 style="text-align:center;padding:60px 0;color:#9ca3af;background:#fff;border-radius:12px;border:1px dashed #e2e8f0;margin-top:20px;">
+                                <i class="far fa-comment-alt" style="font-size:3rem;margin-bottom:15px;display:block;opacity:0.5;"></i>
+                                <p style="font-weight: 500;">Không tìm thấy đánh giá nào phù hợp.</p>
+                            </div>
+
+                            <!-- Success/Error Messages -->
+                            <div id="review-status-msg">
+                                <div th:if="${reviewSuccess}" class="alert alert-success mt-4" style="border-radius:8px; font-size:14px;">
+                                    <i class="fas fa-check-circle mr-2"></i> <span th:text="${reviewSuccess}"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Review Form -->
+                            <div sec:authorize="isAuthenticated()" th:if="${isEnrolled}" class="review-form-section">
+                                <h4 style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;">
+                                    <i class="fas fa-star" style="color:#f59e0b;margin-right:6px;"></i>
+                                    <span th:text="${userReview != null ? 'Cập nhật đánh giá của bạn' : 'Viết đánh giá'}"></span>
+                                </h4>
+                                <form id="reviewSubmitForm" th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post" onsubmit="return handleReviewSubmit(event)">
+                                    <div style="margin-bottom:14px;">
+                                        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Số sao</label>
+                                        <select name="rating" required style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:14px;width:auto;color:#374151;">
+                                            <option value="">-- Chọn số sao --</option>
+                                            <option th:each="i : ${#numbers.sequence(1,5)}"
+                                                    th:value="${i}"
+                                                    th:text="${i} + ' sao'"
+                                                    th:selected="${userReview != null and userReview.rating == i}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div style="margin-bottom:6px;">
+                                        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Nhận xét</label>
+                                        <textarea name="comment" class="cd-textarea" rows="4"
+                                                  placeholder="Chia sẻ trải nghiệm học tập của bạn..."
+                                                  th:text="${userReview != null ? userReview.comment : ''}"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-submit-review">
+                                        <i class="fas fa-paper-plane" style="margin-right:6px;"></i>
+                                        <span th:text="${userReview != null ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}"></span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
-                        <!-- Review Form -->
-                        <div sec:authorize="isAuthenticated()" th:if="${isEnrolled}" class="review-form-section">
-                            <h4 style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;">
-                                <i class="fas fa-star" style="color:#f59e0b;margin-right:6px;"></i>
-                                <span th:text="${userReview != null ? 'Cập nhật đánh giá của bạn' : 'Viết đánh giá'}"></span>
-                            </h4>
-                            <form th:action="@{'/courses/' + ${course.id} + '/reviews'}" method="post">
-                                <div style="margin-bottom:14px;">
-                                    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Số sao</label>
-                                    <select name="rating" style="border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:14px;width:auto;color:#374151;">
-                                        <option value="">-- Chọn số sao --</option>
-                                        <option th:each="i : ${#numbers.sequence(1,5)}"
-                                                th:value="${i}"
-                                                th:text="${i} + ' sao'"
-                                                th:selected="${userReview != null and userReview.rating == i}">
-                                        </option>
-                                    </select>
-                                </div>
-                                <div style="margin-bottom:6px;">
-                                    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Nhận xét</label>
-                                    <textarea name="comment" class="cd-textarea" rows="4"
-                                              placeholder="Chia sẻ trải nghiệm học tập của bạn..."
-                                              th:text="${userReview != null ? userReview.comment : ''}"></textarea>
-                                </div>
-                                <button type="submit" class="btn-submit-review">
-                                    <i class="fas fa-paper-plane" style="margin-right:6px;"></i>
-                                    <span th:text="${userReview != null ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}"></span>
-                                </button>
-                            </form>
-                        </div>
                         <div sec:authorize="isAnonymous()" style="margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;text-align:center;font-size:14px;color:#6b7280;">
                             <a th:href="@{/auth/login}" style="color:#6d28d9;font-weight:600;">Đăng nhập</a> để viết đánh giá khóa học.
                         </div>
@@ -1071,6 +1284,32 @@
     </div>
 </div>
 
+<!-- ===== REPORT REVIEW MODAL ===== -->
+<div id="reportReviewModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div class="modal-content" style="background:#fff; padding:30px; border-radius:12px; max-width:450px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin-top:0; font-size:18px; font-weight:700; color:#1e293b;">Báo cáo vi phạm</h3>
+        <p style="font-size:14px; color:#64748b; margin-bottom:20px;">Vui lòng chọn lý do bạn muốn báo cáo nhận xét này:</p>
+        
+        <form id="reportForm" method="post" onsubmit="return handleReportSubmit(event)">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <div class="form-group mb-3">
+                <select name="reason" class="review-select" style="width:100%;" required>
+                    <option value="">-- Chọn lý do --</option>
+                    <option value="Nội dung không phù hợp">Nội dung không phù hợp</option>
+                    <option value="Spam hoặc lừa đảo">Spam hoặc lừa đảo</option>
+                    <option value="Nội dung quấy rối">Nội dung quấy rối</option>
+                    <option value="Thông tin sai lệch">Thông tin sai lệch</option>
+                    <option value="Lý do khác">Lý do khác</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:24px;">
+                <button type="button" class="btn btn-secondary" onclick="closeReportModal()" style="padding:10px 20px; font-size:14px;">Hủy</button>
+                <button type="submit" class="btn btn-primary" style="padding:10px 20px; font-size:14px; background:#6d28d9; color:#fff; border:none; border-radius:8px;">Gửi báo cáo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
 
@@ -1117,6 +1356,170 @@
             }
         });
     });
+
+    // ===== AJAX REVIEWS LOGIC =====
+    let filterDebounceTimer;
+    function debounceFilter() {
+        clearTimeout(filterDebounceTimer);
+        filterDebounceTimer = setTimeout(() => {
+            handleReviewFilter();
+        }, 500);
+    }
+
+    function handleReviewFilter(event) {
+        if (event) event.preventDefault();
+        const form = document.getElementById('reviewFilterForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+        
+        loadReviewsFragment(params.toString());
+        return false;
+    }
+
+    function loadMoreReviews(newSize) {
+        document.getElementById('reviewSizeInput').value = newSize;
+        handleReviewFilter();
+    }
+
+    function loadReviewsFragment(queryString) {
+        const courseId = /*[[${course.id}]]*/ 0;
+        const container = document.getElementById('reviews-list-container');
+        
+        // Add loading state
+        container.style.opacity = '0.5';
+        container.style.pointerEvents = 'none';
+
+        fetch(`/courses/${courseId}?${queryString}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            container.innerHTML = html;
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+            // Scroll slightly if needed or maintain position
+        })
+        .catch(err => {
+            console.error('Error loading reviews:', err);
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+        });
+    }
+
+    function toggleHelpful(courseId, reviewId, btn) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+        if (csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch(`/courses/${courseId}/reviews/${reviewId}/helpful`, {
+            method: 'POST',
+            headers: headers
+        })
+        .then(response => {
+            if (response.status === 401) { window.location.href = '/auth/login'; return; }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                const countSpan = btn.querySelector('.helpful-count');
+                const icon = btn.querySelector('i');
+                countSpan.textContent = data.helpfulCount;
+                if (data.isHelpful) {
+                    btn.classList.add('active');
+                    icon.className = 'fas fa-thumbs-up';
+                } else {
+                    btn.classList.remove('active');
+                    icon.className = 'far fa-thumbs-up';
+                }
+            }
+        })
+        .catch(err => console.error('Error toggling helpful:', err));
+    }
+
+    function handleReviewSubmit(event) {
+        event.preventDefault();
+        const form = document.getElementById('reviewSubmitForm');
+        const formData = new FormData(form);
+        const courseId = /*[[${course.id}]]*/ 0;
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+        if (csrfToken) headers[csrfHeader] = csrfToken;
+
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                // Refresh the list
+                handleReviewFilter();
+                // Show success message (will be in the fragment after refresh, but let's add a quick one)
+                const statusMsg = document.getElementById('review-status-msg');
+                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Đánh giá của bạn đã được ghi lại thành công!</div>';
+            } else {
+                alert('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.');
+            }
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+
+        return false;
+    }
+
+    function handleReportSubmit(event) {
+        event.preventDefault();
+        const form = document.getElementById('reportForm');
+        const formData = new FormData(form);
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+        if (csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                closeReportModal();
+                // Optionally show a message
+                const statusMsg = document.getElementById('review-status-msg');
+                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Báo cáo đã được gửi. Cảm ơn bạn!</div>';
+            } else {
+                alert('Có lỗi xảy ra khi gửi báo cáo.');
+            }
+        })
+        .catch(err => console.error('Error reporting review:', err));
+
+        return false;
+    }
+
+    // ===== REVIEW REPORT MODAL FUNCTIONS =====
+    function showReportModal(reviewId) {
+        const courseId = /*[[${course.id}]]*/ 0;
+        const form = document.getElementById('reportForm');
+        form.action = `/courses/${courseId}/reviews/${reviewId}/report`;
+        document.getElementById('reportReviewModal').style.display = 'flex';
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportReviewModal').style.display = 'none';
+    }
 
     // ===== VIDEO ENGINE =====
     let currentActiveLessonId = null;

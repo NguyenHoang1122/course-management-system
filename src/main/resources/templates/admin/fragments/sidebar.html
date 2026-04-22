@@ -80,6 +80,14 @@
             </div>
         </div>
 
+        <!-- Báo cáo vi phạm -->
+        <div class="sidebar-single-item" data-label="Báo cáo">
+            <a th:href="@{/admin/reports}" class="admin-sidebar-link" th:classappend="${activeMenu == 'reports'} ? ' active' : ''">
+                <span class="sidebar-icon-wrap"><i class="fas fa-flag"></i></span>
+                <span class="admin-sidebar-text">Quản lý báo cáo</span>
+            </a>
+        </div>
+
         <!-- System Section -->
         <div class="sidebar-group-label">Hệ thống</div>
         
