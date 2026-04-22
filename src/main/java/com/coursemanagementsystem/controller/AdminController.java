@@ -8,6 +8,7 @@ import com.coursemanagementsystem.repository.LessonRepository;
 import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.LessonService;
+import com.coursemanagementsystem.service.ReviewService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class AdminController {
     private LessonService lessonService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ReviewService reviewService;
 
     @Autowired
     private CourseResourceRepository resourceRepository;
@@ -481,11 +484,34 @@ public class AdminController {
                 
                 resourceRepository.delete(resource);
                 redirectAttributes.addFlashAttribute("success", "Đã xóa tài liệu!");
-                return "redirect:/admin/" + courseId;
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa tài liệu: " + e.getMessage());
+            return "redirect:/admin/" + courseId;
         }
-        return "redirect:/admin/course-list";
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa tài liệu: " + e.getMessage());
+    }
+    return "redirect:/admin/course-list";
+}
+
+    // --- REVIEW REPORTS MANAGEMENT ---
+
+    @GetMapping("/reports")
+    public String listReports(Model model) {
+        model.addAttribute("reports", reviewService.getAllReports());
+        model.addAttribute("activeMenu", "reports");
+        return "admin/report-list";
+    }
+
+    @PostMapping("/reports/{id}/dismiss")
+    public String dismissReport(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        reviewService.dismissReport(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã bác bỏ báo cáo.");
+        return "redirect:/admin/reports";
+    }
+
+    @PostMapping("/reviews/{id}/delete")
+    public String deleteReview(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        reviewService.deleteReview(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa đánh giá và các báo cáo liên quan.");
+        return "redirect:/admin/reports";
     }
 }

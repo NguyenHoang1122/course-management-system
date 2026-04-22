@@ -1,45 +1,133 @@
 package com.coursemanagementsystem.service;
 
-import com.coursemanagementsystem.model.Course;
-import com.coursemanagementsystem.model.Review;
-import com.coursemanagementsystem.model.User;
+import com.coursemanagementsystem.model.*;
+import com.coursemanagementsystem.repository.ReviewReactionRepository;
+import com.coursemanagementsystem.repository.ReviewReportRepository;
 import com.coursemanagementsystem.repository.ReviewRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class ReviewService {
 
-	private final ReviewRepository reviewRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
-	public ReviewService(ReviewRepository reviewRepository) {
-		this.reviewRepository = reviewRepository;
-	}
+    @Autowired
+    private ReviewReactionRepository reactionRepository;
 
-	public List<Review> getReviewsByCourseId(Long courseId) {
-		return reviewRepository.findByCourseId(courseId);
-	}
+    @Autowired
+    private ReviewReportRepository reportRepository;
 
-	public double getAverageRating(Long courseId) {
-		Double avg = reviewRepository.findAverageRatingByCourseId(courseId);
-		return avg == null ? 0 : avg;
-	}
+    public List<Review> getReviewsByCourseId(Long courseId) {
+        return reviewRepository.findByCourseId(courseId);
+    }
 
-	public Optional<Review> getUserReview(Long userId, Long courseId) {
-		return reviewRepository.findByUserIdAndCourseId(userId, courseId);
-	}
+    public double getAverageRating(Long courseId) {
+        Double avg = reviewRepository.findAverageRatingByCourseId(courseId);
+        return avg == null ? 0 : avg;
+    }
 
-	public void saveOrUpdateReview(User user, Course course, Integer rating, String comment) {
-		Review review = reviewRepository.findByUserIdAndCourseId(user.getId(), course.getId())
-				.orElseGet(Review::new);
+    public Map<Integer, Long> getStarDistribution(Long courseId) {
+        List<Review> reviews = getReviewsByCourseId(courseId);
+        Map<Integer, Long> distribution = new HashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            distribution.put(i, 0L);
+        }
+        for (Review review : reviews) {
+            int rating = review.getRating();
+            distribution.put(rating, distribution.get(rating) + 1);
+        }
+        return distribution;
+    }
 
-		review.setUser(user);
-		review.setCourse(course);
-		review.setRating(rating);
-		review.setComment(comment == null ? "" : comment.trim());
+    public Optional<Review> getUserReview(Long userId, Long courseId) {
+        return reviewRepository.findByUserIdAndCourseId(userId, courseId);
+    }
 
-		reviewRepository.save(review);
-	}
+    public void saveOrUpdateReview(User user, Course course, Integer rating, String comment) {
+        Review review = reviewRepository.findByUserIdAndCourseId(user.getId(), course.getId())
+                .orElseGet(Review::new);
+
+        review.setUser(user);
+        review.setCourse(course);
+        review.setRating(rating);
+        review.setComment(comment == null ? "" : comment.trim());
+
+        reviewRepository.save(review);
+    }
+
+    public void toggleHelpful(User user, Long reviewId) {
+        Optional<ReviewReaction> reactionOpt = reactionRepository.findByUserIdAndReviewId(user.getId(), reviewId);
+        if (reactionOpt.isPresent()) {
+            reactionRepository.delete(reactionOpt.get());
+        } else {
+            Review review = reviewRepository.findById(reviewId).orElse(null);
+            if (review != null) {
+                ReviewReaction reaction = new ReviewReaction();
+                reaction.setUser(user);
+                reaction.setReview(review);
+                reaction.setHelpful(true);
+                reactionRepository.save(reaction);
+            }
+        }
+    }
+
+    public void reportReview(User user, Long reviewId, String reason) {
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review != null) {
+            ReviewReport report = new ReviewReport();
+            report.setUser(user);
+            report.setReview(review);
+            report.setReason(reason);
+            reportRepository.save(report);
+        }
+    }
+
+    public long getHelpfulCount(Long reviewId) {
+        return reactionRepository.countByReviewIdAndIsHelpful(reviewId, true);
+    }
+
+    public boolean isHelpfulByUser(Long userId, Long reviewId) {
+        return reactionRepository.findByUserIdAndReviewId(userId, reviewId).isPresent();
+    }
+
+    // --- ADMIN METHODS ---
+
+    public List<ReviewReport> getAllReports() {
+        // Return reports sorted by newest first
+        return reportRepository.findAll().stream()
+                .sorted((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        // 1. Delete all reports associated with this review
+        // In a real app, we might have reportRepository.deleteByReviewId(reviewId)
+        // But for simplicity, we find them and delete
+        List<ReviewReport> reports = reportRepository.findAll().stream()
+                .filter(r -> r.getReview().getId().equals(reviewId))
+                .collect(java.util.stream.Collectors.toList());
+        reportRepository.deleteAll(reports);
+
+        // 2. Delete all reactions associated with this review
+        List<ReviewReaction> reactions = reactionRepository.findAll().stream()
+                .filter(r -> r.getReview().getId().equals(reviewId))
+                .collect(java.util.stream.Collectors.toList());
+        reactionRepository.deleteAll(reactions);
+
+        // 3. Delete the review itself
+        reviewRepository.deleteById(reviewId);
+    }
+
+    public void dismissReport(Long reportId) {
+        reportRepository.deleteById(reportId);
+    }
 }
