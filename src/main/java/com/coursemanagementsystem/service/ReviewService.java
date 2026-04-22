@@ -57,6 +57,10 @@ public class ReviewService {
         return reviewRepository.findByUserIdAndCourseId(userId, courseId);
     }
 
+    public Optional<Review> getReviewById(Long reviewId) {
+        return reviewRepository.findById(reviewId);
+    }
+
     public void saveOrUpdateReview(User user, Course course, Integer rating, String comment) {
         Review review = reviewRepository.findByUserIdAndCourseId(user.getId(), course.getId())
                 .orElseGet(Review::new);

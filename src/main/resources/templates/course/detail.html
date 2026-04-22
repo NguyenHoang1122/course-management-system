@@ -1066,7 +1066,11 @@
                                                     <span th:text="${helpfulCounts.get(review.id)}">0</span>
                                                 </button>
                                             </div>
-                                            <a href="javascript:void(0)" class="report-link" th:onclick="'showReportModal(' + ${review.id} + ')'">Báo cáo</a>
+                                            <!-- Report link: only show if not the review author -->
+                                            <a href="javascript:void(0)" class="report-link"
+                                               th:if="${#authentication.principal.id != review.user.id}"
+                                               th:onclick="'showReportModal(' + ${review.id} + ')'"
+                                               sec:authorize="isAuthenticated()">Báo cáo</a>
                                         </div>
                                     </div>
                                 </div>
