@@ -327,6 +327,11 @@
 
         // Initial check
         updateVideoPreview();
+
+        // Listen for changes to video URL input - update preview in real-time
+        videoUrlInput.addEventListener('input', function() {
+            updateVideoPreview();
+        });
     });
 
     // --- AUTO-FETCH DURATION LOGIC ---
