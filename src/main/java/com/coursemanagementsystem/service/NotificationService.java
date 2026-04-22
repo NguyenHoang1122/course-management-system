@@ -52,4 +52,14 @@ public class NotificationService {
         unread.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(unread);
     }
+
+    @Transactional
+    public void deleteNotification(Long id) {
+        notificationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAllNotifications(User user) {
+        notificationRepository.deleteByUser(user);
+    }
 }

@@ -15,4 +15,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     
     // For marking all as read
     List<Notification> findByUserAndIsReadFalse(User user);
+
+    void deleteByUser(User user);
 }

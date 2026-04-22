@@ -188,6 +188,39 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+.noti-delete-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    color: #94a3b8;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 10;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.notification-item-wrapper:hover .noti-delete-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+.noti-delete-btn:hover {
+    background: #ef4444;
+    color: #fff;
+    transform: scale(1.1);
+}
+
 .cart-badge-blue {
     position: absolute;
     top: -2px;
