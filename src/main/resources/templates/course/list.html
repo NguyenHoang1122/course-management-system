@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Courses Archive - Course Management System</title>
@@ -9,138 +10,170 @@
 </head>
 
 <body>
-<div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
+    <div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
-<main>
-    <!-- Hero Section -->
-    <section class="courses-hero">
-        <div class="container">
-            <h1>Archives: Courses</h1>
-            <div class="breadcrumb-container">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Courses</li>
-                    </ol>
-                </nav>
+    <main>
+        <!-- Hero Section -->
+        <section class="courses-hero">
+            <div class="container">
+                <h1>Archives: Courses</h1>
+                <div class="breadcrumb-container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Courses</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Course Archive Section -->
-    <section class="course-archive-section">
-        <div class="container">
-            <!-- Filter / Sorter row (Simplified) -->
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <p class="mb-0" th:text="'Showing ' + ${courses.size()} + ' of ' + ${totalItems} + ' results'">Showing 6 of 20 results</p>
-                <div class="sort-dropdown">
-                    <form th:action="@{/courses}" method="get" style="display: flex; gap: 10px; align-items: center;">
-                        <input type="hidden" name="keyword" th:value="${keyword}">
-                        <label for="sortBy" style="margin: 0; font-weight: 600;">Sort by:</label>
-                        <select class="form-control" id="sortBy" name="sortBy"
+        <!-- Course Archive Section -->
+        <section class="course-archive-section">
+            <div class="container">
+                <!-- Filter / Sorter row (Simplified) -->
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <p class="mb-0">
+                    <span th:text="'Showing ' + ${courses.size()} + ' of ' + ${totalItems} + ' results'">Showing 6 of 20 results</span>
+                    <small class="text-muted ml-2" th:text="'(Debug: Total Pages=' + ${totalPages} + ', Size=' + ${size} + ')'"></small>
+                </p>
+                    <div class="sort-dropdown">
+                        <form th:action="@{/courses}" method="get"
+                            style="display: flex; gap: 10px; align-items: center;">
+                            <input type="hidden" name="keyword" th:value="${keyword}">
+                            <label for="sortBy" style="margin: 0; font-weight: 600;">Sort by:</label>
+                            <select class="form-control" id="sortBy" name="sortBy"
                                 style="border-radius: 20px; padding: 8px 15px; width: auto; display: inline-block;"
                                 onchange="this.form.submit()">
-                            <option value="newest" th:selected="${sortBy == 'newest'}">Newest First</option>
-                            <option value="oldest" th:selected="${sortBy == 'oldest'}">Oldest First</option>
-                            <option value="price_low_high" th:selected="${sortBy == 'price_low_high'}">Price: Low to High</option>
-                            <option value="price_high_low" th:selected="${sortBy == 'price_high_low'}">Price: High to Low</option>
-                        </select>
+                                <option value="newest" th:selected="${sortBy == 'newest'}">Newest First</option>
+                                <option value="oldest" th:selected="${sortBy == 'oldest'}">Oldest First</option>
+                                <option value="price_low_high" th:selected="${sortBy == 'price_low_high'}">Price: Low to
+                                    High</option>
+                                <option value="price_high_low" th:selected="${sortBy == 'price_high_low'}">Price: High
+                                    to Low</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Course Grid -->
+                <div class="course-grid">
+                    <!-- Iterate through courses -->
+                    <div th:each="course : ${courses}" class="premium-course-card"
+                        th:onclick="|window.location.href='/courses/' + ${course.id}|" style="cursor: pointer;">
+                        <div class="course-img-wrapper">
+                            <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}"
+                                alt="Course Image">
+
+                            <!-- Wishlist Heart Button -->
+                            <button class="wishlist-heart-btn"
+                                th:classappend="${wishlistedCourseIds.contains(course.id)} ? 'active' : ''"
+                                th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'"
+                                onclick="event.stopPropagation();" title="Thêm vào Wishlist">
+                                <i
+                                    th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
+                            </button>
+
+                            <!-- Badge for new courses (within last 30 days) -->
+                            <div th:if="${course.createdAt != null && course.createdAt.isAfter(T(java.time.LocalDate).now().minusDays(30))}"
+                                class="course-badge">New</div>
+                        </div>
+
+                        <div class="course-content">
+                            <div class="course-rating">
+                                <th:block
+                                    th:with="rating=${averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
+                                    <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                        th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                </th:block>
+                                <span
+                                    th:text="'(' + ${averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'">
+                                    (0.0)</span>
+                            </div>
+
+                            <h3>
+                                <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}"
+                                    style="color: inherit; text-decoration: none;">Course Title</a>
+                            </h3>
+
+                            <div class="course-meta">
+                                <span><i class="fas fa-play-circle"></i> <span
+                                        th:text="${course.lessons.size()}">0</span> Lessons</span>
+                                <span><i class="fas fa-users"></i> <span
+                                        th:text="${studentCounts.get(course.id)}">0</span> Students</span>
+                            </div>
+
+                            <div class="course-instructor">
+                                <img th:if="${course.instructor != null && course.instructor.avatar != null}"
+                                    th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
+                                    class="instructor-avatar" alt="Instructor">
+                                <div th:unless="${course.instructor != null && course.instructor.avatar != null}"
+                                    class="instructor-avatar d-flex align-items-center justify-content-center bg-light text-muted">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="instructor-info">
+                                    <span>By </span>
+                                    <strong
+                                        th:text="${course.instructor != null ? course.instructor.fullName : 'Unknown'}">Instructor
+                                        Name</strong>
+                                    <span th:if="${course.category != null}" th:text="' in ' + ${course.category}"> in
+                                        Category</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="course-footer">
+                            <div class="course-price"
+                                th:text="${course.price > 0 ? #numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT') + ' VND' : 'Free'}">
+                                0 VND</div>
+                            <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary view-btn"
+                                onclick="event.stopPropagation();">Xem</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}" aria-label="Course pagination" class="premium-pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/courses(page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, keyword=${keyword})}"><i
+                                    class="fas fa-chevron-left"></i></a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                                th:href="@{/courses(page=${i}, size=${size}, sortBy=${sortBy}, keyword=${keyword})}"
+                                th:text="${i}">1</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/courses(page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, keyword=${keyword})}"><i
+                                    class="fas fa-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <div class="newsletter-overlap">
+            <div class="container">
+                <div class="newsletter-card">
+                    <h2>Get Newsletter</h2>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn-subscribe">SUBSCRIBE</button>
                     </form>
                 </div>
             </div>
-
-            <!-- Course Grid -->
-            <div class="course-grid">
-                <!-- Iterate through courses -->
-                <div th:each="course : ${courses}" class="premium-course-card" th:onclick="|window.location.href='/courses/' + ${course.id}|" style="cursor: pointer;">
-                    <div class="course-img-wrapper">
-                        <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" alt="Course Image">
-                        
-                        <!-- Wishlist Heart Button -->
-                        <button class="wishlist-heart-btn" 
-                                th:classappend="${wishlistedCourseIds.contains(course.id)} ? 'active' : ''"
-                                th:onclick="'toggleWishlist(' + ${course.id} + ', event, this)'"
-                                onclick="event.stopPropagation();"
-                                title="Thêm vào Wishlist">
-                            <i th:class="${wishlistedCourseIds.contains(course.id)} ? 'fas fa-heart' : 'far fa-heart'"></i>
-                        </button>
-                        
-                        <!-- Badge for new courses (within last 30 days) -->
-                        <div th:if="${course.createdAt != null && course.createdAt.isAfter(T(java.time.LocalDate).now().minusDays(30))}" class="course-badge">New</div>
-                    </div>
-                    
-                    <div class="course-content">
-                        <div class="course-rating">
-                            <th:block th:with="rating=${averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
-                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
-                                   th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
-                            </th:block>
-                            <span th:text="'(' + ${averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'"> (0.0)</span>
-                        </div>
-                        
-                        <h3>
-                            <a th:href="@{'/courses/' + ${course.id}}" th:text="${course.title}" style="color: inherit; text-decoration: none;">Course Title</a>
-                        </h3>
-                        
-                        <div class="course-meta">
-                            <span><i class="fas fa-play-circle"></i> <span th:text="${course.lessons.size()}">0</span> Lessons</span>
-                            <span><i class="fas fa-users"></i> <span th:text="${studentCounts.get(course.id)}">0</span> Students</span>
-                        </div>
-                        
-                        <div class="course-instructor">
-                            <img th:if="${course.instructor != null && course.instructor.avatar != null}" th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}" class="instructor-avatar" alt="Instructor">
-                            <div th:unless="${course.instructor != null && course.instructor.avatar != null}" class="instructor-avatar d-flex align-items-center justify-content-center bg-light text-muted">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="instructor-info">
-                                <span>By </span>
-                                <strong th:text="${course.instructor != null ? course.instructor.fullName : 'Unknown'}">Instructor Name</strong>
-                                <span th:if="${course.category != null}" th:text="' in ' + ${course.category}"> in Category</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="course-footer">
-                        <div class="course-price" th:text="${course.price > 0 ? #numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT') + ' VND' : 'Free'}">0 VND</div>
-                        <a th:href="@{'/courses/' + ${course.id}}" class="btn btn-primary view-btn" onclick="event.stopPropagation();">Xem</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pagination -->
-            <nav th:if="${totalPages > 1}" aria-label="Course pagination" class="premium-pagination">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage - 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}"><i class="fas fa-chevron-left"></i></a>
-                    </li>
-
-                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${i} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}" th:text="${i}">1</a>
-                    </li>
-
-                    <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
-                        <a class="page-link" th:href="@{'/courses?page=' + ${currentPage + 1} + '&size=' + ${size} + '&sortBy=' + ${sortBy} + (${keyword} ? '&keyword=' + ${keyword} : '')}"><i class="fas fa-chevron-right"></i></a>
-                    </li>
-                </ul>
-            </nav>
         </div>
-    </section>
+    </main>
 
-    <!-- Newsletter Section -->
-    <div class="newsletter-overlap">
-        <div class="container">
-            <div class="newsletter-card">
-                <h2>Get Newsletter</h2>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Your email address" required>
-                    <button type="submit" class="btn-subscribe">SUBSCRIBE</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</main>
-
-<div th:replace="~{layout :: siteFooter}"></div>
-<th:block th:replace="~{layout :: coreScripts}"></th:block>
+    <div th:replace="~{layout :: siteFooter}"></div>
+    <th:block th:replace="~{layout :: coreScripts}"></th:block>
 </body>
+
 </html>

@@ -17,19 +17,19 @@ body, html {
 
 .wavy-bottom {
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     width: 100%;
     overflow: hidden;
     line-height: 0;
-    z-index: -1;
+    z-index: 5;
 }
 
 .wavy-bottom svg {
     position: relative;
     display: block;
     width: calc(100% + 1.3px);
-    height: 120px;
+    height: 180px; /* Increased height for a deeper, softer curve */
 }
 
 .glassy-categories {
@@ -90,22 +90,29 @@ body, html {
 
 .scroll-down-btn {
     position: absolute;
-    bottom: 40px;
+    bottom: 20px; /* Adjusted for the deeper curve */
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ff6b8b;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    color: #FE79A2;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     animation: bounce 2s infinite;
     z-index: 10;
-    font-size: 20px;
+    font-size: 22px;
     text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.scroll-down-btn:hover {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    color: #ff4e82;
 }
 
 @keyframes bounce {
