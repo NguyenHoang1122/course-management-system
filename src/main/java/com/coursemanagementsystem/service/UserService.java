@@ -87,6 +87,12 @@ public class UserService {
         return userRepository.findByDeletedTrueOrderByDeletedAtDesc();
     }
 
+    public List<User> findAllAdmins() {
+        return userRepository.findByRole_NameInAndDeletedFalseOrderByFullNameAsc(
+                Arrays.asList(ROLE_ADMIN, ROLE_PREFIX + ROLE_ADMIN)
+        );
+    }
+
     public UserDTO save(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
         User savedUser = userRepository.save(user);

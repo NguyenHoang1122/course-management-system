@@ -25,6 +25,12 @@ public class ReviewService {
     @Autowired
     private ReviewReportRepository reportRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private UserService userService;
+
     public List<Review> getReviewsByCourseId(Long courseId) {
         return reviewRepository.findByCourseId(courseId);
     }
@@ -75,6 +81,17 @@ public class ReviewService {
                 reaction.setReview(review);
                 reaction.setHelpful(true);
                 reactionRepository.save(reaction);
+
+                // Notification: Review Author gets notified when someone likes their review
+                if (!review.getUser().getId().equals(user.getId())) {
+                    notificationService.createNotification(
+                        review.getUser(),
+                        "Lượt thích mới",
+                        "<b>" + user.getFullName() + "</b> đã thích đánh giá của bạn trong khóa học <b>" + review.getCourse().getTitle() + "</b>",
+                        "SUCCESS",
+                        "/courses/" + review.getCourse().getId() + "#reviews"
+                    );
+                }
             }
         }
     }
@@ -87,6 +104,18 @@ public class ReviewService {
             report.setReview(review);
             report.setReason(reason);
             reportRepository.save(report);
+
+            // Notification: All Admins get notified when a review is reported
+            List<User> admins = userService.findAllAdmins();
+            for (User admin : admins) {
+                notificationService.createNotification(
+                    admin,
+                    "Báo cáo đánh giá mới",
+                    "<b>" + user.getFullName() + "</b> đã báo cáo một đánh giá trong khóa học <b>" + review.getCourse().getTitle() + "</b>",
+                    "DANGER",
+                    "/admin/reports"
+                );
+            }
         }
     }
 

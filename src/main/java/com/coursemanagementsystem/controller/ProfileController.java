@@ -7,6 +7,7 @@ import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.FileService;
 import com.coursemanagementsystem.service.LessonProgressService;
+import com.coursemanagementsystem.service.NotificationService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,17 +35,20 @@ public class ProfileController {
     private final EnrollmentService enrollmentService;
     private final UserDetailsService userDetailsService;
     private final LessonProgressService lessonProgressService;
+    private final NotificationService notificationService;
 
     public ProfileController(UserService userService,
                              FileService fileService,
                              EnrollmentService enrollmentService,
                              UserDetailsService userDetailsService,
-                             LessonProgressService lessonProgressService) {
+                             LessonProgressService lessonProgressService,
+                             NotificationService notificationService) {
         this.userService = userService;
         this.fileService = fileService;
         this.enrollmentService = enrollmentService;
         this.userDetailsService = userDetailsService;
         this.lessonProgressService = lessonProgressService;
+        this.notificationService = notificationService;
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -188,6 +192,15 @@ public class ProfileController {
             model.addAttribute("changePasswordError", ex.getMessage());
             return "profile/edit";
         }
+    }
+
+    @GetMapping("/notifications")
+    public String viewNotifications(Model model, Principal principal) {
+        if (principal == null) return "redirect:/auth/login";
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("notifications", notificationService.getAllNotifications(user));
+        return "profile/notifications";
     }
 
     // ──────────────────────────────────────────────────────────────
