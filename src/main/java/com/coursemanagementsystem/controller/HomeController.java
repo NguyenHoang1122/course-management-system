@@ -94,4 +94,10 @@ public class HomeController {
         model.addAttribute("pageTitle", "About Us | Coursia");
         return "about";
     }
+
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        model.addAttribute("pageTitle", "Contact Us | Coursia");
+        return "contact";
+    }
 }
