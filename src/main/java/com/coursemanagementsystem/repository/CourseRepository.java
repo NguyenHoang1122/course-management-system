@@ -32,4 +32,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Modifying
     @Query("update Course c set c.instructor = null where c.instructor.id in :userIds")
     int clearInstructorForUserIds(@Param("userIds") List<Long> userIds);
+
+    @Query("select count(c) from Course c")
+    long countTotalCourses();
+
+    @Query("select count(c) from Course c where c.price = 0 or c.price is null")
+    long countFreeCourses();
 }

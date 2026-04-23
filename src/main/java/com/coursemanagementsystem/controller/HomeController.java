@@ -1,6 +1,7 @@
 package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.model.Course;
+import com.coursemanagementsystem.model.Review;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.CourseService;
 import com.coursemanagementsystem.service.EnrollmentService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,6 +70,21 @@ public class HomeController {
         model.addAttribute("studentCounts", studentCounts);
         model.addAttribute("averageRatings", averageRatings);
         model.addAttribute("wishlistedCourseIds", wishlistedCourseIds);
+
+        // Get top 3 reviews for testimonials
+        List<Review> topReviews = reviewService.getTopReviews(3);
+        model.addAttribute("topReviews", topReviews);
+
+        // Get statistics for "Our Progress Never End" section
+        long totalStudents = enrollmentService.countDistinctStudents();
+        long totalGraduates = enrollmentService.countGraduates();
+        long freeCourses = courseService.countFreeCourses();
+        long totalCourses = courseService.countTotalCourses();
+
+        model.addAttribute("totalStudents", totalStudents);
+        model.addAttribute("totalGraduates", totalGraduates);
+        model.addAttribute("freeCourses", freeCourses);
+        model.addAttribute("totalCourses", totalCourses);
 
         return "home";
     }
