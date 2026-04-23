@@ -2,113 +2,374 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
-    <title th:text="${pageTitle} ?: 'Contact Us | Course Management System'">Contact Us | Course Management System</title>
+    <title th:text="${pageTitle} ?: 'Contact Us | Coursia'">Contact Us | Coursia</title>
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <style>
+        :root {
+            --udemy-dark: #2d2f31;
+            --udemy-blue: #004bb1;
+            --udemy-gray: #6a6f73;
+            --udemy-orange: #f3ca8c;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--udemy-dark);
+            background-color: #fff;
+        }
+
+        /* Hero Section */
+        .contact-hero {
+            padding: 80px 0;
+            background-color: #f7f9fa;
+        }
+
+        .hero-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--udemy-dark);
+            max-width: 500px;
+        }
+
+        .hero-image-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-image-bg {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 300px;
+            height: 200px;
+            background-color: var(--udemy-orange);
+            z-index: 1;
+        }
+
+        .hero-image-container img {
+            position: relative;
+            z-index: 2;
+            width: 400px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* Section Styling */
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            color: var(--udemy-gray);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Origins Section */
+        .origins-text {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .origins-text p {
+            margin-bottom: 25px;
+        }
+
+        /* Started Section */
+        .started-section {
+            background-color: #fff;
+        }
+
+        .started-flex {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .video-thumbnail {
+            position: relative;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--udemy-dark);
+            font-size: 24px;
+            transition: 0.3s;
+        }
+
+        .video-thumbnail:hover .play-btn {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: #fff;
+        }
+
+        .started-content h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .contact-category {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #d1d7dc;
+        }
+
+        .contact-category h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .contact-category p {
+            font-size: 0.9rem;
+            color: var(--udemy-gray);
+            margin-bottom: 10px;
+        }
+
+        .contact-category a {
+            color: var(--udemy-blue);
+            text-decoration: underline;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        /* Offices Grid */
+        .offices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .office-card {
+            margin-bottom: 30px;
+        }
+
+        .office-card img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .office-card h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        /* Footer Help Link */
+        .help-footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid #d1d7dc;
+            font-size: 0.95rem;
+        }
+
+        .help-footer a {
+            color: var(--udemy-blue);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .started-flex { flex-direction: column; text-align: center; }
+            .video-thumbnail { width: 100%; }
+            .contact-grid { grid-template-columns: repeat(2, 1fr); }
+            .offices-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-flex { flex-direction: column; text-align: center; }
+            .hero-image-container img { width: 100%; max-width: 300px; }
+            .hero-text h1 { font-size: 2.5rem; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .offices-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 
 <body>
 <div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
-    <!-- Contact Area Start -->
-    <section class="contact-area section-padding">
+<main>
+    <!-- Hero Section -->
+    <section class="contact-hero">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-8">
-                    <div class="section-tittle text-center mb-80">
-                        <span>Contact Us</span>
-                        <h2>Get In Touch</h2>
-                        <p>Have questions about our courses or need support? We'd love to hear from you!</p>
-                    </div>
+            <div class="hero-flex">
+                <div class="hero-text">
+                    <h1>Connecting people with knowledge</h1>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-8 col-md-8">
-                    <div class="contact-form">
-                        <form action="#" method="post" class="needs-validation" novalidate>
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-group">
-                                        <input type="text" name="name" class="form-control" placeholder="Your Name" required>
-                                        <div class="invalid-feedback">Please enter your name.</div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-group">
-                                        <input type="email" name="email" class="form-control" placeholder="Your Email" required>
-                                        <div class="invalid-feedback">Please enter a valid email.</div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <input type="text" name="subject" class="form-control" placeholder="Subject" required>
-                                        <div class="invalid-feedback">Please enter a subject.</div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <textarea name="message" class="form-control" rows="6" placeholder="Your Message" required></textarea>
-                                        <div class="invalid-feedback">Please enter your message.</div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <button type="submit" class="btn theme-bg w-100">Send Message</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                    <div class="contact-info">
-                        <div class="single-contact-info mb-30">
-                            <div class="contact-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="contact-text">
-                                <h4>Address</h4>
-                                <p>123 Learning Street<br>Education City, EC 12345</p>
-                            </div>
-                        </div>
-
-                        <div class="single-contact-info mb-30">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-text">
-                                <h4>Phone</h4>
-                                <p>+84 123 456 789</p>
-                            </div>
-                        </div>
-
-                        <div class="single-contact-info mb-30">
-                            <div class="contact-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="contact-text">
-                                <h4>Email</h4>
-                                <p>info@coursemanagementsystem.com</p>
-                            </div>
-                        </div>
-
-                        <div class="single-contact-info">
-                            <div class="contact-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="contact-text">
-                                <h4>Business Hours</h4>
-                                <p>Mon - Fri: 9:00 AM - 6:00 PM<br>Sat - Sun: 10:00 AM - 4:00 PM</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-image-container">
+                    <div class="hero-image-bg"></div>
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Coursia CEO">
                 </div>
             </div>
         </div>
     </section>
-    <!-- Contact Area End -->
+
+    <!-- Origins Section -->
+    <section class="section-padding">
+        <div class="container">
+            <h2 class="section-title">Our origins</h2>
+            <div class="origins-text">
+                <p>Growing up in a small Vietnamese village, our founder had few educational opportunities — until they got access to a computer. Fueled by a dream to excel in technology, they used the internet to learn, eventually leading them to represent their country in international competitions.</p>
+                <p>After learning online changed their life, they partnered with industry experts to achieve a common goal: to make quality education accessible to everyone, everywhere.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Started Section -->
+    <section class="section-padding started-section">
+        <div class="container">
+            <div class="started-flex">
+                <div class="video-thumbnail">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="How we started">
+                    <div class="play-btn"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="started-content">
+                    <h2>How we started</h2>
+                    <p>From an early age, our founder knew learning was the key to unlocking opportunity. Our platform was born from the belief that knowledge should be shared, not gatekept.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section class="section-padding" style="background-color: #f7f9fa;">
+        <div class="container">
+            <h2 class="section-title">Contact us</h2>
+            <p class="section-subtitle">The quickest way to get in touch with us is by using the contact information below.</p>
+            
+            <div class="contact-grid">
+                <!-- Learners -->
+                <div class="contact-category">
+                    <h3>Learners</h3>
+                    <p>Visit our <a href="#">Help Center</a></p>
+                    <p><a href="#">How to reach our support team</a></p>
+                </div>
+                <!-- Business -->
+                <div class="contact-category">
+                    <h3>Business</h3>
+                    <p>Visit our <a href="#">Help Center</a></p>
+                    <p><a href="#">Enterprise New Customer Inquiry</a></p>
+                </div>
+                <!-- Instructors -->
+                <div class="contact-category">
+                    <h3>Instructors</h3>
+                    <p>Visit our <a href="#">Help Center</a> and explore our <a href="#">Teaching Center</a></p>
+                </div>
+                <!-- Partners -->
+                <div class="contact-category">
+                    <h3>Partners & Affiliates</h3>
+                    <p>Visit our <a href="#">Help Center</a></p>
+                </div>
+                <!-- Investors -->
+                <div class="contact-category">
+                    <h3>Investors</h3>
+                    <p>Learn more <a href="#">here</a></p>
+                    <p>Contact our <a href="#">Investor Relations team</a></p>
+                </div>
+                <!-- Press -->
+                <div class="contact-category">
+                    <h3>Press</h3>
+                    <p>View <a href="#">general information</a></p>
+                    <p>Email <a href="mailto:press@coursia.com">press@coursia.com</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Offices Section -->
+    <section class="section-padding">
+        <div class="container">
+            <h2 class="section-title">Our offices</h2>
+            
+            <div class="offices-grid">
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="San Francisco">
+                    <h4>San Francisco, CA</h4>
+                </div>
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1619856699906-09e1f58c98b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Denver">
+                    <h4>Denver, CO</h4>
+                </div>
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1564959130747-897fb406b9af?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Dublin">
+                    <h4>Dublin, Ireland</h4>
+                </div>
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1581007871115-f14bc016e0a4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Ankara">
+                    <h4>Ankara, Türkiye</h4>
+                </div>
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1531219432768-9f540ce91ef3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Austin">
+                    <h4>Austin, TX</h4>
+                </div>
+                <div class="office-card">
+                    <img src="https://images.unsplash.com/photo-1514395462725-fb4566210144?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Melbourne">
+                    <h4>Melbourne, Australia</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="help-footer">
+        Check out our <a href="#">Help and Support</a> center to find quick answers to your questions.
+    </div>
+</main>
 
 <div th:replace="~{layout :: siteFooter}"></div>
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+
 </body>
 </html>
