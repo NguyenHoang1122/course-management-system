@@ -120,7 +120,7 @@
 
             <div class="row">
                 <!-- Dynamic Courses from DB -->
-                <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
+                <div th:each="course : ${coursePage.content}" class="col-lg-4 col-md-6 mb-4">
                     <div class="course-card" th:onclick="|window.location.href='/courses/' + ${course.id}|">
                         <!-- Wishlist Heart Button -->
                         <button class="wishlist-heart-btn"
@@ -173,6 +173,27 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container text-center mt-4" th:if="${coursePage.totalPages > 1}">
+                <nav aria-label="Course pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${coursePage.hasPrevious()}">
+                            <a class="page-link" th:href="@{/(page=${coursePage.number})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, coursePage.totalPages - 1)}" th:classappend="${pageNum == coursePage.number} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/(page=${pageNum + 1})}" th:text="${pageNum + 1}"></a>
+                        </li>
+                        <li class="page-item" th:if="${coursePage.hasNext()}">
+                            <a class="page-link" th:href="@{/(page=${coursePage.number + 2})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
             <div class="text-center mt-5">
@@ -619,3 +640,4 @@
 </body>
 
 </html>
+
