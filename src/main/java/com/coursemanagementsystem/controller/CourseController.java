@@ -51,7 +51,7 @@ public class CourseController {
 
     @GetMapping("")
     public String findAllCourse(@RequestParam(value = "page", defaultValue = "1") int page,
-                                @RequestParam(value = "size", defaultValue = "10") int size,
+                                @RequestParam(value = "size", defaultValue = "9") int size,
                                 @RequestParam(value = "sortBy", defaultValue = "newest") String sortBy,
                                 @RequestParam(value = "keyword", required = false) String keyword,
                                 Model model, Principal principal) {

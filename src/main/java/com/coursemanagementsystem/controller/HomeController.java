@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -39,10 +40,11 @@ public class HomeController {
     private UserService userService;
 
     @GetMapping("/")
-    public String home(Model model, Principal principal) {
-        // Fetch top 6 courses for featured section
-        Page<Course> coursePage = courseService.findCoursesPaged("", 1, 6);
+    public String home(@RequestParam(defaultValue = "1") int page, Model model, Principal principal) {
+        // Fetch courses with pagination
+        Page<Course> coursePage = courseService.findCoursesPaged("", page, 6);
         model.addAttribute("courses", coursePage.getContent());
+        model.addAttribute("coursePage", coursePage);
 
         // Prepare meta info
         Map<Long, Long> studentCounts = new HashMap<>();

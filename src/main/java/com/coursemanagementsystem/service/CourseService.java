@@ -167,7 +167,7 @@ public class CourseService {
     }
 
     private int normalizePageSize(int size) {
-        if (size == 20 || size == 50) {
+        if (size == 6 || size == 9 || size == 10 || size == 20 || size == 50) {
             return size;
         }
         return 10;
