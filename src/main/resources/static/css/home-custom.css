@@ -8,8 +8,9 @@ body, html {
 
 .custom-hero {
     position: relative;
-    background: linear-gradient(135deg, rgba(200, 111, 255, 0.85), rgba(66, 85, 164, 0.85)), url('/img/hero/h1_hero.png') center/cover;
-    padding: 220px 0 200px;
+    background: linear-gradient(135deg, rgba(162, 87, 216, 0.65), rgba(40, 54, 117, 0.7)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    background-attachment: fixed; /* Parallax effect for a more professional feel */
+    padding: 240px 0 220px;
     text-align: center;
     color: white;
     z-index: 1;
@@ -41,22 +42,26 @@ body, html {
 }
 
 .glassy-box {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 20px 40px;
-    color: white;
-    font-size: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 18px 35px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 14px;
     font-weight: 500;
-    transition: 0.3s;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     cursor: pointer;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .glassy-box:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    color: white;
 }
 
 .hero-btn {
