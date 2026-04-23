@@ -432,42 +432,21 @@
             </div>
 
             <div class="row mt-5 pt-3">
-                <div class="col-md-4 mb-5 pb-5">
+                <div th:each="review : ${topReviews}" class="col-md-4 mb-5 pb-5">
                     <div class="testimonial-card">
-                        <p class="testimonial-text">"Proin a euismod tellus, ac ultrices urna. Donec tristique eget diam
-                            non tristique. Donec lobortis id odio hendrerit pulvinar. Curabitur vel leo lectus."</p>
+                        <p class="testimonial-text" th:text="${review.comment}">Review comment</p>
                         <div class="testimonial-author">
-                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                            <div class="testimonial-name">Christian Smith</div>
+                            <img th:if="${review.user != null and review.user.avatar != null}"
+                                 th:src="${review.user.avatar.startsWith('http') ? review.user.avatar : (review.user.avatar.startsWith('/') ? review.user.avatar : '/' + review.user.avatar)}"
+                                 alt="Student" style="width:50px; height:50px; object-fit: cover; border-radius: 50%;">
+                            <i th:unless="${review.user != null and review.user.avatar != null}"
+                               class="fas fa-user-circle" style="font-size: 50px; color: #ddd;"></i>
+                            <div class="testimonial-name" th:text="${review.user != null ? review.user.fullName : 'Anonymous'}">Student Name</div>
                             <div class="testimonial-role">Student</div>
-                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-5 pb-5">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text">"Nulla auctor, nisl vitae viverra vulputate, neque ante dapibus
-                            nunc, nec tincidunt mauris nulla sed urna. Proin a euismod tellus, ac ultrices urna."</p>
-                        <div class="testimonial-author">
-                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                            <div class="testimonial-name">Olivia Diego</div>
-                            <div class="testimonial-role">Student</div>
-                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-5 pb-5">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text">"Vestibulum id leo et nunc tempor hendrerit. Aenean vel est
-                            vehicula, ullamcorper sem sit amet, consequat libero. Proin a euismod tellus."</p>
-                        <div class="testimonial-author">
-                            <img th:src="@{/img/testimonial/testimonial.png}" alt="Student">
-                            <div class="testimonial-name">Margot Linsley</div>
-                            <div class="testimonial-role">Student</div>
-                            <div class="text-warning mt-1"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                            <div class="text-warning mt-1">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                   th:class="${i <= review.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -484,22 +463,22 @@
             <div class="row text-center mt-4">
                 <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
                     <i class="fas fa-users" style="font-size: 50px;"></i>
-                    <h3>3999+</h3>
+                    <h3 th:text="${totalStudents}+'+'"></h3>
                     <p>Students Learning</p>
                 </div>
                 <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
                     <i class="fas fa-graduation-cap" style="font-size: 50px;"></i>
-                    <h3>50000+</h3>
+                    <h3 th:text="${totalGraduates}+'+'"></h3>
                     <p>Graduates</p>
                 </div>
                 <div class="col-md-3 stat-item border-right border-white-20 mb-4 mb-md-0">
                     <i class="fas fa-book" style="font-size: 50px;"></i>
-                    <h3>2999+</h3>
+                    <h3 th:text="${freeCourses}+'+'"></h3>
                     <p>Free courses</p>
                 </div>
                 <div class="col-md-3 stat-item">
                     <i class="fas fa-laptop-code" style="font-size: 50px;"></i>
-                    <h3>7000+</h3>
+                    <h3 th:text="${totalCourses}+'+'"></h3>
                     <p>Active courses</p>
                 </div>
             </div>

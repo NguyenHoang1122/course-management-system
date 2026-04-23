@@ -27,4 +27,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     boolean existsByUserIdAndCourseId(Long userId, Long courseId);
 
     long countByCourseId(Long courseId);
+
+    @Query("select count(distinct e.user.id) from Enrollment e")
+    long countDistinctStudents();
+
+    @Query("select count(distinct e.user.id) from Enrollment e where e.status = 'COMPLETED'")
+    long countGraduates();
 }

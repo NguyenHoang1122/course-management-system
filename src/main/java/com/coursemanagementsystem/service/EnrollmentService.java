@@ -94,4 +94,12 @@ public class EnrollmentService {
     public long countEnrollmentsByCourseId(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
     }
+
+    public long countDistinctStudents() {
+        return enrollmentRepository.countDistinctStudents();
+    }
+
+    public long countGraduates() {
+        return enrollmentRepository.countGraduates();
+    }
 }

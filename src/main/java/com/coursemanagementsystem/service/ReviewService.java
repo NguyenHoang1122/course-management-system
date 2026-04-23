@@ -131,6 +131,10 @@ public class ReviewService {
         return reactionRepository.findByUserIdAndReviewId(userId, reviewId).isPresent();
     }
 
+    public List<Review> getTopReviews(int limit) {
+        return reviewRepository.findTop3ByOrderByCreatedAtDesc();
+    }
+
     // --- ADMIN METHODS ---
 
     public List<ReviewReport> getAllReports() {

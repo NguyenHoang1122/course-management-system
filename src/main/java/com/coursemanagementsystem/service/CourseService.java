@@ -226,4 +226,13 @@ public class CourseService {
         }
         return course;
     }
+
+    public long countTotalCourses() {
+        return courseRepository.countTotalCourses();
+    }
+
+    public long countFreeCourses() {
+        return courseRepository.countFreeCourses();
+    }
 }
+

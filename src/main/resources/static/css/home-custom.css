@@ -448,10 +448,8 @@ body, html {
 }
 
 .testimonial-author {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    margin-top: 30px;
     width: 100%;
 }
 

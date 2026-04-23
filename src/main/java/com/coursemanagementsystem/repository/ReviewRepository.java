@@ -22,4 +22,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("select coalesce(avg(r.rating), 0) from Review r where r.course.id = :courseId")
     Double findAverageRatingByCourseId(@Param("courseId") Long courseId);
 
+    List<Review> findTop3ByOrderByCreatedAtDesc();
+
 }
