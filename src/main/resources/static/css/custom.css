@@ -54,11 +54,11 @@ h1, h2, h3, h4, h5, h6 {
 .unified-logo {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-family: 'Josefin Sans', sans-serif;
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: 1px;
+    gap: 15px;
+    font-family: 'Mulish', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     text-decoration: none !important;
     color: inherit;
@@ -70,16 +70,26 @@ h1, h2, h3, h4, h5, h6 {
 .logo-icon-box {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 
 .logo-line {
-    width: 3px;
-    height: 24px;
+    width: 4px;
     background: var(--header-gradient);
-    border-radius: 4px;
-    transform: skewX(-20deg);
+    border-radius: 10px;
+    transform: skewX(-15deg);
+    transition: all 0.3s ease;
 }
+
+/* Individual heights to create the dynamic peak shape */
+.logo-line:nth-child(1) { height: 12px; opacity: 0.6; }
+.logo-line:nth-child(2) { height: 20px; opacity: 0.8; }
+.logo-line:nth-child(3) { height: 28px; opacity: 1; }
+.logo-line:nth-child(4) { height: 20px; opacity: 0.8; }
+.logo-line:nth-child(5) { height: 12px; opacity: 0.6; }
+
+.header-transparent .logo-line { background: white; }
+.header-solid .logo-line, .header-sticky .logo-line { background: var(--header-gradient); }
 
 /* Navigation - Center aligned */
 .unified-nav {
