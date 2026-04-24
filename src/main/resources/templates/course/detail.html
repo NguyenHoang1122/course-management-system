@@ -1226,7 +1226,7 @@
                             <div class="course-meta-item">
                                 <i class="far fa-clock"></i>
                                 <span>Thời lượng</span>
-                                <strong th:text="${course.duration != null ? course.duration : '--'}">--</strong>
+                                <strong th:text="${displayDuration}">--</strong>
                             </div>
                             <div class="course-meta-item">
                                 <i class="fas fa-users"></i>
@@ -1236,7 +1236,7 @@
                             <div class="course-meta-item">
                                 <i class="fas fa-list-ul"></i>
                                 <span>Bài học</span>
-                                <strong th:text="${course.lessons != null ? course.lessons.size() : 0}">0</strong>
+                                <strong th:text="${totalLessons}">0</strong>
                             </div>
                             <div class="course-meta-item">
                                 <i class="fas fa-calendar-alt"></i>

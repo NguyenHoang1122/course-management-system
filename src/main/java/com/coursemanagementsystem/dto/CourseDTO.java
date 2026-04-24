@@ -29,5 +29,12 @@ public class CourseDTO {
     private String previewVideoUrl;
     private String category;
 
+    // --- NEW PREMIUM FIELDS ---
+    private String level;
+    private String duration;
+    private String learningPoints;
+    private String requirements;
+    private String targetAudience;
+
     private List<?> lessons;
 }

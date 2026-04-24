@@ -179,6 +179,61 @@
                     </div>
                 </div>
 
+                <hr style="grid-column: span 1; margin: 20px 0; border-top: 1px dashed var(--border-color);">
+                <h4 style="grid-column: span 1; color: var(--secondary-color); margin-bottom: 15px;">
+                    <i class="fas fa-star"></i> Thông Số Premium
+                </h4>
+
+                <!-- Level -->
+                <div class="form-group">
+                    <label for="level">
+                        <i class="fas fa-signal"></i> Trình Độ
+                    </label>
+                    <select id="level" th:field="*{level}" class="form-control">
+                        <option value="">-- Chọn Trình Độ --</option>
+                        <option value="Tất cả trình độ">Tất cả trình độ</option>
+                        <option value="Cơ bản (Beginner)">Cơ bản (Beginner)</option>
+                        <option value="Trung cấp (Intermediate)">Trung cấp (Intermediate)</option>
+                        <option value="Nâng cao (Advanced)">Nâng cao (Advanced)</option>
+                    </select>
+                </div>
+
+                <!-- Duration -->
+                <div class="form-group">
+                    <label for="duration">
+                        <i class="far fa-clock"></i> Thời Lượng
+                    </label>
+                    <input type="text" id="duration" th:field="*{duration}" class="form-control"
+                           placeholder="Ví dụ: 15 giờ, 8 tuần...">
+                </div>
+
+                <!-- Learning Points -->
+                <div class="form-group" style="grid-column: span 1;">
+                    <label for="learningPoints">
+                        <i class="fas fa-check-double"></i> Kết quả đạt được (Phân cách bằng dấu |)
+                    </label>
+                    <textarea id="learningPoints" th:field="*{learningPoints}" class="form-control" rows="3"
+                              placeholder="Ví dụ: Hiểu cơ bản về Java | Xây dựng ứng dụng web..."></textarea>
+                </div>
+
+                <!-- Requirements -->
+                <div class="form-group" style="grid-column: span 1;">
+                    <label for="requirements">
+                        <i class="fas fa-list-check"></i> Yêu Cầu Đầu Vào (Phân cách bằng dấu |)
+                    </label>
+                    <textarea id="requirements" th:field="*{requirements}" class="form-control" rows="3"
+                              placeholder="Ví dụ: Có kiến thức cơ bản về HTML | Máy tính có cài JDK..."></textarea>
+                </div>
+
+                <!-- Target Audience -->
+                <div class="form-group" style="grid-column: span 1;">
+                    <label for="targetAudience">
+                        <i class="fas fa-users"></i> Đối Tượng Học Viên (Phân cách bằng dấu |)
+                    </label>
+                    <textarea id="targetAudience" th:field="*{targetAudience}" class="form-control" rows="3"
+                              placeholder="Ví dụ: Sinh viên CNTT | Người mới bắt đầu học code..."></textarea>
+                </div>
+
                 <!-- Preview Section -->
                 <div class="admin-content" style="margin-top: 30px;">
                     <h4 style="color: var(--secondary-color); margin-bottom: 20px;">
