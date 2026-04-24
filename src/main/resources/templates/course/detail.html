@@ -665,6 +665,143 @@
         }
         .btn-resume:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(109, 40, 217, 0.3); color: #fff; }
 
+        /* ========== FOCUS MUSIC WIDGET ========== */
+        .focus-music-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: inherit;
+        }
+        .music-bubble {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(109, 40, 217, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .music-bubble:hover { transform: scale(1.1); box-shadow: 0 15px 35px rgba(109, 40, 217, 0.5); }
+        .music-bubble.active { transform: rotate(15deg); }
+        
+        .music-player-panel {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            transform-origin: bottom right;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .player-header h5 { margin: 0; font-size: 15px; font-weight: 700; color: #1e293b; }
+        .close-player { cursor: pointer; color: #94a3b8; transition: color 0.2s; }
+        .close-player:hover { color: #ef4444; }
+        
+        .music-channels { display: flex; flex-direction: column; gap: 8px; }
+        .channel-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .channel-item:hover { background: #fff; border-color: #e2e8f0; }
+        .channel-item.active { background: #ede9fe; border-color: #a78bfa; }
+        .channel-icon {
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .channel-item.active .channel-icon { background: #6d28d9; color: #fff; }
+        .channel-info { flex: 1; }
+        .channel-name { display: block; font-size: 13px; font-weight: 600; color: #1e293b; }
+        .channel-desc { display: block; font-size: 11px; color: #64748b; }
+        
+        .playing-wave {
+            display: none;
+            align-items: center;
+            gap: 2px;
+            height: 12px;
+        }
+        .channel-item.active .playing-wave { display: flex; }
+        .wave-bar {
+            width: 2px;
+            height: 100%;
+            background: #6d28d9;
+            border-radius: 1px;
+            animation: musicWave 1s infinite ease-in-out;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes musicWave {
+            0%, 100% { height: 4px; }
+            50% { height: 12px; }
+        }
+        
+        .player-controls {
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-controls i { color: #64748b; font-size: 14px; }
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #e2e8f0;
+            border-radius: 2px;
+            outline: none;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #6d28d9;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .course-detail-layout { grid-template-columns: 1fr; }
@@ -1860,6 +1997,120 @@
         wrapper.style.display = 'none';
         placeholder.innerHTML = '';
     }
+
+    // ===== FOCUS MUSIC WIDGET LOGIC =====
+    let activeMusicChannel = null;
+
+    function toggleMusicPlayer() {
+        const panel = document.getElementById('musicPlayerPanel');
+        const bubble = document.getElementById('musicBubble');
+        if (panel.style.display === 'flex') {
+            panel.style.display = 'none';
+            bubble.classList.remove('active');
+        } else {
+            panel.style.display = 'flex';
+            bubble.classList.add('active');
+        }
+    }
+
+    function switchMusicChannel(channelId, videoId) {
+        const items = document.querySelectorAll('.channel-item');
+        const clickedItem = document.querySelector(`.channel-item[onclick*="${channelId}"]`);
+        const iframeContainer = document.getElementById('musicIframeContainer');
+
+        if (activeMusicChannel === channelId) {
+            // Toggle stop
+            stopMusic();
+            return;
+        }
+
+        // Update UI
+        items.forEach(item => item.classList.remove('active'));
+        if (clickedItem) clickedItem.classList.add('active');
+        
+        // Load YouTube Iframe
+        activeMusicChannel = channelId;
+        iframeContainer.innerHTML = `<iframe id="focusIframe" width="100" height="100" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>`;
+        
+        // Show volume icon in bubble to indicate playing
+        document.getElementById('musicBubble').innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+
+    function stopMusic() {
+        activeMusicChannel = null;
+        document.querySelectorAll('.channel-item').forEach(item => item.classList.remove('active'));
+        document.getElementById('musicIframeContainer').innerHTML = '';
+        document.getElementById('musicBubble').innerHTML = '<i class="fas fa-headphones-alt"></i>';
+    }
+
+    function changeVolume(val) {
+        // Simple volume indicator
+        console.log("Volume changed to: " + val);
+    }
 </script>
+
+<!-- ===== FOCUS MUSIC WIDGET HTML ===== -->
+<div class="focus-music-widget">
+    <div class="music-player-panel" id="musicPlayerPanel">
+        <div class="player-header">
+            <h5><i class="fas fa-brain" style="color:#6d28d9; margin-right:8px;"></i> Focus Studio</h5>
+            <i class="fas fa-times close-player" onclick="toggleMusicPlayer()"></i>
+        </div>
+        
+        <div class="music-channels">
+            <div class="channel-item" onclick="switchMusicChannel('lofi', 'jfKfPfyJRdk')">
+                <div class="channel-icon"><i class="fas fa-coffee"></i></div>
+                <div class="channel-info">
+                    <span class="channel-name">Lofi Study</span>
+                    <span class="channel-desc">Chill beats to relax</span>
+                </div>
+                <div class="playing-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+            
+            <div class="channel-item" onclick="switchMusicChannel('piano', 'nm6S3A4pUv0')">
+                <div class="channel-icon"><i class="fas fa-music"></i></div>
+                <div class="channel-info">
+                    <span class="channel-name">Deep Piano</span>
+                    <span class="channel-desc">Intense concentration</span>
+                </div>
+                <div class="playing-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+            
+            <div class="channel-item" onclick="switchMusicChannel('nature', 'mPZkdNFkNps')">
+                <div class="channel-icon"><i class="fas fa-leaf"></i></div>
+                <div class="channel-info">
+                    <span class="channel-name">Nature Sounds</span>
+                    <span class="channel-desc">Rain and ambient environment</span>
+                </div>
+                <div class="playing-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="player-controls">
+            <i class="fas fa-volume-down"></i>
+            <input type="range" class="volume-slider" min="0" max="100" value="80" oninput="changeVolume(this.value)">
+            <i class="fas fa-volume-up"></i>
+        </div>
+        
+        <div id="musicIframeContainer" style="display:none;"></div>
+    </div>
+    
+    <div class="music-bubble" id="musicBubble" onclick="toggleMusicPlayer()" title="Âm nhạc tập trung">
+        <i class="fas fa-headphones-alt"></i>
+    </div>
+</div>
+
 </body>
 </html>
