@@ -195,6 +195,44 @@ public class CourseController {
         }
         model.addAttribute("totalLessons", totalLessons);
 
+        // Progress calculation & Next Lesson for enrolled users
+        Long nextLessonId = null;
+        String nextLessonTitle = null;
+        int progressPercentage = 0;
+
+        if (enrolled && totalLessons > 0) {
+            progressPercentage = (completedLessonIds.size() * 100) / totalLessons;
+            
+            // Find the first uncompleted lesson to resume
+            boolean found = false;
+            if (course.getSections() != null && !course.getSections().isEmpty()) {
+                outer: for (com.coursemanagementsystem.model.CourseSection section : course.getSections()) {
+                    if (section.getLessons() != null) {
+                        for (com.coursemanagementsystem.model.Lesson lesson : section.getLessons()) {
+                            if (!completedLessonIds.contains(lesson.getId())) {
+                                nextLessonId = lesson.getId();
+                                nextLessonTitle = lesson.getTitle();
+                                found = true;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+            } else if (course.getLessons() != null) {
+                for (com.coursemanagementsystem.model.Lesson lesson : course.getLessons()) {
+                    if (!completedLessonIds.contains(lesson.getId())) {
+                        nextLessonId = lesson.getId();
+                        nextLessonTitle = lesson.getTitle();
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        model.addAttribute("progressPercentage", progressPercentage);
+        model.addAttribute("nextLessonId", nextLessonId);
+        model.addAttribute("nextLessonTitle", nextLessonTitle);
+
         // Auto-calculate duration if not set manually
         String displayDuration = course.getDuration();
         if (displayDuration == null || displayDuration.trim().isEmpty()) {
