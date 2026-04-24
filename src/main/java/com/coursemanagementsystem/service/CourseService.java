@@ -45,6 +45,11 @@ public class CourseService {
             course.setImageUrl(dto.getImageUrl());
             course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
             course.setCategory(dto.getCategory());
+            course.setLevel(dto.getLevel());
+            course.setDuration(dto.getDuration());
+            course.setLearningPoints(dto.getLearningPoints());
+            course.setRequirements(dto.getRequirements());
+            course.setTargetAudience(dto.getTargetAudience());
 
         } else {
             // CREATE
@@ -55,6 +60,11 @@ public class CourseService {
             course.setImageUrl(dto.getImageUrl());
             course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
             course.setCategory(dto.getCategory());
+            course.setLevel(dto.getLevel());
+            course.setDuration(dto.getDuration());
+            course.setLearningPoints(dto.getLearningPoints());
+            course.setRequirements(dto.getRequirements());
+            course.setTargetAudience(dto.getTargetAudience());
             course.setCreatedAt(LocalDate.now());
         }
 
@@ -190,6 +200,11 @@ public class CourseService {
         dto.setImageUrl(course.getImageUrl());
         dto.setPreviewVideoUrl(course.getPreviewVideoUrl());
         dto.setCategory(course.getCategory());
+        dto.setLevel(course.getLevel());
+        dto.setDuration(course.getDuration());
+        dto.setLearningPoints(course.getLearningPoints());
+        dto.setRequirements(course.getRequirements());
+        dto.setTargetAudience(course.getTargetAudience());
 
         if (course.getInstructor() != null) {
             dto.setInstructorId(course.getInstructor().getId());
@@ -233,6 +248,67 @@ public class CourseService {
 
     public long countFreeCourses() {
         return courseRepository.countFreeCourses();
+    }
+
+    // --- AUTOMATIC DURATION CALCULATION ---
+
+    public String getAutoDuration(Course course) {
+        if (course == null) return "0m";
+
+        long totalSeconds = 0;
+        List<com.coursemanagementsystem.model.Lesson> lessons = course.getLessons();
+        
+        // Fallback to sections if lessons list is empty
+        if ((lessons == null || lessons.isEmpty()) && course.getSections() != null) {
+            for (com.coursemanagementsystem.model.CourseSection section : course.getSections()) {
+                if (section.getLessons() != null) {
+                    for (com.coursemanagementsystem.model.Lesson lesson : section.getLessons()) {
+                        totalSeconds += parseDurationToSeconds(lesson.getDuration());
+                    }
+                }
+            }
+        } else if (lessons != null) {
+            for (com.coursemanagementsystem.model.Lesson lesson : lessons) {
+                totalSeconds += parseDurationToSeconds(lesson.getDuration());
+            }
+        }
+
+        if (totalSeconds == 0) return "0m";
+        return formatSecondsToHumanReadable(totalSeconds);
+    }
+
+    private long parseDurationToSeconds(String duration) {
+        if (duration == null || duration.trim().isEmpty()) return 0;
+        try {
+            String[] parts = duration.split(":");
+            if (parts.length == 2) {
+                // mm:ss
+                return Long.parseLong(parts[0]) * 60 + Long.parseLong(parts[1]);
+            } else if (parts.length == 3) {
+                // hh:mm:ss
+                return Long.parseLong(parts[0]) * 3600 + Long.parseLong(parts[1]) * 60 + Long.parseLong(parts[2]);
+            }
+        } catch (NumberFormatException e) {
+            // Log error or ignore if format is invalid
+        }
+        return 0;
+    }
+
+    private String formatSecondsToHumanReadable(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+        if (hours > 0) {
+            sb.append(hours).append(" giờ ");
+        }
+        if (minutes > 0 || (hours == 0 && seconds > 0)) {
+            sb.append(minutes).append(" phút");
+        }
+        
+        String result = sb.toString().trim();
+        return result.isEmpty() ? "0m" : result;
     }
 }
 

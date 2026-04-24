@@ -183,6 +183,24 @@ public class CourseController {
         model.addAttribute("userHelpfulStates", userHelpfulStates);
         model.addAttribute("userReview", userReview);
         model.addAttribute("studentCount", enrollmentService.countEnrollmentsByCourseId(id));
+
+        // Calculate total lessons more robustly
+        int totalLessons = 0;
+        if (course.getLessons() != null && !course.getLessons().isEmpty()) {
+            totalLessons = course.getLessons().size();
+        } else if (course.getSections() != null) {
+            totalLessons = course.getSections().stream()
+                    .mapToInt(s -> s.getLessons() != null ? s.getLessons().size() : 0)
+                    .sum();
+        }
+        model.addAttribute("totalLessons", totalLessons);
+
+        // Auto-calculate duration if not set manually
+        String displayDuration = course.getDuration();
+        if (displayDuration == null || displayDuration.trim().isEmpty()) {
+            displayDuration = courseService.getAutoDuration(course);
+        }
+        model.addAttribute("displayDuration", displayDuration);
         
         // Check if it's an AJAX request
         String requestedWith = request.getHeader("X-Requested-With");
