@@ -2000,6 +2000,7 @@
 
     // ===== FOCUS MUSIC WIDGET LOGIC =====
     let activeMusicChannel = null;
+    let focusYtPlayer = null;
 
     function toggleMusicPlayer() {
         const panel = document.getElementById('musicPlayerPanel');
@@ -2019,7 +2020,6 @@
         const iframeContainer = document.getElementById('musicIframeContainer');
 
         if (activeMusicChannel === channelId) {
-            // Toggle stop
             stopMusic();
             return;
         }
@@ -2028,24 +2028,49 @@
         items.forEach(item => item.classList.remove('active'));
         if (clickedItem) clickedItem.classList.add('active');
         
-        // Load YouTube Iframe
         activeMusicChannel = channelId;
-        iframeContainer.innerHTML = `<iframe id="focusIframe" width="100" height="100" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>`;
         
-        // Show volume icon in bubble to indicate playing
+        // Clean container
+        iframeContainer.innerHTML = '<div id="focusIframe"></div>';
+        
+        // Load YouTube Iframe via API for volume control
+        if (typeof YT !== 'undefined' && YT.Player) {
+            focusYtPlayer = new YT.Player('focusIframe', {
+                height: '100',
+                width: '100',
+                videoId: videoId,
+                playerVars: { 'autoplay': 1, 'enablejsapi': 1 },
+                events: {
+                    'onReady': function(event) {
+                        const vol = document.querySelector('.volume-slider').value;
+                        event.target.setVolume(vol);
+                        event.target.playVideo();
+                    }
+                }
+            });
+        } else {
+            // Fallback
+            iframeContainer.innerHTML = `<iframe id="focusIframe" width="100" height="100" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>`;
+        }
+        
         document.getElementById('musicBubble').innerHTML = '<i class="fas fa-volume-up"></i>';
     }
 
     function stopMusic() {
         activeMusicChannel = null;
+        if (focusYtPlayer) {
+            try { focusYtPlayer.destroy(); } catch(e) {}
+            focusYtPlayer = null;
+        }
         document.querySelectorAll('.channel-item').forEach(item => item.classList.remove('active'));
         document.getElementById('musicIframeContainer').innerHTML = '';
         document.getElementById('musicBubble').innerHTML = '<i class="fas fa-headphones-alt"></i>';
     }
 
     function changeVolume(val) {
-        // Simple volume indicator
-        console.log("Volume changed to: " + val);
+        if (focusYtPlayer && typeof focusYtPlayer.setVolume === 'function') {
+            focusYtPlayer.setVolume(val);
+        }
     }
 </script>
 
@@ -2071,7 +2096,7 @@
                 </div>
             </div>
             
-            <div class="channel-item" onclick="switchMusicChannel('piano', 'nm6S3A4pUv0')">
+            <div class="channel-item" onclick="switchMusicChannel('piano', 'lTRiuFIWV54')">
                 <div class="channel-icon"><i class="fas fa-music"></i></div>
                 <div class="channel-info">
                     <span class="channel-name">Deep Piano</span>
@@ -2104,7 +2129,7 @@
             <i class="fas fa-volume-up"></i>
         </div>
         
-        <div id="musicIframeContainer" style="display:none;"></div>
+        <div id="musicIframeContainer" style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;"></div>
     </div>
     
     <div class="music-bubble" id="musicBubble" onclick="toggleMusicPlayer()" title="Âm nhạc tập trung">
