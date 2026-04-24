@@ -607,6 +607,63 @@
         .btn-wishlist:hover { background: #fff5f5; transform: translateY(-1px); }
         .btn-wishlist.active { background: #ff4d4d; color: #fff; }
         .btn-wishlist.active:hover { background: #ff3333; }
+        
+        /* ========== PROGRESS CARD STYLES ========== */
+        .progress-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-top: 5px solid #10b981;
+        }
+        .progress-card-body { padding: 24px; }
+        .progress-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .progress-bar-wrapper {
+            height: 10px;
+            background: #f1f5f9;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.8s ease;
+        }
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .btn-resume {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(109, 40, 217, 0.2);
+        }
+        .btn-resume:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(109, 40, 217, 0.3); color: #fff; }
 
         /* Responsive */
         @media (max-width: 992px) {
@@ -1179,8 +1236,9 @@
 
             <!-- ===== RIGHT SIDEBAR ===== -->
             <div class="cd-sidebar">
-                <!-- Price & Enroll Card -->
-                <div class="price-card">
+                
+                <!-- CASE 1: NOT ENROLLED (Marketing Card) -->
+                <div th:if="${!isEnrolled}" class="price-card">
                     <div class="price-card-body">
                         <div class="price-main">
                             <th:block th:if="${course.price != null and course.price > 0}"
@@ -1196,14 +1254,11 @@
                             </a>
                         </div>
                         <div sec:authorize="isAuthenticated()">
-                            <form th:if="${!isEnrolled}" th:action="@{'/enrollments/enroll/' + ${course.id}}" method="post">
+                            <form th:action="@{'/enrollments/enroll/' + ${course.id}}" method="post">
                                 <button type="submit" class="btn-enroll">
                                     <i class="fas fa-graduation-cap" style="margin-right:8px;"></i> Đăng ký ngay
                                 </button>
                             </form>
-                            <a th:if="${isEnrolled}" th:href="@{/courses/my-courses}" class="btn-enrolled">
-                                <i class="fas fa-check-circle" style="margin-right:8px;"></i> Đã đăng ký · Học ngay
-                            </a>
                         </div>
 
                         <!-- Wishlist Toggle -->
@@ -1216,7 +1271,7 @@
                             </button>
                         </div>
 
-                        <!-- Meta Info -->
+                        <!-- Meta Info (Basic) -->
                         <div class="course-meta-list">
                             <div class="course-meta-item">
                                 <i class="fas fa-signal"></i>
@@ -1232,6 +1287,56 @@
                                 <i class="fas fa-users"></i>
                                 <span>Học viên</span>
                                 <strong th:text="${studentCount}">0</strong>
+                            </div>
+                            <div class="course-meta-item">
+                                <i class="fas fa-list-ul"></i>
+                                <span>Bài học</span>
+                                <strong th:text="${totalLessons}">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CASE 2: ENROLLED (Learning Dashboard Card) -->
+                <div th:if="${isEnrolled}" class="progress-card" id="sidebarProgressCard" th:data-total-lessons="${totalLessons}">
+                    <div class="progress-card-body">
+                        <div class="progress-title">
+                            <i class="fas fa-chart-line" style="color:#10b981;"></i>
+                            Tiến độ học tập
+                        </div>
+                        
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" id="sidebarProgressBar" th:style="'width: ' + ${progressPercentage} + '%'"></div>
+                        </div>
+                        
+                        <div class="progress-stats">
+                            <span id="sidebarProgressCount" th:text="${completedLessonIds.size()} + '/' + ${totalLessons} + ' bài học'">0/0 bài học</span>
+                            <span id="sidebarProgressPercent" th:text="${progressPercentage} + '%'">0%</span>
+                        </div>
+                        
+                        <!-- Resume Button -->
+                        <div th:if="${nextLessonId != null}">
+                            <button class="btn-resume" 
+                                    th:onclick="'playLessonById(' + ${nextLessonId} + ')'">
+                                <i class="fas fa-play-circle"></i>
+                                <span th:text="${progressPercentage == 0 ? 'Bắt đầu học' : 'Học tiếp'}">Tiếp tục học</span>
+                            </button>
+                            <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 10px; font-style: italic;"
+                               th:text="'Bài kế tiếp: ' + ${nextLessonTitle}">Bài kế tiếp: ...</p>
+                        </div>
+                        
+                        <div th:if="${nextLessonId == null and totalLessons > 0}">
+                             <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:8px; text-align:center; font-size:13px; font-weight:600;">
+                                 <i class="fas fa-check-circle"></i> Bạn đã hoàn thành khóa học!
+                             </div>
+                        </div>
+
+                        <!-- Meta Info (Enrolled - Focused) -->
+                        <div class="course-meta-list" style="margin-top: 24px;">
+                            <div class="course-meta-item">
+                                <i class="far fa-clock"></i>
+                                <span>Thời lượng</span>
+                                <strong th:text="${displayDuration}">--</strong>
                             </div>
                             <div class="course-meta-item">
                                 <i class="fas fa-list-ul"></i>
@@ -1543,6 +1648,79 @@
         isYtApiReady = true;
     };
 
+    function playLessonById(lessonId) {
+        const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
+        if (row) {
+            // Find the section and open it if closed
+            const sectionBody = row.closest('.cd-acc-body');
+            if (sectionBody && !sectionBody.classList.contains('open')) {
+                const header = document.querySelector(`.cd-acc-header[data-acc-target="${sectionBody.id}"]`);
+                if (header) header.click();
+            }
+            row.click();
+        } else {
+            // If row not found (maybe first lesson?), just scroll to the content
+            document.querySelector('.cd-accordion').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function updateSidebarProgress() {
+        const card = document.getElementById('sidebarProgressCard');
+        if (!card) return;
+        
+        const total = parseInt(card.getAttribute('data-total-lessons') || 0);
+        if (total === 0) return;
+        
+        const completed = document.querySelectorAll('.cd-lesson-row.completed').length;
+        const percent = Math.round((completed / total) * 100);
+        
+        const bar = document.getElementById('sidebarProgressBar');
+        const countText = document.getElementById('sidebarProgressCount');
+        const percentText = document.getElementById('sidebarProgressPercent');
+        
+        if (bar) bar.style.width = percent + '%';
+        if (countText) countText.textContent = completed + '/' + total + ' bài học';
+        if (percentText) percentText.textContent = percent + '%';
+
+        // Update Next Lesson Hint and Resume Button
+        const nextLessonRow = document.querySelector('.cd-lesson-row.playable:not(.completed)');
+        const resumeBtn = document.querySelector('.btn-resume');
+        const resumeBtnWrap = resumeBtn ? resumeBtn.parentElement : null;
+        const nextHint = resumeBtnWrap ? resumeBtnWrap.querySelector('p') : null;
+
+        if (nextLessonRow) {
+            const nextId = nextLessonRow.getAttribute('data-lesson-id');
+            const nextTitle = nextLessonRow.getAttribute('data-lesson-title');
+            
+            if (resumeBtn) {
+                resumeBtn.setAttribute('onclick', `playLessonById(${nextId})`);
+                const btnText = resumeBtn.querySelector('span');
+                if (btnText) btnText.textContent = (completed === 0) ? 'Bắt đầu học' : 'Học tiếp';
+                resumeBtn.style.display = 'flex';
+            }
+            if (nextHint) {
+                nextHint.textContent = 'Bài kế tiếp: ' + nextTitle;
+                nextHint.style.display = 'block';
+            }
+            
+            // Remove completion message if exists
+            const completionMsg = document.getElementById('completionMessage');
+            if (completionMsg) completionMsg.remove();
+        } else {
+            // All completed
+            if (resumeBtn) resumeBtn.style.display = 'none';
+            if (nextHint) nextHint.style.display = 'none';
+            
+            if (!document.getElementById('completionMessage')) {
+                const msg = document.createElement('div');
+                msg.id = 'completionMessage';
+                msg.style.cssText = 'background:#dcfce7; color:#166534; padding:12px; border-radius:8px; text-align:center; font-size:13px; font-weight:600; margin-top:10px;';
+                msg.innerHTML = '<i class="fas fa-check-circle"></i> Bạn đã hoàn thành khóa học!';
+                if (resumeBtnWrap) resumeBtnWrap.appendChild(msg);
+            }
+        }
+    }
+
     function playCoursePreview(element) {
         currentActiveLessonId = null; 
         const videoUrl = element.getAttribute('data-video-url');
@@ -1613,6 +1791,9 @@
                 row.classList.remove('completed');
                 if (icon) icon.className = 'far fa-circle status-icon';
             }
+            
+            // NEW: Update Sidebar Progress Card in real-time
+            updateSidebarProgress();
         })
         .catch(err => console.error('Error toggling progress:', err));
     }
