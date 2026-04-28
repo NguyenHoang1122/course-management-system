@@ -56,7 +56,7 @@
             <!-- Enrolled Courses Section -->
             <div class="course-section-header">
                 <h3>Current Courses</h3>
-                <a th:href="@{/courses/my-courses}" class="btn btn-sm btn-outline-primary" style="border-radius:20px;">View All</a>
+                <a th:href="@{/courses/my-courses}" class="btn-view-all">View All</a>
             </div>
 
             <div class="row" th:if="${enrollmentProgress != null and !enrollmentProgress.isEmpty()}">

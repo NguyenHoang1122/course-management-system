@@ -28,9 +28,9 @@
         <main class="dashboard-main-content">
             <div class="course-section-header">
                 <h3>Tất cả thông báo</h3>
-                <div class="d-flex gap-2">
-                    <button id="pageMarkAllRead" class="btn btn-sm btn-outline-primary rounded-pill px-3">Đánh dấu đã đọc hết</button>
-                    <button id="pageDeleteAll" class="btn btn-sm btn-outline-danger rounded-pill px-3">Xóa tất cả</button>
+                <div class="header-actions">
+                    <button id="pageMarkAllRead" class="btn-dashboard-primary">Đánh dấu đã đọc hết</button>
+                    <button id="pageDeleteAll" class="btn-dashboard-danger">Xóa tất cả</button>
                 </div>
             </div>
 
@@ -57,13 +57,33 @@
                 </a>
             </div>
 
-            <div th:if="${notifications == null or notifications.isEmpty()}" class="text-center py-5 bg-white border-radius-20 shadow-sm" style="border-radius:20px;">
-                <i class="fas fa-bell-slash" style="font-size: 64px; color: #cbd5e1; margin-bottom: 20px;"></i>
+            <div th:if="${notifications == null or notifications.isEmpty()}" class="empty-state-container">
+                <i class="fas fa-bell-slash empty-main-icon"></i>
                 <h4>Bạn chưa có thông báo nào.</h4>
                 <p class="text-muted">Mọi tin nhắn quan trọng sẽ xuất hiện ở đây!</p>
-                <a th:href="@{/courses}" class="btn btn-primary mt-3 px-5 py-3 rounded-pill">Khám phá khóa học</a>
+                <a th:href="@{/courses}" class="btn-dashboard-primary btn-large">Khám phá khóa học</a>
             </div>
         </main>
+    </div>
+</div>
+<div id="deleteAllConfirmBox" class="modal-overlay">
+    <div class="custom-confirm-modal">
+        <div class="modal-header">
+            <i class="fas fa-exclamation-circle warning-icon"></i>
+            <h2>Xác Nhận Xóa Tất Cả</h2>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa <strong>TOÀN BỘ</strong> thông báo không?</p>
+            <span class="text-danger-action">Hành động này không thể hoàn tác!</span>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-action-confirm btn-delete-red">
+                <i class="fas fa-trash"></i> XÓA TẤT CẢ
+            </button>
+            <button class="btn-action-confirm btn-cancel-blue" onclick="hideDeleteAllConfirm()">
+                <i class="fas fa-times"></i> HỦY
+            </button>
+        </div>
     </div>
 </div>
 

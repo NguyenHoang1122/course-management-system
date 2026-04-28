@@ -28,7 +28,7 @@ public class AdminController {
     public String userList(Model model) {
         model.addAttribute("users", userService.findAllActiveUsers());
         model.addAttribute("activeMenu", "users");
-        return "admin/user-list";
+        return "admin/user/user-list";
     }
 
     @GetMapping("/user-trash")
@@ -36,7 +36,7 @@ public class AdminController {
     public String userTrash(Model model) {
         model.addAttribute("deletedUsers", userService.findAllDeletedUsers());
         model.addAttribute("activeMenu", "user-trash");
-        return "admin/user-trash";
+        return "admin/user/user-trash";
     }
 
     @PostMapping("/users/{id}/role")
@@ -50,7 +50,7 @@ public class AdminController {
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/admin/user-list";
+        return "redirect:/admin/user/user-list";
     }
 
     @PostMapping("/users/{id}/delete")
@@ -64,7 +64,7 @@ public class AdminController {
             // Check if trying to delete self
             if (currentUser != null && currentUser.getId().equals(id)) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Bạn không thể tự xóa chính mình.");
-                return "redirect:/admin/user-list";
+                return "redirect:/admin/user/user-list";
             }
 
             userService.softDeleteUser(id);
@@ -72,7 +72,7 @@ public class AdminController {
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/admin/user-list";
+        return "redirect:/admin/user/user-list";
     }
 
     @PostMapping("/users/{id}/restore")
@@ -85,16 +85,7 @@ public class AdminController {
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/admin/user-trash";
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String viewCourse(@PathVariable("id") Long id, Model model) {
-        Course course = courseService.findByIdWithLessons(id);
-        model.addAttribute("course", course);
-        model.addAttribute("activeMenu", "courses");
-        return "admin/admin-detail";
+        return "redirect:/admin/user/user-trash";
     }
 
     // --- REVIEW REPORTS MANAGEMENT ---

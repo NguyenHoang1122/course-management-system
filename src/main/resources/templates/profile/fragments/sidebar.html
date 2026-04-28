@@ -22,10 +22,10 @@
         <li th:classappend="${activeTab == 'settings' ? 'active' : ''}"><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
     </ul>
 
-    <div class="mt-4 pt-3 border-top">
+    <div class="logout-container">
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-link text-danger p-0" style="text-decoration:none; font-weight:600;">
-                <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+            <button type="submit" class="btn-logout-sidebar">
+                <i class="fas fa-sign-out-alt"></i> Log Out
             </button>
         </form>
     </div>
