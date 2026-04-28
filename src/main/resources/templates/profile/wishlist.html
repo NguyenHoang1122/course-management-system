@@ -51,8 +51,9 @@
                                     <i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy')}"></span>
                                 </span>
                             </div>
-
-                            <a th:href="@{'/courses/' + ${item.course.id}}" class="btn-view-course">View Details</a>
+                            <div class="wishlist-body">
+                                <a th:href="@{'/courses/' + ${item.course.id}}" class="btn-dashboard-primary">View Details</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,11 +81,12 @@
             </div>
 
             <!-- Empty State -->
-            <div th:if="${wishlistPage == null or wishlistPage.isEmpty()}" class="empty-wishlist-state">
-                <div class="empty-icon"><i class="far fa-heart"></i></div>
+            <div th:if="${wishlistPage == null or wishlistPage.isEmpty()}" class="empty-state-container">
+                <div class="empty-state-container">
+                    <i class="far fa-heart empty-main-icon"></i></div>
                 <h4>Your wishlist is empty</h4>
-                <p class="text-muted mb-4">You haven't saved any courses to your wishlist yet.</p>
-                <a th:href="@{/courses}" class="btn btn-primary px-5 py-3 rounded-pill" style="font-weight: 700; background: var(--accent-secondary); border: none;">Explore Courses</a>
+                <p class="text-muted">You haven't saved any courses to your wishlist yet.</p>
+                <a th:href="@{/courses}" class="btn-dashboard-primary btn-large">Explore Courses</a>
             </div>
         </main>
     </div>

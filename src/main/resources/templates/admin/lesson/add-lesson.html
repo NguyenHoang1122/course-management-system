@@ -20,16 +20,6 @@
         <p th:if="${lessonDTO.id != null}">Chỉnh sửa thông tin bài học</p>
     </div>
 
-<!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
-<!--    <nav aria-label="breadcrumb">-->
-<!--        <ol class="breadcrumb">-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
-<!--            <li class="breadcrumb-item"><a th:href="@{'/admin/' + ${courseId}}">Chi Tiết</a></li>-->
-<!--            <li class="breadcrumb-item active" aria-current="page" th:text="${lessonDTO.id == null ? 'Thêm Bài Học' : 'Chỉnh Sửa Bài Học'}">Thêm Bài Học</li>-->
-<!--        </ol>-->
-<!--    </nav>-->
-
     <!-- Course Info -->
     <!-- Course info card: only when adding from course detail page -->
     <div class="admin-content" th:if="${courseTitle != null}">

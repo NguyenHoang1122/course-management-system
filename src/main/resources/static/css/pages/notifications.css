@@ -1,99 +1,251 @@
-        .notification-page-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .notification-page-item {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            gap: 20px;
-            text-decoration: none !important;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            position: relative;
-        }
-        .notification-page-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        }
-        .notification-page-item.unread {
-            background: #f0f7ff;
-            border-left-color: var(--primary-color);
-        }
-        .noti-page-delete-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #f8fafc;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-size: 10px;
-            opacity: 0;
-            visibility: hidden;
-        }
-        .notification-page-item:hover .noti-page-delete-btn {
-            opacity: 1;
-            visibility: visible;
-        }
-        .noti-page-delete-btn:hover {
-            background: #ef4444;
-            color: #fff;
-            transform: rotate(90deg);
-        }
-        .noti-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .noti-SUCCESS { background: #ecfdf5; color: #10b981; }
-        .noti-DANGER { background: #fef2f2; color: #ef4444; }
-        .noti-WARNING { background: #fffbeb; color: #f59e0b; }
-        .noti-INFO { background: #f0f9ff; color: #0ea5e9; }
-        
-        .noti-content {
-            flex: 1;
-        }
-        .noti-title {
-            display: block;
-            font-weight: 800;
-            font-size: 16px;
-            color: #1e293b;
-            margin-bottom: 5px;
-        }
-        .noti-message {
-            display: block;
-            font-size: 14px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-        .noti-time {
-            display: block;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-        .mark-read-badge {
-            font-size: 11px;
-            background: var(--primary-color);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 10px;
-        }
+/* ==========================================================================
+   NOTIFICATIONS PAGE STYLES
+   ========================================================================== */
+
+/* Container danh sách thông báo */
+.notification-page-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Item thông báo đơn lẻ */
+.notification-page-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    text-decoration: none !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-left: 4px solid transparent;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    align-items: flex-start;
+}
+
+.notification-page-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    background: #fafafa;
+}
+
+.notification-page-item.unread {
+    background: #f0f7ff;
+    border-left-color: #4255A4; /* Giả định primary color */
+}
+
+/* Nút xóa nhanh trên từng item */
+.noti-page-delete-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2;
+}
+
+.notification-page-item:hover .noti-page-delete-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+.noti-page-delete-btn:hover {
+    background: #ef4444;
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+/* Icon trạng thái thông báo */
+.noti-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.noti-SUCCESS { background: #ecfdf5; color: #10b981; }
+.noti-DANGER { background: #fef2f2; color: #ef4444; }
+.noti-WARNING { background: #fffbeb; color: #f59e0b; }
+.noti-INFO { background: #f0f9ff; color: #0ea5e9; }
+
+.noti-content { flex: 1; }
+
+.noti-title {
+    display: block;
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.noti-message {
+    display: block;
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.noti-time {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Badge chưa đọc */
+.mark-read-badge {
+    font-size: 10px;
+    background: #4255A4;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   CUSTOM MODAL DELETE ALL (Căn chỉnh cân đối)
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    display: none; /* THAY ĐỔI TẠI ĐÂY: Mặc định là ẩn */
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(6px);
+}
+
+/* Khung Modal chính */
+.custom-confirm-modal {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa mọi thành phần con */
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Header & Icon */
+.modal-header {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.warning-icon {
+    font-size: 56px;
+    color: #f06292;
+    margin-bottom: 16px;
+}
+
+.custom-confirm-modal h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* Body Text */
+.modal-body {
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.modal-body p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+}
+
+.text-danger-action {
+    color: #f06292 !important;
+    font-size: 14px;
+    font-weight: 700;
+    background: #fff1f2;
+    padding: 6px 16px;
+    border-radius: 100px;
+    display: inline-block;
+}
+
+/* Footer & Buttons */
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-action-confirm {
+    flex: 1;
+    max-width: 160px;
+    height: 48px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-red {
+    background: #f06292;
+    color: white;
+}
+
+.btn-delete-red:hover {
+    background: #e91e63;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(240, 98, 146, 0.3);
+}
+
+.btn-cancel-blue {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-cancel-blue:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: translateY(-2px);
+}

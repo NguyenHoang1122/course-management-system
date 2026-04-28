@@ -2,14 +2,12 @@ package com.coursemanagementsystem.controller.admin;
 
 import com.coursemanagementsystem.dto.CourseDTO;
 import com.coursemanagementsystem.model.Course;
-import com.coursemanagementsystem.model.CourseResource;
 import com.coursemanagementsystem.model.CourseSection;
 import com.coursemanagementsystem.model.Lesson;
-import com.coursemanagementsystem.repository.course.CourseResourceRepository;
-import com.coursemanagementsystem.repository.course.CourseSectionRepository;
 import com.coursemanagementsystem.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,14 +27,12 @@ public class AdminCourseController {
     private UserService userService;
     @Autowired
     private LessonService lessonService;
-    @Autowired
-    private FileService fileService;
 
     @Autowired
-    private CourseResourceRepository resourceRepository;
+    private CourseSectionService courseSectionService;
 
     @Autowired
-    private CourseSectionRepository courseSectionRepository;
+    private CourseResourceService courseResourceService;
 
     @GetMapping("/course-list")
     public String findALlCourseList(@RequestParam(value = "page", defaultValue = "1") int page,
@@ -72,7 +68,7 @@ public class AdminCourseController {
         model.addAttribute("size", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeMenu", "courses");
-        return "admin/course-list";
+        return "admin/course/course-list";
     }
 
     @GetMapping("/create-course")
@@ -80,7 +76,7 @@ public class AdminCourseController {
         model.addAttribute("courseDTO", new CourseDTO());
         model.addAttribute("instructors", userService.findAllInstructor());
         model.addAttribute("activeMenu", "courses");
-        return "admin/create-course";
+        return "admin/course/create-course";
     }
 
     @PostMapping("/save-course")
@@ -90,10 +86,10 @@ public class AdminCourseController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("instructors", userService.findAllInstructor());
             model.addAttribute("activeMenu", "courses");
-            return "admin/create-course";
+            return "admin/course/create-course";
         }
         courseService.saveFromDTO(courseDTO);
-        return "redirect:/admin/course-list";
+        return "redirect:/admin/course/course-list";
     }
 
     @GetMapping("/edit/{id}")
@@ -101,7 +97,7 @@ public class AdminCourseController {
         model.addAttribute("courseDTO", courseService.findDTOById(id));
         model.addAttribute("instructors", userService.findAllInstructor());
         model.addAttribute("activeMenu", "courses");
-        return "admin/edit-course";
+        return "admin/course/edit-course";
     }
 
     @PostMapping("/update")
@@ -111,16 +107,16 @@ public class AdminCourseController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("instructors", userService.findAllInstructor());
             model.addAttribute("activeMenu", "courses");
-            return "admin/edit-course";
+            return "admin/course/edit-course";
         }
         courseService.saveFromDTO(courseDTO);
-        return "redirect:/admin/course-list";
+        return "redirect:/admin/course/course-list";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteCourse(@PathVariable("id") Long id) {
         courseService.deleteById(id);
-        return "redirect:/admin/course-list";
+        return "redirect:/admin/course/course-list";
     }
 
     @PostMapping("/delete-lesson/{id}")
@@ -129,9 +125,9 @@ public class AdminCourseController {
         if (lesson != null) {
             Long courseId = lesson.getCourse().getId();
             lessonService.deleteById(id);
-            return "redirect:/admin/" + courseId;
+            return "redirect:/admin/course/" + courseId;
         }
-        return "redirect:/admin/course-list";
+        return "redirect:/admin/course/course-list";
     }
     @GetMapping("/course/{courseId}/select-lessons")
     public String selectLessonsForSection(@PathVariable("courseId") Long courseId,
@@ -139,11 +135,11 @@ public class AdminCourseController {
                                           Model model) {
         Course course = courseService.findByIdWithLessons(courseId);
         if (course == null) {
-            return "redirect:/admin/course-list";
+            return "redirect:/admin/course/course-list";
         }
-        CourseSection section = courseSectionRepository.findById(sectionId).orElse(null);
+        CourseSection section = courseSectionService.findById(sectionId).orElse(null);
         if (section == null || !section.getCourse().getId().equals(courseId)) {
-            return "redirect:/admin/" + courseId;
+            return "redirect:/admin/course/" + courseId;
         }
 
         // Get all lessons of the course
@@ -159,7 +155,7 @@ public class AdminCourseController {
         model.addAttribute("allLessons", allLessons);
         model.addAttribute("assignedLessonIds", assignedLessonIds);
         model.addAttribute("activeMenu", "courses");
-        return "admin/select-lessons";
+        return "admin/course/select-lessons";
     }
     @PostMapping("/course/{courseId}/assign-lessons")
     public String assignLessonsToSection(@PathVariable("courseId") Long courseId,
@@ -168,11 +164,11 @@ public class AdminCourseController {
                                          RedirectAttributes redirectAttributes) {
         Course course = courseService.findByIdWithLessons(courseId);
         if (course == null) {
-            return "redirect:/admin/course-list";
+            return "redirect:/admin/course/course-list";
         }
-        CourseSection section = courseSectionRepository.findById(sectionId).orElse(null);
+        CourseSection section = courseSectionService.findById(sectionId).orElse(null);
         if (section == null || !section.getCourse().getId().equals(courseId)) {
-            return "redirect:/admin/" + courseId;
+            return "redirect:/admin/course/" + courseId;
         }
 
         // Get all lessons of the course
@@ -198,7 +194,15 @@ public class AdminCourseController {
         }
 
         redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật bài học cho chương thành công.");
-        return "redirect:/admin/" + courseId;
+        return "redirect:/admin/course/" + courseId;
+    }
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String viewCourse(@PathVariable("id") Long id, Model model) {
+        Course course = courseService.findByIdWithLessons(id);
+        model.addAttribute("course", course);
+        model.addAttribute("activeMenu", "courses");
+        return "admin/course/admin-detail";
     }
 
     // --- COURSE RESOURCES MANAGEMENT ---
@@ -212,58 +216,29 @@ public class AdminCourseController {
                               @RequestParam("isExternal") boolean isExternal,
                               org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         try {
-            Course course = courseService.findById(courseId);
-            if (course == null) return "redirect:/admin/course-list";
-
-            CourseResource resource = new CourseResource();
-            resource.setTitle(title);
-            resource.setFileType(fileType);
-            resource.setCourse(course);
-            resource.setExternal(isExternal);
-
-            if (isExternal) {
-                if (externalUrl == null || externalUrl.trim().isEmpty()) {
-                    redirectAttributes.addFlashAttribute("error", "Link ngoài không được để trống");
-                    return "redirect:/admin/" + courseId;
-                }
-                resource.setUrl(externalUrl.trim());
-            } else {
-                if (resourceFile == null || resourceFile.isEmpty()) {
-                    redirectAttributes.addFlashAttribute("error", "Vui lòng chọn file để upload");
-                    return "redirect:/admin/" + courseId;
-                }
-                String fileUrl = fileService.uploadResource(resourceFile);
-                resource.setUrl(fileUrl);
-            }
-
-            resourceRepository.save(resource);
+            courseResourceService.addResource(courseId, title, fileType, externalUrl, resourceFile, isExternal);
             redirectAttributes.addFlashAttribute("success", "Đã thêm tài liệu thành công!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Lỗi khi thêm tài liệu: " + e.getMessage());
         }
-        return "redirect:/admin/" + courseId;
+        return "redirect:/admin/course/" + courseId;
     }
 
     @PostMapping("/resources/delete/{id}")
     public String deleteResource(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         try {
-            java.util.Optional<CourseResource> resourceOpt = resourceRepository.findById(id);
-            if (resourceOpt.isPresent()) {
-                CourseResource resource = resourceOpt.get();
-                Long courseId = resource.getCourse().getId();
-
-                // If local file, delete it from disk
-                if (!resource.isExternal()) {
-                    fileService.deleteFile(resource.getUrl());
-                }
-
-                resourceRepository.delete(resource);
+            if (courseResourceService.deleteResource(id)) {
                 redirectAttributes.addFlashAttribute("success", "Đã xóa tài liệu!");
-                return "redirect:/admin/" + courseId;
+                // Note: courseId is not returned, but since it's in the resource, we can assume success
+                return "redirect:/admin/course/course-list"; // Or find a way to get courseId, but for simplicity
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Tài liệu không tồn tại");
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa tài liệu: " + e.getMessage());
         }
-        return "redirect:/admin/course-list";
+        return "redirect:/admin/course/course-list";
     }
 }

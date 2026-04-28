@@ -330,3 +330,265 @@
         grid-template-columns: 1fr;
     }
 }
+/* --- Tối ưu lại phần Logout Sidebar --- */
+
+.logout-container {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color) !important; /* Dùng biến border có sẵn */
+}
+
+.btn-logout-sidebar {
+    background-color: #f06292; /* Màu hồng giống trong ảnh anh5.png */
+    color: #ffffff !important;
+    border: none;
+    padding: 12px 25px;
+    font-weight: 500;
+    font-size: 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Căn giữa hoàn hảo */
+    width: 100%; /* Chiếm hết chiều ngang sidebar */
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-logout-sidebar i {
+    font-size: 16px;
+    margin-right: 8px; /* Khoảng cách icon và chữ */
+    color: #ffffff !important;
+}
+
+.btn-logout-sidebar:hover {
+    background-color: var(--accent-color); /* Chuyển sang tím khi hover */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(200, 111, 255, 0.3);
+}
+
+/* Xóa bỏ các đoạn .btn-logout cũ bị trùng lặp nếu có */
+/* Màu chữ cho phần Hero */
+.profile-hero-content p {
+    color: #ffffff !important;
+    opacity: 0.9; /* Giữ độ mờ nhẹ cho tinh tế */
+}
+
+/* --- Hiệu ứng chữ chuyển màu cho tiêu đề --- */
+.course-section-header h3 {
+    background: linear-gradient(90deg, #4255A4 0%, #C86FFF 50%, #e0b3ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent; /* Fallback */
+    font-weight: 800;
+    display: inline-block;
+}
+
+/* --- Custom View All Button (Bỏ hoàn toàn Bootstrap) --- */
+.btn-view-all {
+    display: inline-block;
+    padding: 8px 25px;
+    text-decoration: none;
+    text-align: center;
+    background-color: var(--accent-secondary);
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hiệu ứng Hover giống hệt btn-continue */
+.btn-view-all:hover {
+    background-color: var(--accent-color);
+    color: #ffffff !important;
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 5px 15px rgba(200, 111, 255, 0.3);
+}
+
+.btn-view-all:active {
+    transform: scale(0.98);
+}
+/* --- Hiệu ứng chữ chuyển màu cho Hero Section --- */
+.profile-hero-content h1 {
+    background: linear-gradient(90deg, #ffffff 0%, #e0b3ff 50%, #C86FFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent; /* Fallback cho trình duyệt cũ */
+
+    font-weight: 800;
+    display: inline-block;
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2)); /* Giúp chữ nổi bật trên nền ảnh */
+}
+
+/* Tùy chỉnh nhẹ cho dòng Bio để trông thanh thoát hơn */
+.profile-hero-content p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 400;
+    margin-top: 10px;
+}
+/* --- Bổ sung cho trang Wishlist & Notifications (Đồng nhất với Dashboard) --- */
+
+/* Container trạng thái trống */
+.empty-state-container {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+}
+
+.empty-main-icon {
+    font-size: 64px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+/* Nút bấm Dashboard Primary (Dùng cho "Khám phá" hoặc "Xem chi tiết") */
+.btn-dashboard-primary {
+    display: inline-block;
+    background: var(--accent-secondary);
+    color: white !important;
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-dashboard-primary:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(200, 111, 255, 0.3);
+}
+
+/* Nút kích thước lớn cho Empty State */
+.btn-large {
+    padding: 15px 45px;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+/* Nút Outline cho các hành động phụ (Notifications) */
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-outline-custom {
+    background: transparent;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.color-secondary {
+    border: 1.5px solid var(--accent-secondary);
+    color: var(--accent-secondary);
+}
+
+.color-secondary:hover {
+    background: var(--accent-secondary);
+    color: white;
+}
+
+.color-danger {
+    border: 1.5px solid #f06292; /* Màu hồng giống nút Logout của bạn */
+    color: #f06292;
+}
+
+.color-danger:hover {
+    background: #f06292;
+    color: white;
+}
+
+/* Cập nhật layout cho trang Wishlist Card (Nếu cần) */
+.wishlist-body .btn-dashboard-primary {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+}
+/* --- Sửa lỗi hiển thị Header Actions & Title --- */
+
+/* 1. Đảm bảo khu vực tiêu đề có khoảng cách và nền sạch sẽ nếu nằm ngoài Hero */
+.course-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 10px 0;
+}
+
+/* 2. Làm nổi bật tiêu đề "Tất cả thông báo" */
+.course-section-header h3 {
+    font-size: 24px;
+    font-weight: 800;
+    /* Hiệu ứng gradient đổ màu hiện đại */
+    background: linear-gradient(45deg, var(--accent-secondary), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+/* 3. Sửa nút "Đánh dấu đã đọc hết" (Primary) */
+.btn-dashboard-primary {
+    background: var(--accent-secondary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(66, 85, 164, 0.2);
+}
+
+.btn-dashboard-primary:hover {
+    background: var(--accent-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200, 111, 255, 0.3);
+}
+
+/* 4. Sửa nút "Xóa tất cả" (Danger) */
+.btn-dashboard-danger {
+    background: #fff !important; /* Nền trắng để nổi bật chữ đỏ */
+    color: #f06292 !important;
+    border: 1.5px solid #f06292 !important;
+    padding: 9px 20px !important; /* Giảm 1px để bù trừ border */
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-dashboard-danger:hover {
+    background: #f06292 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(240, 98, 146, 0.3);
+}
+
+/* 5. Responsive cho mobile (đẩy nút xuống dưới tiêu đề nếu màn hình hẹp) */
+@media (max-width: 576px) {
+    .course-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .header-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+}

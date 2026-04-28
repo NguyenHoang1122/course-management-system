@@ -193,13 +193,15 @@ public class ProfileController {
             return "profile/edit";
         }
     }
-
+    // Hiển thị thông báo của user
     @GetMapping("/notifications")
     public String viewNotifications(Model model, Principal principal) {
-        if (principal == null) return "redirect:/auth/login";
         User user = userService.findByUsername(principal.getName());
+
         model.addAttribute("user", user);
-        model.addAttribute("notifications", notificationService.getAllNotifications(user));
+        model.addAttribute("notifications",
+                notificationService.getAllNotifications(user));
+
         return "profile/notifications";
     }
 
@@ -225,7 +227,7 @@ public class ProfileController {
 
         model.addAttribute("user", user);
         model.addAttribute("activeMenu", "profile");
-        return "admin/admin-view";
+        return "admin/user/admin-view";
     }
 
     @GetMapping("/admin/profile/edit")
@@ -247,7 +249,7 @@ public class ProfileController {
         model.addAttribute("user", user);
         model.addAttribute("userProfileDTO", buildProfileDTO(user));
         model.addAttribute("activeMenu", "profile");
-        return "admin/admin-edit";
+        return "admin/user/admin-edit";
     }
 
     @PostMapping("/admin/profile/edit")
@@ -279,7 +281,7 @@ public class ProfileController {
                 model.addAttribute("user", currentUser);
                 model.addAttribute("updateError", ex.getMessage());
                 model.addAttribute("activeMenu", "profile");
-                return "admin/admin-edit";
+                return "admin/user/admin-edit";
             }
         } else {
             profileDTO.setAvatar(currentUser.getAvatar());
@@ -288,7 +290,7 @@ public class ProfileController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", currentUser);
             model.addAttribute("activeMenu", "profile");
-            return "admin/admin-edit";
+            return "admin/user/admin-edit";
         }
 
         try {
@@ -298,7 +300,7 @@ public class ProfileController {
             model.addAttribute("user", currentUser);
             model.addAttribute("updateError", ex.getMessage());
             model.addAttribute("activeMenu", "profile");
-            return "admin/admin-edit";
+            return "admin/user/admin-edit";
         }
 
         return "redirect:/admin/profile?updated=true";
@@ -333,7 +335,7 @@ public class ProfileController {
             model.addAttribute("userProfileDTO", buildProfileDTO(currentUser));
             model.addAttribute("changePasswordError", ex.getMessage());
             model.addAttribute("activeMenu", "profile");
-            return "admin/admin-edit";
+            return "admin/user/admin-edit";
         }
     }
 
