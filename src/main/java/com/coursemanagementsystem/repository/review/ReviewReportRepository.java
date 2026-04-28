@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.repository;
+package com.coursemanagementsystem.repository.review;
 
 import com.coursemanagementsystem.model.ReviewReport;
 import org.springframework.data.jpa.repository.JpaRepository;

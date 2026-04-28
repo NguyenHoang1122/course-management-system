@@ -1,9 +1,9 @@
 package com.coursemanagementsystem.service;
 
 import com.coursemanagementsystem.model.*;
-import com.coursemanagementsystem.repository.ReviewReactionRepository;
-import com.coursemanagementsystem.repository.ReviewReportRepository;
-import com.coursemanagementsystem.repository.ReviewRepository;
+import com.coursemanagementsystem.repository.review.ReviewReactionRepository;
+import com.coursemanagementsystem.repository.review.ReviewReportRepository;
+import com.coursemanagementsystem.repository.review.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

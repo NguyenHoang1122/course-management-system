@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.repository;
+package com.coursemanagementsystem.repository.lesson;
 
 import com.coursemanagementsystem.model.LessonProgress;
 import org.springframework.data.jpa.repository.JpaRepository;

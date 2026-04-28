@@ -2,9 +2,7 @@ package com.coursemanagementsystem.controller.admin;
 
 import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Lesson;
-import com.coursemanagementsystem.repository.CourseResourceRepository;
-import com.coursemanagementsystem.repository.CourseSectionRepository;
-import com.coursemanagementsystem.repository.LessonRepository;
+import com.coursemanagementsystem.repository.course.CourseSectionRepository;
 import com.coursemanagementsystem.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

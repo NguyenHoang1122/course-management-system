@@ -20,15 +20,6 @@
         <p>Thêm khóa học mới vào hệ thống</p>
     </div>
 
-<!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
-<!--    <nav aria-label="breadcrumb">-->
-<!--        <ol class="breadcrumb">-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
-<!--            <li class="breadcrumb-item active" aria-current="page">Tạo Mới</li>-->
-<!--        </ol>-->
-<!--    </nav>-->
-
     <div class="admin-content">
         <div class="form-container">
             <form th:action="@{/admin/save-course}" th:object="${courseDTO}" method="post" id="courseForm" novalidate>

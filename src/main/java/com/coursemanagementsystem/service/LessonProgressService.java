@@ -3,7 +3,7 @@ package com.coursemanagementsystem.service;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.model.LessonProgress;
 import com.coursemanagementsystem.model.User;
-import com.coursemanagementsystem.repository.LessonProgressRepository;
+import com.coursemanagementsystem.repository.lesson.LessonProgressRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

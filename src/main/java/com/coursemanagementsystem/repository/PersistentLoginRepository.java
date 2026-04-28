@@ -13,19 +13,13 @@ import java.util.Optional;
 @Repository
 public interface PersistentLoginRepository extends JpaRepository<PersistentLogin, String> {
 
-    /**
-     * Tìm PersistentLogin theo username
-     */
+    // quan ly session user
     Optional<PersistentLogin> findByUsername(String username);
 
-    /**
-     * Tìm PersistentLogin theo series
-     */
+    //   Xac thuc auto login
     Optional<PersistentLogin> findBySeries(String series);
 
-    /**
-     * Xóa PersistentLogin theo username
-     */
+    // logout/revoke token
     @Modifying
     @Transactional
     @Query("DELETE FROM PersistentLogin p WHERE p.username = :username")
