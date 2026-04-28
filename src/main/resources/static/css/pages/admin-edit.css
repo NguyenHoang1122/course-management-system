@@ -1,0 +1,114 @@
+    /* ===== VALIDATION STYLES ===== */
+    .form-group { position: relative; margin-bottom: 1.1rem; }
+
+    .form-group input,
+    .form-group textarea {
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .form-group input.is-valid,
+    .form-group textarea.is-valid {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+    }
+
+    .form-group input.is-invalid,
+    .form-group textarea.is-invalid {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,.12) !important;
+    }
+
+    .field-error {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ef4444;
+      font-size: 0.78rem;
+      margin-top: 4px;
+      animation: slideDown .2s ease;
+    }
+
+    .field-error i { font-size: .75rem; flex-shrink: 0; }
+
+    /* Password strength */
+    .pw-strength-bar {
+      height: 4px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      margin-top: 7px;
+      overflow: hidden;
+      display: none;
+    }
+    .pw-strength-bar .fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .35s ease, background .35s ease;
+      width: 0;
+    }
+    .pw-strength-label {
+      font-size: .75rem;
+      margin-top: 3px;
+      display: none;
+    }
+
+    /* Password requirements */
+    .pw-requirements { margin-top: 6px; }
+    .pw-requirements ul { list-style: none; padding: 0; margin: 0; }
+    .pw-requirements ul li {
+      font-size: .78rem;
+      color: #9ca3af;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .pw-requirements ul li i { font-size: .72rem; transition: color .2s; }
+    .pw-requirements ul li.req-met { color: #10b981; }
+    .pw-requirements ul li.req-met i { color: #10b981; }
+
+    /* Alert boxes */
+    .alert-success-custom {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #10b981;
+      color: #065f46;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .alert-danger-custom {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    /* Avatar preview */
+    .avatar-preview-box {
+      margin-top: 8px;
+      display: none;
+    }
+    .avatar-preview-box img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #10b981;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }

@@ -1,0 +1,101 @@
+        .report-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            border-left: 5px solid #ef4444;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .report-card:hover {
+            transform: translateY(-2px);
+        }
+        .report-header {
+            padding: 16px 24px;
+            background: #fef2f2;
+            border-bottom: 1px solid #fee2e2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .report-reason {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .report-meta {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .report-body {
+            padding: 24px;
+        }
+        .review-quote {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #cbd5e1;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .review-quote::before {
+            content: '\f10d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #e2e8f0;
+            z-index: 0;
+        }
+        .review-text {
+            position: relative;
+            z-index: 1;
+            font-style: italic;
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .review-author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .report-actions {
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #f1f5f9;
+            padding: 16px 24px;
+            background: #fafafa;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: #fff;
+            border-radius: 12px;
+            border: 2px dashed #e2e8f0;
+        }
+        .empty-state i {
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
