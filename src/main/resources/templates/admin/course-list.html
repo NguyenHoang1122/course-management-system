@@ -45,78 +45,61 @@
             </a>
         </div>
 
-        <!-- Search Form -->
         <div class="mb-4" style="background: var(--white); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
             <form th:action="@{/admin/course-list}" method="get" style="display: flex; gap: 10px; align-items: center;">
                 <input type="hidden" name="page" value="1">
                 <input type="hidden" name="size" th:value="${size}">
-                <label for="keyword" style="margin: 0; font-weight: 600; white-space: nowrap;"><i class="fas fa-search"></i> Tìm kiếm:</label>
-                <input type="text" id="keyword" name="keyword"
-                       th:value="${keyword}"
-                       placeholder="Tìm theo tên khóa học..."
-                       style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
-                    <i class="fas fa-search"></i> Tìm kiếm
-                </button>
-                <a th:href="@{/admin/course-list}" class="btn btn-secondary" style="white-space: nowrap;">
-                    <i class="fas fa-redo"></i> Xóa bộ lọc
-                </a>
+                <input type="text" id="keyword" name="keyword" th:value="${keyword}" placeholder="Tìm theo tên khóa học..." style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+                <a th:href="@{/admin/course-list}" class="btn btn-secondary"><i class="fas fa-redo"></i> Xóa bộ lọc</a>
             </form>
         </div>
 
-        <div th:if="${courses != null and !courses.isEmpty()}" class="course-grid">
-            <div th:each="course : ${courses}" class="course-card">
-                <div class="course-card-img" style="height: 120px; background: #eee; overflow: hidden;">
-                    <img th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
-                         alt="Course Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="course-card-header">
-                    <h3 th:text="${course.title}"></h3>
-                    <div class="price"
-                         th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></div>
-                </div>
-
-                <div class="course-card-body">
-                    <p th:text="${course.description}"
-                       style="-webkit-line-clamp: 3; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;"></p>
-
-                    <div class="course-meta-small">
-                        <small style="color: var(--text-muted);">
-                            <i class="fas fa-user-tie"></i>
-                            <span th:text="${course.instructor != null ? course.instructor.fullName : 'Unknown'}"></span>
-                        </small>
-                        <br>
-                        <small style="color: var(--text-muted);">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'dd/MM/yyyy') : '-'}"></span>
-                        </small>
-                        <br>
-                        <small style="color: var(--text-muted);">
-                            <i class="fas fa-play-circle"></i>
-                            <span th:text="${course.lessons != null ? course.lessons.size() : 0}"></span> bài học
-                        </small>
+        <div th:if="${courses != null and !courses.isEmpty()}" class="row">
+            <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
+                <div class="course-card shadow-sm" style="cursor: pointer;" th:onclick="|window.location.href='/admin/' + ${course.id}|">
+                    <div class="course-badge" th:text="${course.category != null ? course.category : 'Nhật Bản'}">Nhật Bản</div>
+                    <div class="course-card-img"
+                         th:style="'background-image: url(' + (${course.imageUrl != null and !course.imageUrl.isEmpty()} ? (${course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)}) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop') + '); background-size: cover; background-position: center; height: 200px;'">
                     </div>
-                </div>
 
-                <div class="course-card-footer">
-                    <a th:href="@{/admin/{id}(id=${course.id})}" class="btn btn-outline-primary btn-sm btn-action">
-                        <i class="fas fa-eye"></i> Chi tiết
-                    </a>
-                    <a th:href="@{/admin/edit/{id}(id=${course.id})}" class="btn btn-outline-success btn-sm btn-action">
-                        <i class="fas fa-edit"></i> Sửa
-                    </a>
-                    <form method="post" th:action="@{/admin/delete/{id}(id=${course.id})}"
-                          style="flex-basis: 100%;">
-                        <button type="button"
-                                class="btn btn-outline-danger btn-sm btn-action btn-delete-course"
-                                th:data-id="${course.id}"
-                                th:data-title="${course.title}">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </form>
+                    <div class="course-card-body">
+                        <div class="course-rating">
+                            <th:block th:with="rating=${averageRatings != null and averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                            </th:block>
+                            <span class="text-muted ml-2" th:text="'(' + ${averageRatings != null and averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'">(0.0)</span>
+                        </div>
+
+                        <h3 class="course-title">
+                            <a th:href="@{'/admin/' + ${course.id}}" th:text="${course.title}" style="color: inherit; text-decoration: none;">Course Title</a>
+                        </h3>
+
+                        <div class="course-meta">
+                            <img th:if="${course.instructor != null and course.instructor.avatar != null}"
+                                 th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
+                                 alt="author" style="width:25px; height:25px; border-radius: 50%; object-fit: cover;">
+                            <i th:unless="${course.instructor != null and course.instructor.avatar != null}" class="fas fa-user-circle mr-2" style="font-size: 25px; color: #ddd;"></i>
+                            <span>By <strong th:text="${course.instructor != null ? course.instructor.fullName : 'Admin'}">Admin</strong></span>
+                        </div>
+
+                        <div class="course-price-row d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                    <span class="course-price text-primary font-weight-bold" style="font-size: 1.1rem;">
+                        <th:block th:if="${course.price != null and course.price > 0}"
+                                  th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
+                        </th:block>
+                        <th:block th:if="${course.price == null or course.price == 0}">Free</th:block>
+                    </span>
+                            </div>
+                            <a th:href="@{'/admin/' + ${course.id}}" class="btn btn-primary btn-sm px-4"
+                               style="background-color: #4285f4; border: none; border-radius: 4px;">Xem</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
         <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
             <i class="fas fa-graduation-cap"
