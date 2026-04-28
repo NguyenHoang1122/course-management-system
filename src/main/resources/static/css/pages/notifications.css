@@ -126,13 +126,12 @@
    CUSTOM MODAL DELETE ALL (Căn chỉnh cân đối)
    ========================================================================== */
 
-/* Overlay dùng chung nhưng scoped cho modal này */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.6); /* Đậm hơn để nổi bật modal */
-    display: flex;
+    background: rgba(15, 23, 42, 0.6);
+    display: none; /* THAY ĐỔI TẠI ĐÂY: Mặc định là ẩn */
     align-items: center;
     justify-content: center;
     z-index: 10000;
