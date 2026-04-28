@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.repository;
+package com.coursemanagementsystem.repository.course;
 
 import com.coursemanagementsystem.model.Course;
 import org.springframework.data.domain.Page;

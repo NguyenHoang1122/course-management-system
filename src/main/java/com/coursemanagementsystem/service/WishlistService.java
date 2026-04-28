@@ -3,7 +3,7 @@ package com.coursemanagementsystem.service;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.model.Wishlist;
-import com.coursemanagementsystem.repository.CourseRepository;
+import com.coursemanagementsystem.repository.course.CourseRepository;
 import com.coursemanagementsystem.repository.WishlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

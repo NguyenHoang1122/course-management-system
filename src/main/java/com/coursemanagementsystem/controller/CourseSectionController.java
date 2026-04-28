@@ -2,7 +2,7 @@ package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.CourseSection;
-import com.coursemanagementsystem.repository.CourseSectionRepository;
+import com.coursemanagementsystem.repository.course.CourseSectionRepository;
 import com.coursemanagementsystem.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
