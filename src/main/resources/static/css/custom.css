@@ -1449,20 +1449,52 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,1);
 }
 
+/* Căn giữa khối chứa các nút */
 .footer-app-buttons {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
 }
 
+/* Ghi đè và sửa lỗi hiển thị cho nút App Store/Google Play */
 .footer-app-btn {
+    border: 2px solid #ffffff; /* Tạo viền trắng để nút rõ ràng hơn */
     border-radius: 50px;
     height: 55px;
     width: 210px;
     text-decoration: none;
-}
 
+    /* Căn giữa nội dung bên trong */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Khoảng cách giữa icon và chữ */
+
+    /* Màu sắc mặc định */
+    background-color: transparent !important; /* Nền trong suốt */
+    color: #ffffff !important; /* Chữ màu trắng */
+    transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    padding: 0;
+    overflow: hidden;
+}
+/* Loại bỏ các hiệu ứng background-image hoặc gradient gây ra lỗi kéo màu */
+.footer-app-btn::before, .footer-app-btn::after {
+    display: none !important;
+}
+/* Hiệu ứng khi Hover (Trỏ chuột vào) */
+.footer-app-btn:hover {
+    background-color: #ffffff !important; /* Nền trắng */
+    color: #283675 !important; /* Chữ chuyển sang màu xanh */
+    border-color: #ffffff;
+}
+/* Đảm bảo Icon và Span nhận đúng màu */
+.footer-app-btn i, .footer-app-btn span {
+    color: inherit; /* Tự động lấy màu theo thẻ cha (trắng -> xanh) */
+    font-size: 16px;
+    line-height: 1;
+    margin: 0 !important;
+}
 .footer-bottom {
     background: #283675;
     padding: 30px 0;
@@ -1491,4 +1523,17 @@ h1, h2, h3, h4, h5, h6 {
         width: 300px;
         right: -50px;
     }
+}
+/* Ghi đè hiệu ứng hover cho các liên kết trong footer */
+.footer-area .footer-tittle ul li a.footer-link:hover {
+    color: #ffffff !important; /* Giữ chữ màu trắng */
+    font-weight: 700 !important; /* Làm chữ in đậm lên */
+    text-decoration: none; /* Bỏ gạch chân nếu có */
+    transition: all 0.2s ease-in-out; /* Hiệu ứng mượt mà */
+}
+
+/* Đảm bảo màu mặc định của link không bị mờ */
+.footer-area .footer-tittle ul li a.footer-link {
+    color: #bfc3d1 !important; /* Màu xám nhạt như thiết kế cũ */
+    transition: all 0.2s ease-in-out;
 }

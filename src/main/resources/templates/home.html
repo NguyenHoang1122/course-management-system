@@ -32,14 +32,11 @@
 
     <!-- Hero area -->
     <section class="custom-hero">
-        <!-- Snowflake Container -->
-        <div id="snowflake-container"
-            style="position: fixed; top: 0; left: 0; right: 0; height: 100vh; pointer-events: none; z-index: 1;"></div>
+        <div id="snowflake-container" class="snowflake-overlay"></div>
 
-        <div class="container" style="position:relative; z-index:5;">
-            <h1 class="display-3 font-weight-bold mb-3" style="font-size: 60px;">50% Discount on Popular Courses</h1>
-            <p class="lead mb-4" style="font-size: 18px; opacity: 0.9;">Take the first step to your journey to success
-                with us</p>
+        <div class="container hero-content">
+            <h1 class="hero-title">50% Discount on Popular Courses</h1>
+            <p class="hero-subtitle">Take the first step to your journey to success with us</p>
 
             <a href="#courses" class="hero-btn">Ready to get started?</a>
 
@@ -51,19 +48,15 @@
             </div>
         </div>
 
-        <!-- Smooth Deep Arc bottom curve using SVG -->
         <div class="wavy-bottom">
             <svg viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Decorative Glow Layer -->
                 <path d="M0 120 L0 0 Q600 120 1200 0 L1200 120 Z" fill="rgba(255, 255, 255, 0.2)"></path>
-                <!-- Main White Layer -->
                 <path d="M0 120 L0 10 Q600 120 1200 10 L1200 120 Z" fill="#ffffff"></path>
             </svg>
         </div>
 
-        <!-- Bounce Arrow -->
         <a href="#courses" class="scroll-down-btn">
-            <i class="fas fa-arrow-down" style="font-size:16px;"></i>
+            <i class="fas fa-arrow-down"></i>
         </a>
     </section>
 

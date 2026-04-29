@@ -5,6 +5,7 @@ import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.repository.course.CourseRepository;
 import com.coursemanagementsystem.repository.course.CourseSectionRepository;
+import com.coursemanagementsystem.repository.lesson.LessonProgressRepository;
 import com.coursemanagementsystem.repository.lesson.LessonRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,10 @@ public class LessonService {
 
     @Autowired
     private EnrollmentService enrollmentService;
+    @Autowired
+    private LessonProgressService lessonProgressService;
+    @Autowired
+    private LessonProgressRepository lessonProgressRepository;
 
     public void saveFromDTO(LessonDTO dto) {
 
@@ -63,6 +68,7 @@ public class LessonService {
     public void save(Lesson lesson) {
         lessonRepository.save(lesson);
     }
+
 
     public List<Lesson> findAll() {
         return lessonRepository.findAll();

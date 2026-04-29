@@ -33,19 +33,19 @@
             <span>›</span>
             <span th:text="${course.title}">Course</span>
         </div>
-        <div class="video-cinema-wrap" id="mainPlayerContainer">
-            <img id="courseThumbnail" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
+        <div class="video-cinema-wrap" id="mainPlayerContainerEnrolled">
+            <img id="courseThumbnailEnrolled" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}"
                  alt="Course Preview">
-            
+
             <!-- Video Placeholder -->
-            <div id="videoEmbedWrapper" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
-                 <div id="playerPlaceholder" style="width:100%; height:100%;"></div>
-                 <button type="button" onclick="closePlayer()" style="position:absolute; top:15px; right:15px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
-                     <i class="fas fa-times"></i>
-                 </button>
+            <div id="videoEmbedWrapperEnrolled" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
+                <div id="playerPlaceholderEnrolled" style="width:100%; height:100%;"></div>
+                <button type="button" onclick="closePlayer()" style="position:absolute; top:15px; right:15px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
-        
+
     </div>
 </section>
 
@@ -86,23 +86,23 @@
 
                 <!-- Course Image / Video Preview (Guest View) -->
                 <div class="cd-card" style="padding: 0; overflow: hidden;" th:if="${!isEnrolled}">
-                    <div class="course-media-wrap" id="mainPlayerContainer" style="position: relative;">
-                        <img id="courseThumbnail" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
+                    <div class="course-media-wrap" id="mainPlayerContainerGuest" style="position: relative;">
+                        <img id="courseThumbnailGuest" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}"
                              alt="Course Preview">
-                        
+
                         <!-- Overlay for course intro video -->
-                        <div class="play-btn-overlay" th:if="${course.previewVideoUrl != null and !course.previewVideoUrl.isEmpty()}" 
+                        <div class="play-btn-overlay" th:if="${course.previewVideoUrl != null and !course.previewVideoUrl.isEmpty()}"
                              th:data-video-url="${course.previewVideoUrl}"
                              onclick="playCoursePreview(this)" style="cursor: pointer;">
                             <i class="fas fa-play"></i>
                         </div>
-                        
+
                         <!-- Video Placeholder (Hidden by default) -->
-                        <div id="videoEmbedWrapper" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
-                             <div id="playerPlaceholder" style="width:100%; height:100%;"></div>
-                             <button type="button" onclick="closePlayer()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
-                                 <i class="fas fa-times"></i>
-                             </button>
+                        <div id="videoEmbedWrapperGuest" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
+                            <div id="playerPlaceholderGuest" style="width:100%; height:100%;"></div>
+                            <button type="button" onclick="closePlayer()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
 
                         <div class="media-duration-badge" th:if="${course.duration != null}">
@@ -117,9 +117,9 @@
                     <div class="cd-tabs" th:classappend="${isEnrolled} ? 'minimal' : ''">
                         <!-- Enrolled Default Tab -->
                         <button th:if="${isEnrolled}" class="cd-tab-btn active" data-tab="tab-curriculum">Nội dung học tập</button>
-                        
+
                         <button class="cd-tab-btn" th:classappend="${!isEnrolled} ? 'active' : ''" data-tab="tab-info">Thông tin chung</button>
-                        
+
                         <button class="cd-tab-btn" data-tab="tab-reviews">
                             Đánh giá
                             <span style="background:#ede9fe;color:#6d28d9;padding:1px 8px;border-radius:20px;font-size:11px;margin-left:6px;"
@@ -135,7 +135,7 @@
                     <!-- TAB: CURRICULUM (Enrolled Only) -->
                     <div id="tab-curriculum" class="cd-tab-content" th:classappend="${isEnrolled} ? 'active' : ''" th:if="${isEnrolled}">
                         <!-- Real-time Progress -->
-                        <div class="curriculum-progress-box" id="dashboardProgressCard" 
+                        <div class="curriculum-progress-box" id="dashboardProgressCard"
                              th:data-total-lessons="${totalLessons}">
                             <div class="curriculum-progress-header">
                                 <h4>Tiến độ học tập</h4>
@@ -176,7 +176,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Course Content (Only show here for guests) -->
                         <div th:if="${!isEnrolled}" style="margin-top: 28px;">
                             <h3 class="section-title-sm" style="margin-bottom: 12px;">Nội dung khóa học</h3>
@@ -234,105 +234,105 @@
                     <!-- Define Curriculum Fragment (Hidden definition to avoid double rendering) -->
                     <th:block th:if="false">
                         <div th:fragment="curriculum-fragment">
-                        <div class="cd-accordion">
-                            <!-- CASE 1: Hierarchical Sections -->
-                            <th:block th:if="${course.sections != null and !course.sections.isEmpty()}">
-                                <div th:each="section, sStat : ${course.sections}" class="cd-acc-item" style="margin-bottom: 10px; border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
-                                    <div class="cd-acc-header" th:classappend="${sStat.index == 0} ? 'open' : ''" th:attr="data-acc-target='section-' + ${section.id}">
+                            <div class="cd-accordion">
+                                <!-- CASE 1: Hierarchical Sections -->
+                                <th:block th:if="${course.sections != null and !course.sections.isEmpty()}">
+                                    <div th:each="section, sStat : ${course.sections}" class="cd-acc-item" style="margin-bottom: 10px; border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                        <div class="cd-acc-header" th:classappend="${sStat.index == 0} ? 'open' : ''" th:attr="data-acc-target='section-' + ${section.id}">
                                         <span style="font-weight: 600;">
                                             <i class="fas fa-folder-open" style="margin-right:8px;color:#6d28d9;"></i>
                                             <span th:text="${section.title}">Section Title</span>
                                         </span>
-                                        <div style="display:flex;align-items:center;gap:12px;">
-                                            <span class="acc-section-meta" th:text="${section.lessons.size()} + ' bài học'"></span>
-                                            <i class="fas fa-chevron-down acc-chevron"></i>
-                                        </div>
-                                    </div>
-                                    <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
-                                        <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row" 
-                                             th:data-lesson-id="${lesson.id}"
-                                             th:data-video-url="${lesson.videoUrl}"
-                                             th:data-lesson-title="${lesson.title}"
-                                             th:classappend="${((isEnrolled or (sStat.index == 0 and lStat.index == 0)) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
-                                             onclick="if(this.classList.contains('playable')) playLesson(this)">
-                                            <div class="lesson-left">
-                                                <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'" 
-                                                   th:style="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
-                                                <span th:text="${lesson.title}">Lesson</span>
-                                                <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="preview-badge">Dùng thử</span>
-                                            </div>
                                             <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="acc-section-meta" th:text="${section.lessons.size()} + ' bài học'"></span>
+                                                <i class="fas fa-chevron-down acc-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
+                                            <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row"
+                                                 th:data-lesson-id="${lesson.id}"
+                                                 th:data-video-url="${lesson.videoUrl}"
+                                                 th:data-lesson-title="${lesson.title}"
+                                                 th:classappend="${((isEnrolled or (sStat.index == 0 and lStat.index == 0)) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
+                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
+                                                <div class="lesson-left">
+                                                    <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'"
+                                                       th:style="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
+                                                    <span th:text="${lesson.title}">Lesson</span>
+                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="preview-badge">Dùng thử</span>
+                                                </div>
+                                                <div style="display:flex;align-items:center;gap:12px;">
                                                 <span class="lesson-duration">
                                                     <i class="far fa-clock"></i>
                                                     <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
                                                 </span>
-                                                <div th:if="${isEnrolled}" class="lesson-status-box" 
-                                                     th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
-                                                    <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
-                                                </div>
-                                                <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
+                                                    <div th:if="${isEnrolled}" class="lesson-status-box"
+                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                    </div>
+                                                    <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
                                                     <i class="fas fa-lock"></i>
                                                 </span>
-                                                <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </th:block>
+                                </th:block>
 
-                            <!-- CASE 2: Fallback Flat List -->
-                            <th:block th:if="${(course.sections == null or course.sections.isEmpty()) and course.lessons != null and !course.lessons.isEmpty()}">
-                                <div class="cd-acc-item" style="border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
-                                    <div class="cd-acc-header open" data-acc-target="section-0">
+                                <!-- CASE 2: Fallback Flat List -->
+                                <th:block th:if="${(course.sections == null or course.sections.isEmpty()) and course.lessons != null and !course.lessons.isEmpty()}">
+                                    <div class="cd-acc-item" style="border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                        <div class="cd-acc-header open" data-acc-target="section-0">
                                         <span style="font-weight: 600;">
                                             <i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
                                             Nội dung khóa học
                                         </span>
-                                        <div style="display:flex;align-items:center;gap:12px;">
-                                            <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài học'"></span>
-                                            <i class="fas fa-chevron-down acc-chevron"></i>
-                                        </div>
-                                    </div>
-                                    <div class="cd-acc-body open" id="section-0">
-                                        <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
-                                             th:data-lesson-id="${lesson.id}"
-                                             th:data-video-url="${lesson.videoUrl}"
-                                             th:data-lesson-title="${lesson.title}"
-                                             th:classappend="${((isEnrolled or lStat.index == 0) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
-                                             onclick="if(this.classList.contains('playable')) playLesson(this)">
-                                            <div class="lesson-left">
-                                                <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
-                                                   th:style="${isEnrolled or lStat.index == 0} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
-                                                <span th:text="${lesson.title}">Lesson</span>
-                                                <span th:if="${!isEnrolled and lStat.index == 0}" class="preview-badge">Dùng thử</span>
-                                            </div>
                                             <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài học'"></span>
+                                                <i class="fas fa-chevron-down acc-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="cd-acc-body open" id="section-0">
+                                            <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
+                                                 th:data-lesson-id="${lesson.id}"
+                                                 th:data-video-url="${lesson.videoUrl}"
+                                                 th:data-lesson-title="${lesson.title}"
+                                                 th:classappend="${((isEnrolled or lStat.index == 0) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
+                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
+                                                <div class="lesson-left">
+                                                    <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
+                                                       th:style="${isEnrolled or lStat.index == 0} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
+                                                    <span th:text="${lesson.title}">Lesson</span>
+                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="preview-badge">Dùng thử</span>
+                                                </div>
+                                                <div style="display:flex;align-items:center;gap:12px;">
                                                 <span class="lesson-duration">
                                                     <i class="far fa-clock"></i>
                                                     <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
                                                 </span>
-                                                <div th:if="${isEnrolled}" class="lesson-status-box" 
-                                                     th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
-                                                    <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
-                                                </div>
-                                                <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
+                                                    <div th:if="${isEnrolled}" class="lesson-status-box"
+                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                    </div>
+                                                    <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
                                                     <i class="fas fa-lock"></i>
                                                 </span>
-                                                <span th:if="${!isEnrolled and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                </th:block>
+                                <!-- CASE 3: No content yet -->
+                                <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}"
+                                     style="text-align:center; padding: 40px 0; color: #9ca3af;">
+                                    <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                                    <p>Chưa có bài học nào. Hãy quay lại sau!</p>
                                 </div>
-                            </th:block>
-                            <!-- CASE 3: No content yet -->
-                            <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}" 
-                                 style="text-align:center; padding: 40px 0; color: #9ca3af;">
-                                <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
-                                <p>Chưa có bài học nào. Hãy quay lại sau!</p>
-                            </div>
-                        </div> <!-- End .cd-accordion -->
-                    </div> <!-- End th:fragment="curriculum-fragment" -->
-                </th:block>
+                            </div> <!-- End .cd-accordion -->
+                        </div> <!-- End th:fragment="curriculum-fragment" -->
+                    </th:block>
 
                     <!-- TAB: REVIEWS -->
                     <div id="tab-reviews" class="cd-tab-content">
@@ -348,9 +348,9 @@
                                     </div>
                                     <div class="avg-rating-label">Xếp hạng khóa học</div>
                                 </div>
-                                
+
                                 <div class="rating-bars">
-                                    <div th:each="i : ${#numbers.sequence(5, 1)}" class="rating-bar-item" 
+                                    <div th:each="i : ${#numbers.sequence(5, 1)}" class="rating-bar-item"
                                          th:with="count=${starDistribution.get(i)}, percent=${totalReviews > 0 ? (count * 100 / totalReviews) : 0}">
                                         <div class="rating-bar-bg">
                                             <div class="rating-bar-fill" th:style="'width: ' + ${percent} + '%'"></div>
@@ -394,19 +394,19 @@
                                             </th:block>
                                         </div>
                                         <div class="review-text-premium" th:text="${review.comment}">Nhận xét...</div>
-                                        
+
                                         <div class="review-actions-premium">
                                             <span class="helpful-text">Đánh giá này có hữu ích không?</span>
                                             <div class="helpful-action-wrap">
-                                                <button type="button" class="helpful-btn" 
-                                                        th:classappend="${userHelpfulStates.get(review.id) ? 'active' : ''}" 
+                                                <button type="button" class="helpful-btn"
+                                                        th:classappend="${userHelpfulStates.get(review.id) ? 'active' : ''}"
                                                         th:onclick="'toggleHelpful(' + ${course.id} + ', ' + ${review.id} + ', this)'"
                                                         sec:authorize="isAuthenticated()">
                                                     <i class="far fa-thumbs-up" th:if="${!userHelpfulStates.get(review.id)}"></i>
                                                     <i class="fas fa-thumbs-up" th:if="${userHelpfulStates.get(review.id)}"></i>
                                                     <span class="helpful-count" th:text="${helpfulCounts.get(review.id)}">0</span>
                                                 </button>
-                                                <button type="button" class="helpful-btn" onclick="window.location.href='/auth/login'" 
+                                                <button type="button" class="helpful-btn" onclick="window.location.href='/auth/login'"
                                                         sec:authorize="isAnonymous()">
                                                     <i class="far fa-thumbs-up"></i>
                                                     <span th:text="${helpfulCounts.get(review.id)}">0</span>
@@ -441,7 +441,7 @@
                                     <i class="fas fa-check-circle mr-2"></i> <span th:text="${reviewSuccess}"></span>
                                 </div>
                             </div>
-                            
+
                             <!-- Review Form -->
                             <div sec:authorize="isAuthenticated()" th:if="${isEnrolled}" class="review-form-section">
                                 <h4 style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px;">
@@ -490,7 +490,7 @@
 
                         <div th:if="${course.resources != null and !course.resources.isEmpty()}" class="resources-grid">
                             <div th:each="resource : ${course.resources}" class="resource-premium-card">
-                                <div class="resource-icon-box" 
+                                <div class="resource-icon-box"
                                      th:classappend="${resource.fileType == 'PDF' ? 'pdf' : 
                                                       (resource.fileType == 'ZIP' ? 'zip' : 
                                                       (resource.fileType == 'CODE' ? 'code' : 'link'))}">
@@ -508,7 +508,7 @@
                                 </div>
                                 <div class="resource-action">
                                     <a th:href="${resource.url}" target="_blank" class="download-btn-premium" th:title="${resource.external ? 'Mở liên kết ngoài' : 'Tải file từ server'}">
-                                        <i th:class="${resource.external ? 'fas fa-external-link-alt' : 'fas fa-download'}"></i> 
+                                        <i th:class="${resource.external ? 'fas fa-external-link-alt' : 'fas fa-download'}"></i>
                                         <span th:text="${resource.external ? 'Mở Link' : 'Tải về'}">Tải về</span>
                                     </a>
                                 </div>
@@ -525,7 +525,7 @@
 
             <!-- ===== RIGHT SIDEBAR (Marketing Only) ===== -->
             <div class="cd-sidebar" th:if="${!isEnrolled}">
-                
+
                 <!-- PRICE CARD -->
                 <div class="price-card">
                     <div class="price-card-body">
@@ -552,7 +552,7 @@
 
                         <!-- Wishlist Toggle -->
                         <div class="wishlist-btn-wrap">
-                            <button th:id="'wishlistBtn-' + ${course.id}" class="btn-wishlist" th:classappend="${isWishlisted} ? 'active' : ''" 
+                            <button th:id="'wishlistBtn-' + ${course.id}" class="btn-wishlist" th:classappend="${isWishlisted} ? 'active' : ''"
                                     th:data-course-id="${course.id}"
                                     onclick="handleWishlistClick(this, event)">
                                 <i th:class="${isWishlisted} ? 'fas fa-heart' : 'far fa-heart'"></i>
@@ -633,7 +633,7 @@
     <div class="modal-content" style="background:#fff; padding:30px; border-radius:12px; max-width:450px; width:90%; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
         <h3 style="margin-top:0; font-size:18px; font-weight:700; color:#1e293b;">Báo cáo vi phạm</h3>
         <p style="font-size:14px; color:#64748b; margin-bottom:20px;">Vui lòng chọn lý do bạn muốn báo cáo nhận xét này:</p>
-        
+
         <form id="reportForm" method="post" onsubmit="return handleReportSubmit(event)">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <div class="form-group mb-3">
@@ -665,7 +665,7 @@
             <h5><i class="fas fa-brain" style="color:#6d28d9; margin-right:8px;"></i> Focus Studio</h5>
             <i class="fas fa-times close-player" onclick="toggleMusicPlayer()"></i>
         </div>
-        
+
         <div class="music-channels">
             <div class="channel-item" onclick="switchMusicChannel('lofi', 'jfKfPfyJRdk')">
                 <div class="channel-icon"><i class="fas fa-coffee"></i></div>
@@ -679,7 +679,7 @@
                     <div class="wave-bar"></div>
                 </div>
             </div>
-            
+
             <div class="channel-item" onclick="switchMusicChannel('piano', 'lTRiuFIWV54')">
                 <div class="channel-icon"><i class="fas fa-music"></i></div>
                 <div class="channel-info">
@@ -692,7 +692,7 @@
                     <div class="wave-bar"></div>
                 </div>
             </div>
-            
+
             <div class="channel-item" onclick="switchMusicChannel('nature', 'mPZkdNFkNps')">
                 <div class="channel-icon"><i class="fas fa-leaf"></i></div>
                 <div class="channel-info">
@@ -706,16 +706,16 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="player-controls">
             <i class="fas fa-volume-down"></i>
             <input type="range" class="volume-slider" min="0" max="100" value="80" oninput="changeVolume(this.value)">
             <i class="fas fa-volume-up"></i>
         </div>
-        
+
         <div id="musicIframeContainer" style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;"></div>
     </div>
-    
+
     <div class="music-bubble" id="musicBubble" onclick="toggleMusicPlayer()" title="Âm nhạc tập trung">
         <i class="fas fa-headphones-alt"></i>
     </div>

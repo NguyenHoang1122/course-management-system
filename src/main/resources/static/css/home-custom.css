@@ -6,14 +6,44 @@ body, html {
     scroll-behavior: smooth;
 }
 
+/* --- HERO SECTION --- */
 .custom-hero {
     position: relative;
-    background: linear-gradient(135deg, rgba(162, 87, 216, 0.65), rgba(40, 54, 117, 0.7)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-    background-attachment: fixed; /* Parallax effect for a more professional feel */
+    /* Đổi từ tông tím sang tông xanh nước biển đậm phối hợp */
+    background: linear-gradient(135deg, rgba(20, 38, 85, 0.8), rgba(40, 54, 117, 0.75)),
+    url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    background-attachment: fixed;
     padding: 240px 0 220px;
     text-align: center;
     color: white;
     z-index: 1;
+    overflow: hidden;
+}
+.snowflake-overlay {
+    position: absolute; /* Chuyển về absolute để chỉ nằm trong Hero nếu muốn, hoặc giữ fixed tùy bạn */
+    top: 0; left: 0; right: 0;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 5;
+}
+/* Chỉnh màu chữ trắng thuần khiết để nổi bật trên nền xanh */
+.hero-title {
+    font-size: 60px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.hero-subtitle {
+    font-size: 18px;
+    opacity: 0.95;
+    margin-bottom: 40px;
+    color: #ffffff !important;
 }
 
 .wavy-bottom {
@@ -33,6 +63,7 @@ body, html {
     height: 180px; /* Increased height for a deeper, softer curve */
 }
 
+/* --- CÁC BOX CATEGORIES --- */
 .glassy-categories {
     display: flex;
     justify-content: center;
@@ -42,76 +73,56 @@ body, html {
 }
 
 .glassy-box {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     padding: 18px 35px;
-    color: rgba(255, 255, 255, 0.95);
+    color: #ffffff;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .glassy-box:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
 }
 
+/* --- NÚT BẤM HERO --- */
 .hero-btn {
-    background: linear-gradient(45deg, #FE79A2, #ff9eb5);
-    color: white;
-    padding: 20px 55px;
-    border-radius: 100px;
-    text-decoration: none;
-    font-weight: 800;
     display: inline-block;
-    margin-top: 40px;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    box-shadow: 0 15px 35px rgba(254, 121, 162, 0.45);
+    padding: 15px 35px;
     font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-btn:hover, .hero-btn:active {
-    background: transparent !important;
-    color: white !important;
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
+    font-weight: 600;
+    color: #ffffff !important;
+    background-color: transparent !important; /* Trong suốt mặc định */
+    border: 2px solid #ffffff;
+    border-radius: 50px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
 }
 
+.hero-btn:hover {
+    /* Hiệu ứng phóng to (zoom) giữ nguyên như cũ nhưng nền vẫn trong suốt hoặc mờ nhẹ */
+    transform: scale(1.1) translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    color: #ffffff !important;
+    border-color: #ffffff;
+    text-decoration: none;
+}
+
+/* --- SCROLL DOWN BTN --- */
 .scroll-down-btn {
     position: absolute;
-    bottom: 20px; /* Adjusted for the deeper curve */
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 60px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FE79A2;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    animation: bounce 2s infinite;
+    color: white;
     z-index: 10;
-    font-size: 22px;
-    text-decoration: none;
-    transition: all 0.3s ease;
+    animation: bounce 2s infinite;
 }
 
 .scroll-down-btn:hover {
@@ -121,9 +132,9 @@ body, html {
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
-    40% { transform: translateY(-15px) translateX(-50%); }
-    60% { transform: translateY(-7px) translateX(-50%); }
+    0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+    40% {transform: translateX(-50%) translateY(-10px);}
+    60% {transform: translateX(-50%) translateY(-5px);}
 }
 
 .section-title {

@@ -76,7 +76,7 @@ function handleReviewFilter(event) {
     if (!form) return;
     const formData = new FormData(form);
     const params = new URLSearchParams(formData);
-    
+
     loadReviewsFragment(params.toString());
     return false;
 }
@@ -93,26 +93,26 @@ function loadReviewsFragment(queryString) {
     const appContainer = document.getElementById('courseDetailApp');
     const courseId = appContainer ? appContainer.getAttribute('data-course-id') : 0;
     const container = document.getElementById('reviews-list-container');
-    
+
     if (!container) return;
-    
+
     container.style.opacity = '0.5';
     container.style.pointerEvents = 'none';
 
     fetch(`/courses/${courseId}?${queryString}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(response => response.text())
-    .then(html => {
-        container.innerHTML = html;
-        container.style.opacity = '1';
-        container.style.pointerEvents = 'auto';
-    })
-    .catch(err => {
-        console.error('Error loading reviews:', err);
-        container.style.opacity = '1';
-        container.style.pointerEvents = 'auto';
-    });
+        .then(response => response.text())
+        .then(html => {
+            container.innerHTML = html;
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+        })
+        .catch(err => {
+            console.error('Error loading reviews:', err);
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+        });
 }
 
 function toggleHelpful(courseId, reviewId, btn) {
@@ -125,32 +125,32 @@ function toggleHelpful(courseId, reviewId, btn) {
         method: 'POST',
         headers: headers
     })
-    .then(response => {
-        if (response.status === 401) { window.location.href = '/auth/login'; return; }
-        return response.json();
-    })
-    .then(data => {
-        if (data) {
-            const countSpan = btn.querySelector('.helpful-count');
-            const icon = btn.querySelector('i');
-            countSpan.textContent = data.helpfulCount;
-            if (data.isHelpful) {
-                btn.classList.add('active');
-                icon.className = 'fas fa-thumbs-up';
-            } else {
-                btn.classList.remove('active');
-                icon.className = 'far fa-thumbs-up';
+        .then(response => {
+            if (response.status === 401) { window.location.href = '/auth/login'; return; }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                const countSpan = btn.querySelector('.helpful-count');
+                const icon = btn.querySelector('i');
+                countSpan.textContent = data.helpfulCount;
+                if (data.isHelpful) {
+                    btn.classList.add('active');
+                    icon.className = 'fas fa-thumbs-up';
+                } else {
+                    btn.classList.remove('active');
+                    icon.className = 'far fa-thumbs-up';
+                }
             }
-        }
-    })
-    .catch(err => console.error('Error toggling helpful:', err));
+        })
+        .catch(err => console.error('Error toggling helpful:', err));
 }
 
 function handleReviewSubmit(event) {
     event.preventDefault();
     const form = document.getElementById('reviewSubmitForm');
     const formData = new FormData(form);
-    
+
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
     const headers = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -166,21 +166,21 @@ function handleReviewSubmit(event) {
         headers: headers,
         body: formData
     })
-    .then(response => {
-        if (response.ok) {
-            handleReviewFilter();
-            const statusMsg = document.getElementById('review-status-msg');
-            if (statusMsg) {
-                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Đánh giá của bạn đã được ghi lại thành công!</div>';
+        .then(response => {
+            if (response.ok) {
+                handleReviewFilter();
+                const statusMsg = document.getElementById('review-status-msg');
+                if (statusMsg) {
+                    statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Đánh giá của bạn đã được ghi lại thành công!</div>';
+                }
+            } else {
+                alert('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.');
             }
-        } else {
-            alert('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.');
-        }
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    });
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
 
     return false;
 }
@@ -189,7 +189,7 @@ function handleReportSubmit(event) {
     event.preventDefault();
     const form = document.getElementById('reportForm');
     const formData = new FormData(form);
-    
+
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
     const headers = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -200,18 +200,18 @@ function handleReportSubmit(event) {
         headers: headers,
         body: formData
     })
-    .then(response => {
-        if (response.ok) {
-            closeReportModal();
-            const statusMsg = document.getElementById('review-status-msg');
-            if (statusMsg) {
-                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Báo cáo đã được gửi. Cảm ơn bạn!</div>';
+        .then(response => {
+            if (response.ok) {
+                closeReportModal();
+                const statusMsg = document.getElementById('review-status-msg');
+                if (statusMsg) {
+                    statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Báo cáo đã được gửi. Cảm ơn bạn!</div>';
+                }
+            } else {
+                alert('Có lỗi xảy ra khi gửi báo cáo.');
             }
-        } else {
-            alert('Có lỗi xảy ra khi gửi báo cáo.');
-        }
-    })
-    .catch(err => console.error('Error reporting review:', err));
+        })
+        .catch(err => console.error('Error reporting review:', err));
 
     return false;
 }
@@ -268,20 +268,20 @@ function updateSidebarProgress() {
     // Check for either sidebar card or dashboard card
     const card = document.getElementById('dashboardProgressCard') || document.getElementById('sidebarProgressCard');
     if (!card) return;
-    
+
     const total = parseInt(card.getAttribute('data-total-lessons') || 0);
     if (total === 0) return;
-    
+
     const completed = document.querySelectorAll('.cd-lesson-row.completed').length;
     const percent = Math.round((completed / total) * 100);
-    
+
     // Support both ID systems for backward compatibility
     const bar = document.getElementById('dashboardProgressBar') || document.getElementById('sidebarProgressBar');
     const countText = document.getElementById('dashboardProgressCount') || document.getElementById('sidebarProgressCount');
     const percentText = document.getElementById('dashboardProgressPercent') || document.getElementById('sidebarProgressPercent');
-    
+
     if (bar) bar.style.width = percent + '%';
-    
+
     if (countText) {
         if (countText.id === 'dashboardProgressCount') {
             countText.textContent = completed + '/' + total;
@@ -289,7 +289,7 @@ function updateSidebarProgress() {
             countText.textContent = completed + '/' + total + ' bài học';
         }
     }
-    
+
     if (percentText) percentText.textContent = percent + '%';
 
     // Resume button logic
@@ -301,7 +301,7 @@ function updateSidebarProgress() {
     if (nextLessonRow) {
         const nextId = nextLessonRow.getAttribute('data-lesson-id');
         const nextTitle = nextLessonRow.getAttribute('data-lesson-title');
-        
+
         if (resumeBtn) {
             resumeBtn.setAttribute('onclick', `playLessonById(${nextId})`);
             const btnText = resumeBtn.querySelector('span');
@@ -317,7 +317,7 @@ function updateSidebarProgress() {
     } else {
         if (resumeBtn) resumeBtn.style.display = 'none';
         if (nextHint) nextHint.style.display = 'none';
-        
+
         if (!document.getElementById('completionMessage')) {
             const msg = document.createElement('div');
             msg.id = 'completionMessage';
@@ -329,14 +329,14 @@ function updateSidebarProgress() {
 }
 
 function playCoursePreview(element) {
-    currentActiveLessonId = null; 
+    currentActiveLessonId = null;
     const videoUrl = element.getAttribute('data-video-url');
     if (!videoUrl) return;
-    
+
     // Update display title
     const currentTitle = document.getElementById('currentLessonTitle');
     if (currentTitle) currentTitle.textContent = 'Video giới thiệu';
-    
+
     document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
     renderVideoPlayer(videoUrl);
 }
@@ -345,13 +345,13 @@ function playLesson(element) {
     currentActiveLessonId = element.getAttribute('data-lesson-id');
     const videoUrl = element.getAttribute('data-video-url');
     if (!videoUrl) return;
-    
+
     // Update display title
     const currentTitle = document.getElementById('currentLessonTitle');
     if (currentTitle) {
         currentTitle.textContent = element.getAttribute('data-lesson-title');
     }
-    
+
     document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
     element.classList.add('active-lesson');
     renderVideoPlayer(videoUrl);
@@ -381,25 +381,25 @@ function toggleLessonStatus(lessonId, element) {
         method: 'POST',
         headers: headers
     })
-    .then(response => {
-        if (response.status === 401) { window.location.href = '/auth/login'; return; }
-        return response.text();
-    })
-    .then(status => {
-        const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
-        if (!row) return;
-        
-        const icon = row.querySelector('.status-icon');
-        if (status === 'COMPLETED') {
-            row.classList.add('completed');
-            if (icon) icon.className = 'fas fa-check-circle status-icon';
-        } else if (status === 'REMOVED') {
-            row.classList.remove('completed');
-            if (icon) icon.className = 'far fa-circle status-icon';
-        }
-        updateSidebarProgress();
-    })
-    .catch(err => console.error('Error toggling progress:', err));
+        .then(response => {
+            if (response.status === 401) { window.location.href = '/auth/login'; return; }
+            return response.text();
+        })
+        .then(status => {
+            const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
+            if (!row) return;
+
+            const icon = row.querySelector('.status-icon');
+            if (status === 'COMPLETED') {
+                row.classList.add('completed');
+                if (icon) icon.className = 'fas fa-check-circle status-icon';
+            } else if (status === 'REMOVED') {
+                row.classList.remove('completed');
+                if (icon) icon.className = 'far fa-circle status-icon';
+            }
+            updateSidebarProgress();
+        })
+        .catch(err => console.error('Error toggling progress:', err));
 }
 
 function handleWishlistClick(element, event) {
@@ -414,12 +414,12 @@ function renderVideoPlayer(url) {
     const placeholder = document.getElementById('playerPlaceholder');
     if (!wrapper || !placeholder) return;
     wrapper.style.display = 'block';
-    
+
     const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/|vimeo\.com\/channels\/.+\/|vimeo\.com\/groups\/.+\/videos\/)(\d+)(?:[#?].*)?/;
     const ytMatch = url.match(youtubeRegex);
     const vimeoMatch = url.match(vimeoRegex);
-    
+
     placeholder.innerHTML = '<div id="ytPlayerContainer"></div>';
     ytPlayer = null;
 
@@ -487,10 +487,10 @@ function switchMusicChannel(channelId, videoId) {
 
     items.forEach(item => item.classList.remove('active'));
     if (clickedItem) clickedItem.classList.add('active');
-    
+
     activeMusicChannel = channelId;
     iframeContainer.innerHTML = '<div id="focusIframe"></div>';
-    
+
     if (typeof YT !== 'undefined' && YT.Player) {
         focusYtPlayer = new YT.Player('focusIframe', {
             height: '100', width: '100', videoId: videoId,
@@ -506,7 +506,7 @@ function switchMusicChannel(channelId, videoId) {
     } else {
         iframeContainer.innerHTML = `<iframe id="focusIframe" width="100" height="100" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>`;
     }
-    
+
     document.getElementById('musicBubble').innerHTML = '<i class="fas fa-volume-up"></i>';
 }
 
