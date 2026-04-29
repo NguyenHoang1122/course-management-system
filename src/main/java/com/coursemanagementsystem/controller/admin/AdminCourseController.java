@@ -14,7 +14,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,10 +29,10 @@ public class AdminCourseController {
     private UserService userService;
     @Autowired
     private LessonService lessonService;
-
+    @Autowired
+    private ReviewService reviewService;
     @Autowired
     private CourseSectionService courseSectionService;
-
     @Autowired
     private CourseResourceService courseResourceService;
 
@@ -59,12 +61,19 @@ public class AdminCourseController {
                 .mapToLong(course -> course.getLessons() != null ? course.getLessons().size() : 0)
                 .sum();
 
+        // Calculate average ratings
+        Map<Long, Double> averageRatings = new HashMap<>();
+        for (Course course : paginatedCourses) {
+            averageRatings.put(course.getId(), reviewService.getAverageRating(course.getId()));
+        }
+
         model.addAttribute("courses", paginatedCourses);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalItems", totalCourses);
         model.addAttribute("totalValue", totalValue);
         model.addAttribute("totalLessons", totalLessons);
+        model.addAttribute("averageRatings", averageRatings);
         model.addAttribute("size", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeMenu", "courses");
