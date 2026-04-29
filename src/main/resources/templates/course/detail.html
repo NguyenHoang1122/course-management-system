@@ -6,12 +6,12 @@
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
     <link rel="stylesheet" th:href="@{/css/pages/detail.css}">
 </head>
-<body>
+<body id="courseDetailApp" th:data-course-id="${course.id}" th:data-is-enrolled="${isEnrolled}">
 <!-- HEADER (solid on this page) -->
 <div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
-<!-- ===== HERO BANNER ===== -->
-<section class="course-detail-hero">
+<!-- ===== HERO BANNER (Hide if enrolled to focus on video) ===== -->
+<section class="course-detail-hero" th:if="${!isEnrolled}">
     <div class="container">
         <div class="hero-breadcrumb">
             <a th:href="@{/}">Home</a>
@@ -24,8 +24,33 @@
     </div>
 </section>
 
+<!-- ===== CINEMA MODE VIDEO (Enrolled Only) ===== -->
+<section th:if="${isEnrolled}" class="video-cinema-section">
+    <div class="video-cinema-container">
+        <!-- Minimal Breadcrumb for Enrolled -->
+        <div class="enrolled-breadcrumb">
+            <a th:href="@{/courses}">Khóa học</a>
+            <span>›</span>
+            <span th:text="${course.title}">Course</span>
+        </div>
+        <div class="video-cinema-wrap" id="mainPlayerContainer">
+            <img id="courseThumbnail" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
+                 alt="Course Preview">
+            
+            <!-- Video Placeholder -->
+            <div id="videoEmbedWrapper" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10;">
+                 <div id="playerPlaceholder" style="width:100%; height:100%;"></div>
+                 <button type="button" onclick="closePlayer()" style="position:absolute; top:15px; right:15px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index: 11;">
+                     <i class="fas fa-times"></i>
+                 </button>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
 <!-- ===== MAIN CONTENT ===== -->
-<div class="course-detail-page">
+<div class="course-detail-page" th:classappend="${isEnrolled} ? 'enrolled-view' : ''">
     <div class="container">
         <!-- Flash messages -->
         <div th:if="${enrolledSuccess}" class="alert alert-success mb-4" th:text="${enrolledSuccess}"></div>
@@ -36,8 +61,18 @@
             <!-- ===== LEFT COLUMN ===== -->
             <div class="course-detail-main">
 
-                <!-- Course Header Card -->
-                <div class="cd-card">
+                <!-- Course Title for Enrolled (Moved from dark section) -->
+                <div class="enrolled-course-header" th:if="${isEnrolled}">
+                    <h1 class="enrolled-title" th:text="${course.title}">Course Title</h1>
+                    <div class="enrolled-meta">
+                        <span><i class="fas fa-graduation-cap"></i> <span th:text="${#authentication.principal.fullName}">User</span></span>
+                        <span class="meta-dot"></span>
+                        <span class="now-playing-status"><i class="fas fa-play-circle"></i> Đang học: <span id="currentLessonTitle">--</span></span>
+                    </div>
+                </div>
+
+                <!-- Course Header Card (Hide if enrolled) -->
+                <div class="cd-card" th:if="${!isEnrolled}">
                     <div class="course-stars">
                         <th:block th:each="i : ${#numbers.sequence(1,5)}">
                             <i th:class="${i <= averageRating} ? 'fas fa-star' : (${i - averageRating < 1 and i - averageRating > 0} ? 'fas fa-star-half-alt' : 'far fa-star')"></i>
@@ -49,8 +84,8 @@
                     <h2 class="course-title-main" th:text="${course.title}">Course Title</h2>
                 </div>
 
-                <!-- Course Image / Video Preview -->
-                <div class="cd-card" style="padding: 0; overflow: hidden;">
+                <!-- Course Image / Video Preview (Guest View) -->
+                <div class="cd-card" style="padding: 0; overflow: hidden;" th:if="${!isEnrolled}">
                     <div class="course-media-wrap" id="mainPlayerContainer" style="position: relative;">
                         <img id="courseThumbnail" th:src="${course.imageUrl != null && !course.imageUrl.isEmpty() ? (course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop'}" 
                              alt="Course Preview">
@@ -77,12 +112,16 @@
                     </div>
                 </div>
 
-                <!-- TABS -->
+                <!-- TABS SYSTEM -->
                 <div class="cd-card">
-                    <div class="cd-tabs">
-                        <button class="cd-tab-btn active" data-tab="tab-info">Course Info</button>
+                    <div class="cd-tabs" th:classappend="${isEnrolled} ? 'minimal' : ''">
+                        <!-- Enrolled Default Tab -->
+                        <button th:if="${isEnrolled}" class="cd-tab-btn active" data-tab="tab-curriculum">Nội dung học tập</button>
+                        
+                        <button class="cd-tab-btn" th:classappend="${!isEnrolled} ? 'active' : ''" data-tab="tab-info">Thông tin chung</button>
+                        
                         <button class="cd-tab-btn" data-tab="tab-reviews">
-                            Reviews
+                            Đánh giá
                             <span style="background:#ede9fe;color:#6d28d9;padding:1px 8px;border-radius:20px;font-size:11px;margin-left:6px;"
                                   th:text="${reviews.size()}">0</span>
                         </button>
@@ -93,10 +132,31 @@
                         </button>
                     </div>
 
+                    <!-- TAB: CURRICULUM (Enrolled Only) -->
+                    <div id="tab-curriculum" class="cd-tab-content" th:classappend="${isEnrolled} ? 'active' : ''" th:if="${isEnrolled}">
+                        <!-- Real-time Progress -->
+                        <div class="curriculum-progress-box" id="dashboardProgressCard" 
+                             th:data-total-lessons="${totalLessons}">
+                            <div class="curriculum-progress-header">
+                                <h4>Tiến độ học tập</h4>
+                                <span id="dashboardProgressPercent" th:text="${progressPercentage} + '%'">0%</span>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-fill" id="dashboardProgressBar" th:style="'width: ' + ${progressPercentage} + '%'"></div>
+                            </div>
+                            <div style="font-size: 13px; color: #6a6f73; margin-top: 8px;">
+                                <i class="fas fa-check-circle"></i> Đã hoàn thành: <span id="dashboardProgressCount" th:text="${completedLessonIds.size()} + '/' + ${totalLessons}">0/0</span> bài học
+                            </div>
+                        </div>
+
+                        <!-- Curriculum Accordion (Moved here for enrolled) -->
+                        <div th:replace="~{::curriculum-fragment}"></div>
+                    </div>
+
                     <!-- TAB: COURSE INFO -->
-                    <div id="tab-info" class="cd-tab-content active">
+                    <div id="tab-info" class="cd-tab-content" th:classappend="${!isEnrolled} ? 'active' : ''">
                         <!-- About -->
-                        <h3 class="section-title-sm">About Course</h3>
+                        <h3 class="section-title-sm">Về khóa học</h3>
                         <div class="about-text">
                             <div class="about-text-clamp" id="aboutText"
                                  th:text="${course.description != null ? course.description : 'Chưa có mô tả cho khóa học này.'}"></div>
@@ -107,7 +167,7 @@
 
                         <!-- What You'll Learn -->
                         <div th:if="${course.learningPoints != null and !course.learningPoints.isEmpty()}" style="margin-top: 28px;">
-                            <h3 class="section-title-sm">What Will You Learn?</h3>
+                            <h3 class="section-title-sm">Bạn sẽ học được gì?</h3>
                             <div class="learn-grid">
                                 <div th:each="point : ${#strings.arraySplit(course.learningPoints, '|')}"
                                      class="learn-item">
@@ -116,122 +176,163 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Placeholder nếu chưa có learning points -->
-                        <div th:unless="${course.learningPoints != null and !course.learningPoints.isEmpty()}" style="margin-top: 28px;">
-                            <h3 class="section-title-sm">What Will You Learn?</h3>
-                            <div class="learn-grid">
-                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Nắm vững kiến thức nền tảng</span></div>
-                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Thực hành qua dự án thực tế</span></div>
-                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Xây dựng portfolio chuyên nghiệp</span></div>
-                                <div class="learn-item"><i class="fas fa-check-circle"></i><span>Tư duy giải quyết vấn đề</span></div>
-                            </div>
+                        
+                        <!-- Course Content (Only show here for guests) -->
+                        <div th:if="${!isEnrolled}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm" style="margin-bottom: 12px;">Nội dung khóa học</h3>
+                            <div th:replace="~{::curriculum-fragment}"></div>
                         </div>
 
-                        <!-- Course Content (Hierarchical Sections) -->
-                        <div style="margin-top: 28px;">
-                            <h3 class="section-title-sm" style="margin-bottom: 12px;">Course Content</h3>
-                            
-                            <div class="cd-accordion">
-                                <!-- CASE 1: Hierarchical Sections -->
-                                <th:block th:if="${course.sections != null and !course.sections.isEmpty()}">
-                                    <div th:each="section, sStat : ${course.sections}" class="cd-acc-item" style="margin-bottom: 10px; border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
-                                        <div class="cd-acc-header" th:classappend="${sStat.index == 0} ? 'open' : ''" th:attr="data-acc-target='section-' + ${section.id}">
-                                            <span style="font-weight: 600;">
-                                                <i class="fas fa-folder-open" style="margin-right:8px;color:#6d28d9;"></i>
-                                                <span th:text="${section.title}">Section Title</span>
-                                            </span>
-                                            <div style="display:flex;align-items:center;gap:12px;">
-                                                <span class="acc-section-meta" th:text="${section.lessons.size()} + ' bài học'"></span>
-                                                <i class="fas fa-chevron-down acc-chevron"></i>
-                                            </div>
-                                        </div>
-                                        <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
-                                            <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row" 
-                                                 th:data-lesson-id="${lesson.id}"
-                                                 th:data-video-url="${lesson.videoUrl}"
-                                                 th:data-lesson-title="${lesson.title}"
-                                                 th:classappend="${((isEnrolled or (sStat.index == 0 and lStat.index == 0)) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
-                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
-                                                <div class="lesson-left">
-                                                    <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'" 
-                                                       th:style="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
-                                                    <span th:text="${lesson.title}">Lesson</span>
-                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="preview-badge">Dùng thử</span>
-                                                </div>
-                                                <div style="display:flex;align-items:center;gap:12px;">
-                                                    <span class="lesson-duration">
-                                                        <i class="far fa-clock"></i>
-                                                        <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
-                                                    </span>
-                                                    <div th:if="${isEnrolled}" class="lesson-status-box" 
-                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
-                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
-                                                    </div>
-                                                    <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
-                                                        <i class="fas fa-lock"></i>
-                                                    </span>
-                                                    <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </th:block>
-
-                                <!-- CASE 2: Fallback Flat List (no sections) -->
-                                <th:block th:if="${(course.sections == null or course.sections.isEmpty()) and course.lessons != null and !course.lessons.isEmpty()}">
-                                    <div class="cd-acc-item" style="border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
-                                        <div class="cd-acc-header open" data-acc-target="section-0">
-                                            <span style="font-weight: 600;">
-                                                <i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
-                                                Nội dung khóa học
-                                            </span>
-                                            <div style="display:flex;align-items:center;gap:12px;">
-                                                <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài học'"></span>
-                                                <i class="fas fa-chevron-down acc-chevron"></i>
-                                            </div>
-                                        </div>
-                                        <div class="cd-acc-body open" id="section-0">
-                                            <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
-                                                 th:data-lesson-id="${lesson.id}"
-                                                 th:data-video-url="${lesson.videoUrl}"
-                                                 th:data-lesson-title="${lesson.title}"
-                                                 th:classappend="${((isEnrolled or lStat.index == 0) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
-                                                 onclick="if(this.classList.contains('playable')) playLesson(this)">
-                                                <div class="lesson-left">
-                                                    <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
-                                                       th:style="${isEnrolled or lStat.index == 0} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
-                                                    <span th:text="${lesson.title}">Lesson</span>
-                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="preview-badge">Dùng thử</span>
-                                                </div>
-                                                <div style="display:flex;align-items:center;gap:12px;">
-                                                    <span class="lesson-duration">
-                                                        <i class="far fa-clock"></i>
-                                                        <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
-                                                    </span>
-                                                    <div th:if="${isEnrolled}" class="lesson-status-box" 
-                                                         th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
-                                                        <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
-                                                    </div>
-                                                    <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
-                                                        <i class="fas fa-lock"></i>
-                                                    </span>
-                                                    <span th:if="${!isEnrolled and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </th:block>
-
-                                <!-- CASE 3: No content yet -->
-                                <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}" 
-                                     style="text-align:center; padding: 40px 0; color: #9ca3af;">
-                                    <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
-                                    <p>Chưa có bài học nào. Hãy quay lại sau!</p>
+                        <!-- Requirements (Always show in Info tab) -->
+                        <div th:if="${course.requirements != null and !course.requirements.isEmpty()}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm">Yêu cầu</h3>
+                            <div class="learn-grid">
+                                <div th:each="req : ${#strings.arraySplit(course.requirements, '|')}" class="learn-item">
+                                    <i class="fas fa-check"></i>
+                                    <span th:text="${req.trim()}"></span>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Target Audience (Always show in Info tab) -->
+                        <div th:if="${course.targetAudience != null and !course.targetAudience.isEmpty()}" style="margin-top: 28px;">
+                            <h3 class="section-title-sm">Đối tượng học viên</h3>
+                            <div class="learn-grid">
+                                <div th:each="aud : ${#strings.arraySplit(course.targetAudience, '|')}" class="learn-item">
+                                    <i class="fas fa-check"></i>
+                                    <span th:text="${aud.trim()}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructor Info (Always show in Info tab) -->
+                        <div th:if="${course.instructor != null}" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #f1f5f9;">
+                            <h3 class="section-title-sm">Giảng viên</h3>
+                            <div class="instructor-tab-profile" style="display:flex; gap:20px; margin-top:16px;">
+                                <div class="instructor-avatar-big" style="width:80px; height:80px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#f1f5f9; display:flex; align-items:center; justify-content:center;">
+                                    <img th:if="${course.instructor.avatar != null and !course.instructor.avatar.isEmpty()}"
+                                         th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar
+                                                 : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
+                                         alt="Instructor" style="width:100%; height:100%; object-fit:cover;">
+                                    <span th:unless="${course.instructor.avatar != null and !course.instructor.avatar.isEmpty()}"
+                                          th:text="${#strings.substring(course.instructor.fullName, 0, 1).toUpperCase()}"
+                                          style="font-size:32px; font-weight:700; color:#6d28d9;">I</span>
+                                </div>
+                                <div class="instructor-tab-meta">
+                                    <h4 th:text="${course.instructor.fullName}">Instructor</h4>
+                                    <p>Chuyên gia đào tạo tại Antigravity</p>
+                                    <div class="instructor-tab-stats">
+                                        <span><i class="fas fa-star"></i> 4.8 Rating</span>
+                                        <span><i class="fas fa-users"></i> 1,200+ Học viên</span>
+                                        <span><i class="fas fa-play-circle"></i> 12 Khóa học</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Define Curriculum Fragment (Hidden definition to avoid double rendering) -->
+                    <th:block th:if="false">
+                        <div th:fragment="curriculum-fragment">
+                        <div class="cd-accordion">
+                            <!-- CASE 1: Hierarchical Sections -->
+                            <th:block th:if="${course.sections != null and !course.sections.isEmpty()}">
+                                <div th:each="section, sStat : ${course.sections}" class="cd-acc-item" style="margin-bottom: 10px; border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                    <div class="cd-acc-header" th:classappend="${sStat.index == 0} ? 'open' : ''" th:attr="data-acc-target='section-' + ${section.id}">
+                                        <span style="font-weight: 600;">
+                                            <i class="fas fa-folder-open" style="margin-right:8px;color:#6d28d9;"></i>
+                                            <span th:text="${section.title}">Section Title</span>
+                                        </span>
+                                        <div style="display:flex;align-items:center;gap:12px;">
+                                            <span class="acc-section-meta" th:text="${section.lessons.size()} + ' bài học'"></span>
+                                            <i class="fas fa-chevron-down acc-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="cd-acc-body" th:classappend="${sStat.index == 0} ? 'open' : ''" th:id="'section-' + ${section.id}">
+                                        <div th:each="lesson, lStat : ${section.lessons}" class="cd-lesson-row" 
+                                             th:data-lesson-id="${lesson.id}"
+                                             th:data-video-url="${lesson.videoUrl}"
+                                             th:data-lesson-title="${lesson.title}"
+                                             th:classappend="${((isEnrolled or (sStat.index == 0 and lStat.index == 0)) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
+                                             onclick="if(this.classList.contains('playable')) playLesson(this)">
+                                            <div class="lesson-left">
+                                                <i th:class="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'fas fa-play-circle' : 'fas fa-lock'" 
+                                                   th:style="${isEnrolled or (sStat.index == 0 and lStat.index == 0)} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
+                                                <span th:text="${lesson.title}">Lesson</span>
+                                                <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="preview-badge">Dùng thử</span>
+                                            </div>
+                                            <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="lesson-duration">
+                                                    <i class="far fa-clock"></i>
+                                                    <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
+                                                </span>
+                                                <div th:if="${isEnrolled}" class="lesson-status-box" 
+                                                     th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                    <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                </div>
+                                                <span th:unless="${isEnrolled or (sStat.index == 0 and lStat.index == 0)}" class="lesson-locked">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                                <span th:if="${!isEnrolled and sStat.index == 0 and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+
+                            <!-- CASE 2: Fallback Flat List -->
+                            <th:block th:if="${(course.sections == null or course.sections.isEmpty()) and course.lessons != null and !course.lessons.isEmpty()}">
+                                <div class="cd-acc-item" style="border: 1px solid #f3f4f6; border-radius: 10px; overflow: hidden;">
+                                    <div class="cd-acc-header open" data-acc-target="section-0">
+                                        <span style="font-weight: 600;">
+                                            <i class="fas fa-layer-group" style="margin-right:8px;color:#6d28d9;"></i>
+                                            Nội dung khóa học
+                                        </span>
+                                        <div style="display:flex;align-items:center;gap:12px;">
+                                            <span class="acc-section-meta" th:text="${course.lessons.size()} + ' bài học'"></span>
+                                            <i class="fas fa-chevron-down acc-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="cd-acc-body open" id="section-0">
+                                        <div th:each="lesson, lStat : ${course.lessons}" class="cd-lesson-row"
+                                             th:data-lesson-id="${lesson.id}"
+                                             th:data-video-url="${lesson.videoUrl}"
+                                             th:data-lesson-title="${lesson.title}"
+                                             th:classappend="${((isEnrolled or lStat.index == 0) ? 'playable' : 'locked') + (completedLessonIds.contains(lesson.id) ? ' completed' : '')}"
+                                             onclick="if(this.classList.contains('playable')) playLesson(this)">
+                                            <div class="lesson-left">
+                                                <i th:class="${isEnrolled or lStat.index == 0} ? 'fas fa-play-circle' : 'fas fa-lock'"
+                                                   th:style="${isEnrolled or lStat.index == 0} ? 'color: #6d28d9;' : 'color: #94a3b8;'"></i>
+                                                <span th:text="${lesson.title}">Lesson</span>
+                                                <span th:if="${!isEnrolled and lStat.index == 0}" class="preview-badge">Dùng thử</span>
+                                            </div>
+                                            <div style="display:flex;align-items:center;gap:12px;">
+                                                <span class="lesson-duration">
+                                                    <i class="far fa-clock"></i>
+                                                    <span th:text="${lesson.duration != null and !lesson.duration.isEmpty() ? lesson.duration : 'Chưa rõ'}">0:00</span>
+                                                </span>
+                                                <div th:if="${isEnrolled}" class="lesson-status-box" 
+                                                     th:onclick="'event.stopPropagation(); toggleLessonStatus(' + ${lesson.id} + ', this)'">
+                                                    <i th:class="${completedLessonIds.contains(lesson.id)} ? 'fas fa-check-circle status-icon' : 'far fa-circle status-icon'"></i>
+                                                </div>
+                                                <span th:unless="${isEnrolled or lStat.index == 0}" class="lesson-locked">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                                <span th:if="${!isEnrolled and lStat.index == 0}" class="lesson-preview-btn">Xem thử</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                            <!-- CASE 3: No content yet -->
+                            <div th:if="${(course.sections == null or course.sections.isEmpty()) and (course.lessons == null or course.lessons.isEmpty())}" 
+                                 style="text-align:center; padding: 40px 0; color: #9ca3af;">
+                                <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                                <p>Chưa có bài học nào. Hãy quay lại sau!</p>
+                            </div>
+                        </div> <!-- End .cd-accordion -->
+                    </div> <!-- End th:fragment="curriculum-fragment" -->
+                </th:block>
 
                     <!-- TAB: REVIEWS -->
                     <div id="tab-reviews" class="cd-tab-content">
@@ -370,13 +471,13 @@
                                         <span th:text="${userReview != null ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}"></span>
                                     </button>
                                 </form>
-                            </div>
-                        </div>
+                            </div> <!-- End .review-form-section -->
+                        </div> <!-- End #reviews-list-container -->
 
                         <div sec:authorize="isAnonymous()" style="margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;text-align:center;font-size:14px;color:#6b7280;">
                             <a th:href="@{/auth/login}" style="color:#6d28d9;font-weight:600;">Đăng nhập</a> để viết đánh giá khóa học.
                         </div>
-                    </div>
+                    </div> <!-- End #tab-reviews -->
 
                     <!-- TAB: RESOURCES -->
                     <div id="tab-resources" class="cd-tab-content">
@@ -422,11 +523,11 @@
                 </div>
             </div>
 
-            <!-- ===== RIGHT SIDEBAR ===== -->
-            <div class="cd-sidebar">
+            <!-- ===== RIGHT SIDEBAR (Marketing Only) ===== -->
+            <div class="cd-sidebar" th:if="${!isEnrolled}">
                 
-                <!-- CASE 1: NOT ENROLLED (Marketing Card) -->
-                <div th:if="${!isEnrolled}" class="price-card">
+                <!-- PRICE CARD -->
+                <div class="price-card">
                     <div class="price-card-body">
                         <div class="price-main">
                             <th:block th:if="${course.price != null and course.price > 0}"
@@ -485,62 +586,7 @@
                     </div>
                 </div>
 
-                <!-- CASE 2: ENROLLED (Learning Dashboard Card) -->
-                <div th:if="${isEnrolled}" class="progress-card" id="sidebarProgressCard" th:data-total-lessons="${totalLessons}">
-                    <div class="progress-card-body">
-                        <div class="progress-title">
-                            <i class="fas fa-chart-line" style="color:#10b981;"></i>
-                            Tiến độ học tập
-                        </div>
-                        
-                        <div class="progress-bar-wrapper">
-                            <div class="progress-bar-fill" id="sidebarProgressBar" th:style="'width: ' + ${progressPercentage} + '%'"></div>
-                        </div>
-                        
-                        <div class="progress-stats">
-                            <span id="sidebarProgressCount" th:text="${completedLessonIds.size()} + '/' + ${totalLessons} + ' bài học'">0/0 bài học</span>
-                            <span id="sidebarProgressPercent" th:text="${progressPercentage} + '%'">0%</span>
-                        </div>
-                        
-                        <!-- Resume Button -->
-                        <div th:if="${nextLessonId != null}">
-                            <button class="btn-resume" 
-                                    th:onclick="'playLessonById(' + ${nextLessonId} + ')'">
-                                <i class="fas fa-play-circle"></i>
-                                <span th:text="${progressPercentage == 0 ? 'Bắt đầu học' : 'Học tiếp'}">Tiếp tục học</span>
-                            </button>
-                            <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 10px; font-style: italic;"
-                               th:text="'Bài kế tiếp: ' + ${nextLessonTitle}">Bài kế tiếp: ...</p>
-                        </div>
-                        
-                        <div th:if="${nextLessonId == null and totalLessons > 0}">
-                             <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:8px; text-align:center; font-size:13px; font-weight:600;">
-                                 <i class="fas fa-check-circle"></i> Bạn đã hoàn thành khóa học!
-                             </div>
-                        </div>
-
-                        <!-- Meta Info (Enrolled - Focused) -->
-                        <div class="course-meta-list" style="margin-top: 24px;">
-                            <div class="course-meta-item">
-                                <i class="far fa-clock"></i>
-                                <span>Thời lượng</span>
-                                <strong th:text="${displayDuration}">--</strong>
-                            </div>
-                            <div class="course-meta-item">
-                                <i class="fas fa-list-ul"></i>
-                                <span>Bài học</span>
-                                <strong th:text="${totalLessons}">0</strong>
-                            </div>
-                            <div class="course-meta-item">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Cập nhật</span>
-                                <strong th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'dd/MM/yyyy') : '--'}">--</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Instructor Card -->
+                <!-- Instructor Card (Guest) -->
                 <div class="instructor-card" th:if="${course.instructor != null}">
                     <h6>A COURSE BY</h6>
                     <div class="instructor-info">
@@ -559,7 +605,7 @@
                     </div>
                 </div>
 
-                <!-- Requirements Card -->
+                <!-- Requirements Card (Guest Only) -->
                 <div class="sidebar-list-card" th:if="${course.requirements != null and !course.requirements.isEmpty()}">
                     <h6>Requirements</h6>
                     <div th:each="req : ${#strings.arraySplit(course.requirements, '|')}" class="sidebar-list-item">
@@ -568,7 +614,7 @@
                     </div>
                 </div>
 
-                <!-- Target Audience Card -->
+                <!-- Target Audience Card (Guest Only) -->
                 <div class="sidebar-list-card" th:if="${course.targetAudience != null and !course.targetAudience.isEmpty()}">
                     <h6>Audience</h6>
                     <div th:each="aud : ${#strings.arraySplit(course.targetAudience, '|')}" class="sidebar-list-item">
@@ -576,10 +622,11 @@
                         <span th:text="${aud.trim()}"></span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+            </div> <!-- End .cd-sidebar -->
+        </div> <!-- End .course-detail-layout -->
+    </div> <!-- End .container -->
+</div> <!-- End .course-detail-page -->
+
 
 <!-- ===== REPORT REVIEW MODAL ===== -->
 <div id="reportReviewModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
@@ -609,521 +656,7 @@
 
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
-<script th:inline="javascript">
-/* Global toggleWishlist function is used since it's already defined in layout.html */
-
-    $(document).ready(function() {
-        // ===== TABS =====
-        $('.cd-tab-btn').on('click', function() {
-            var target = $(this).data('tab');
-            $('.cd-tab-btn').removeClass('active');
-            $(this).addClass('active');
-            $('.cd-tab-content').removeClass('active');
-            $('#' + target).addClass('active');
-        });
-
-        // ===== SHOW MORE =====
-        var showMoreBtn = document.getElementById('showMoreBtn');
-        var aboutText = document.getElementById('aboutText');
-
-        if (showMoreBtn && aboutText) {
-            showMoreBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (aboutText.classList.contains('expanded')) {
-                    aboutText.classList.remove('expanded');
-                    showMoreBtn.innerHTML = '<i class="fas fa-plus-circle"></i> SHOW MORE';
-                } else {
-                    aboutText.classList.add('expanded');
-                    showMoreBtn.innerHTML = '<i class="fas fa-minus-circle"></i> SHOW LESS';
-                }
-            });
-        }
-
-        // ===== ACCORDION =====
-        $(document).on('click', '.cd-acc-header', function() {
-            var target = $(this).data('acc-target');
-            var $body = $('#' + target);
-            if ($(this).hasClass('open')) {
-                $(this).removeClass('open');
-                $body.removeClass('open');
-            } else {
-                $(this).addClass('open');
-                $body.addClass('open');
-            }
-        });
-    });
-
-    // ===== AJAX REVIEWS LOGIC =====
-    let filterDebounceTimer;
-    function debounceFilter() {
-        clearTimeout(filterDebounceTimer);
-        filterDebounceTimer = setTimeout(() => {
-            handleReviewFilter();
-        }, 500);
-    }
-
-    function handleReviewFilter(event) {
-        if (event) event.preventDefault();
-        const form = document.getElementById('reviewFilterForm');
-        const formData = new FormData(form);
-        const params = new URLSearchParams(formData);
-        
-        loadReviewsFragment(params.toString());
-        return false;
-    }
-
-    function loadMoreReviews(newSize) {
-        document.getElementById('reviewSizeInput').value = newSize;
-        handleReviewFilter();
-    }
-
-    function loadReviewsFragment(queryString) {
-        const courseId = /*[[${course.id}]]*/ 0;
-        const container = document.getElementById('reviews-list-container');
-        
-        // Add loading state
-        container.style.opacity = '0.5';
-        container.style.pointerEvents = 'none';
-
-        fetch(`/courses/${courseId}?${queryString}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            container.innerHTML = html;
-            container.style.opacity = '1';
-            container.style.pointerEvents = 'auto';
-            // Scroll slightly if needed or maintain position
-        })
-        .catch(err => {
-            console.error('Error loading reviews:', err);
-            container.style.opacity = '1';
-            container.style.pointerEvents = 'auto';
-        });
-    }
-
-    function toggleHelpful(courseId, reviewId, btn) {
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
-        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-        if (csrfToken) headers[csrfHeader] = csrfToken;
-
-        fetch(`/courses/${courseId}/reviews/${reviewId}/helpful`, {
-            method: 'POST',
-            headers: headers
-        })
-        .then(response => {
-            if (response.status === 401) { window.location.href = '/auth/login'; return; }
-            return response.json();
-        })
-        .then(data => {
-            if (data) {
-                const countSpan = btn.querySelector('.helpful-count');
-                const icon = btn.querySelector('i');
-                countSpan.textContent = data.helpfulCount;
-                if (data.isHelpful) {
-                    btn.classList.add('active');
-                    icon.className = 'fas fa-thumbs-up';
-                } else {
-                    btn.classList.remove('active');
-                    icon.className = 'far fa-thumbs-up';
-                }
-            }
-        })
-        .catch(err => console.error('Error toggling helpful:', err));
-    }
-
-    function handleReviewSubmit(event) {
-        event.preventDefault();
-        const form = document.getElementById('reviewSubmitForm');
-        const formData = new FormData(form);
-        const courseId = /*[[${course.id}]]*/ 0;
-        
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
-        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-        if (csrfToken) headers[csrfHeader] = csrfToken;
-
-        const btn = form.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
-
-        fetch(form.action, {
-            method: 'POST',
-            headers: headers,
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                // Refresh the list
-                handleReviewFilter();
-                // Show success message (will be in the fragment after refresh, but let's add a quick one)
-                const statusMsg = document.getElementById('review-status-msg');
-                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Đánh giá của bạn đã được ghi lại thành công!</div>';
-            } else {
-                alert('Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.');
-            }
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        });
-
-        return false;
-    }
-
-    function handleReportSubmit(event) {
-        event.preventDefault();
-        const form = document.getElementById('reportForm');
-        const formData = new FormData(form);
-        
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
-        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-        if (csrfToken) headers[csrfHeader] = csrfToken;
-
-        fetch(form.action, {
-            method: 'POST',
-            headers: headers,
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                closeReportModal();
-                // Optionally show a message
-                const statusMsg = document.getElementById('review-status-msg');
-                statusMsg.innerHTML = '<div class="alert alert-success mt-4"><i class="fas fa-check-circle mr-2"></i> Báo cáo đã được gửi. Cảm ơn bạn!</div>';
-            } else {
-                alert('Có lỗi xảy ra khi gửi báo cáo.');
-            }
-        })
-        .catch(err => console.error('Error reporting review:', err));
-
-        return false;
-    }
-
-    // ===== REVIEW REPORT MODAL FUNCTIONS =====
-    function showReportModal(reviewId) {
-        const courseId = /*[[${course.id}]]*/ 0;
-        const form = document.getElementById('reportForm');
-        form.action = `/courses/${courseId}/reviews/${reviewId}/report`;
-        document.getElementById('reportReviewModal').style.display = 'flex';
-    }
-
-    function closeReportModal() {
-        document.getElementById('reportReviewModal').style.display = 'none';
-    }
-
-    // ===== VIDEO ENGINE =====
-    let currentActiveLessonId = null;
-    let ytPlayer = null;
-    let isYtApiReady = false;
-
-    // Load YouTube API
-    (function() {
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    })();
-
-    window.onYouTubeIframeAPIReady = function() {
-        console.log("YouTube API Ready");
-        isYtApiReady = true;
-    };
-
-    function playLessonById(lessonId) {
-        const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
-        if (row) {
-            // Find the section and open it if closed
-            const sectionBody = row.closest('.cd-acc-body');
-            if (sectionBody && !sectionBody.classList.contains('open')) {
-                const header = document.querySelector(`.cd-acc-header[data-acc-target="${sectionBody.id}"]`);
-                if (header) header.click();
-            }
-            row.click();
-        } else {
-            // If row not found (maybe first lesson?), just scroll to the content
-            document.querySelector('.cd-accordion').scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-
-    function updateSidebarProgress() {
-        const card = document.getElementById('sidebarProgressCard');
-        if (!card) return;
-        
-        const total = parseInt(card.getAttribute('data-total-lessons') || 0);
-        if (total === 0) return;
-        
-        const completed = document.querySelectorAll('.cd-lesson-row.completed').length;
-        const percent = Math.round((completed / total) * 100);
-        
-        const bar = document.getElementById('sidebarProgressBar');
-        const countText = document.getElementById('sidebarProgressCount');
-        const percentText = document.getElementById('sidebarProgressPercent');
-        
-        if (bar) bar.style.width = percent + '%';
-        if (countText) countText.textContent = completed + '/' + total + ' bài học';
-        if (percentText) percentText.textContent = percent + '%';
-
-        // Update Next Lesson Hint and Resume Button
-        const nextLessonRow = document.querySelector('.cd-lesson-row.playable:not(.completed)');
-        const resumeBtn = document.querySelector('.btn-resume');
-        const resumeBtnWrap = resumeBtn ? resumeBtn.parentElement : null;
-        const nextHint = resumeBtnWrap ? resumeBtnWrap.querySelector('p') : null;
-
-        if (nextLessonRow) {
-            const nextId = nextLessonRow.getAttribute('data-lesson-id');
-            const nextTitle = nextLessonRow.getAttribute('data-lesson-title');
-            
-            if (resumeBtn) {
-                resumeBtn.setAttribute('onclick', `playLessonById(${nextId})`);
-                const btnText = resumeBtn.querySelector('span');
-                if (btnText) btnText.textContent = (completed === 0) ? 'Bắt đầu học' : 'Học tiếp';
-                resumeBtn.style.display = 'flex';
-            }
-            if (nextHint) {
-                nextHint.textContent = 'Bài kế tiếp: ' + nextTitle;
-                nextHint.style.display = 'block';
-            }
-            
-            // Remove completion message if exists
-            const completionMsg = document.getElementById('completionMessage');
-            if (completionMsg) completionMsg.remove();
-        } else {
-            // All completed
-            if (resumeBtn) resumeBtn.style.display = 'none';
-            if (nextHint) nextHint.style.display = 'none';
-            
-            if (!document.getElementById('completionMessage')) {
-                const msg = document.createElement('div');
-                msg.id = 'completionMessage';
-                msg.style.cssText = 'background:#dcfce7; color:#166534; padding:12px; border-radius:8px; text-align:center; font-size:13px; font-weight:600; margin-top:10px;';
-                msg.innerHTML = '<i class="fas fa-check-circle"></i> Bạn đã hoàn thành khóa học!';
-                if (resumeBtnWrap) resumeBtnWrap.appendChild(msg);
-            }
-        }
-    }
-
-    function playCoursePreview(element) {
-        currentActiveLessonId = null; 
-        const videoUrl = element.getAttribute('data-video-url');
-        if (!videoUrl) return;
-        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
-        renderVideoPlayer(videoUrl);
-    }
-
-    function playCoursePreview(element) {
-        currentActiveLessonId = null; // Re-zero lesson tracking
-        const videoUrl = element.getAttribute('data-video-url');
-        if (!videoUrl) return;
-        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
-        renderVideoPlayer(videoUrl);
-    }
-
-    function playLesson(element) {
-        currentActiveLessonId = element.getAttribute('data-lesson-id');
-        const videoUrl = element.getAttribute('data-video-url');
-        const title = element.getAttribute('data-lesson-title');
-        if (!videoUrl) return;
-        document.querySelectorAll('.cd-lesson-row').forEach(row => row.classList.remove('active-lesson'));
-        element.classList.add('active-lesson');
-        renderVideoPlayer(videoUrl);
-        if (window.innerWidth < 992) {
-            document.getElementById('mainPlayerContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-
-    // Auto-complete logic when video ends
-    function markActiveLessonComplete() {
-        if (!currentActiveLessonId) return;
-        const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${currentActiveLessonId}"]`);
-        if (row && !row.classList.contains('completed')) {
-            const statusBox = row.querySelector('.lesson-status-box');
-            if (statusBox) toggleLessonStatus(currentActiveLessonId, statusBox);
-        }
-    }
-
-    function toggleLessonStatus(lessonId, element) {
-        if (!lessonId) return;
-        console.log("Progress Toggle triggered for Lesson ID:", lessonId);
-        
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
-
-        const headers = { 'X-Requested-With': 'XMLHttpRequest' };
-        if (csrfToken) headers[csrfHeader] = csrfToken;
-
-        fetch(`/lessons/${lessonId}/toggle-progress`, {
-            method: 'POST',
-            headers: headers
-        })
-        .then(response => {
-            if (response.status === 401) { window.location.href = '/auth/login'; return; }
-            return response.text();
-        })
-        .then(status => {
-            console.log("Toggle Result from Server:", status);
-            const row = document.querySelector(`.cd-lesson-row[data-lesson-id="${lessonId}"]`);
-            if (!row) return;
-            
-            const icon = row.querySelector('.status-icon');
-            if (status === 'COMPLETED') {
-                row.classList.add('completed');
-                if (icon) icon.className = 'fas fa-check-circle status-icon';
-            } else if (status === 'REMOVED') {
-                row.classList.remove('completed');
-                if (icon) icon.className = 'far fa-circle status-icon';
-            }
-            
-            // NEW: Update Sidebar Progress Card in real-time
-            updateSidebarProgress();
-        })
-        .catch(err => console.error('Error toggling progress:', err));
-    }
-
-    function handleWishlistClick(element, event) {
-        const courseId = element.getAttribute('data-course-id');
-        if (typeof toggleWishlist === 'function') {
-            toggleWishlist(courseId, event, element);
-        }
-    }
-
-    function renderVideoPlayer(url) {
-        const wrapper = document.getElementById('videoEmbedWrapper');
-        const placeholder = document.getElementById('playerPlaceholder');
-        if (!wrapper || !placeholder) return;
-        wrapper.style.display = 'block';
-        
-        const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-        const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/|vimeo\.com\/channels\/.+\/|vimeo\.com\/groups\/.+\/videos\/)(\d+)(?:[#?].*)?/;
-        const ytMatch = url.match(youtubeRegex);
-        const vimeoMatch = url.match(vimeoRegex);
-        
-        // Clean existing player
-        placeholder.innerHTML = '<div id="ytPlayerContainer"></div>';
-        ytPlayer = null;
-
-        if (ytMatch && isYtApiReady) {
-            const videoId = ytMatch[1];
-            ytPlayer = new YT.Player('ytPlayerContainer', {
-                height: '100%',
-                width: '100%',
-                videoId: videoId,
-                playerVars: { 
-                    'autoplay': 1,
-                    'modestbranding': 1,
-                    'rel': 0
-                },
-                events: {
-                    'onStateChange': function(event) {
-                        if (event.data === YT.PlayerState.ENDED) {
-                            console.log("YouTube Video Ended (API)");
-                            markActiveLessonComplete();
-                        }
-                    }
-                }
-            });
-        } else if (ytMatch && !isYtApiReady) {
-            // Fallback if API not loaded yet
-            const videoId = ytMatch[1];
-            placeholder.innerHTML = `<iframe id="mainIframePlayer" width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allowfullscreen></iframe>`;
-        } else if (vimeoMatch) {
-            const videoId = vimeoMatch[1];
-            placeholder.innerHTML = `<iframe id="mainIframePlayer" src="https://player.vimeo.com/video/${videoId}?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        } else if (url.toLowerCase().endsWith('.mp4') || url.includes('.mp4?') || url.includes('.mp4#')) {
-            placeholder.innerHTML = `<video id="mainVideoPlayer" width="100%" height="100%" controls autoplay style="background:#000;" onended="markActiveLessonComplete()"><source src="${url}" type="video/mp4">Your browser does not support the video tag.</video>`;
-        } else {
-            placeholder.innerHTML = `<iframe id="mainIframePlayer" width="100%" height="100%" src="${url}" frameborder="0" allowfullscreen></iframe>`;
-        }
-    }
-
-    function closePlayer() {
-        const wrapper = document.getElementById('videoEmbedWrapper');
-        const placeholder = document.getElementById('playerPlaceholder');
-        wrapper.style.display = 'none';
-        placeholder.innerHTML = '';
-    }
-
-    // ===== FOCUS MUSIC WIDGET LOGIC =====
-    let activeMusicChannel = null;
-    let focusYtPlayer = null;
-
-    function toggleMusicPlayer() {
-        const panel = document.getElementById('musicPlayerPanel');
-        const bubble = document.getElementById('musicBubble');
-        if (panel.style.display === 'flex') {
-            panel.style.display = 'none';
-            bubble.classList.remove('active');
-        } else {
-            panel.style.display = 'flex';
-            bubble.classList.add('active');
-        }
-    }
-
-    function switchMusicChannel(channelId, videoId) {
-        const items = document.querySelectorAll('.channel-item');
-        const clickedItem = document.querySelector(`.channel-item[onclick*="${channelId}"]`);
-        const iframeContainer = document.getElementById('musicIframeContainer');
-
-        if (activeMusicChannel === channelId) {
-            stopMusic();
-            return;
-        }
-
-        // Update UI
-        items.forEach(item => item.classList.remove('active'));
-        if (clickedItem) clickedItem.classList.add('active');
-        
-        activeMusicChannel = channelId;
-        
-        // Clean container
-        iframeContainer.innerHTML = '<div id="focusIframe"></div>';
-        
-        // Load YouTube Iframe via API for volume control
-        if (typeof YT !== 'undefined' && YT.Player) {
-            focusYtPlayer = new YT.Player('focusIframe', {
-                height: '100',
-                width: '100',
-                videoId: videoId,
-                playerVars: { 'autoplay': 1, 'enablejsapi': 1 },
-                events: {
-                    'onReady': function(event) {
-                        const vol = document.querySelector('.volume-slider').value;
-                        event.target.setVolume(vol);
-                        event.target.playVideo();
-                    }
-                }
-            });
-        } else {
-            // Fallback
-            iframeContainer.innerHTML = `<iframe id="focusIframe" width="100" height="100" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>`;
-        }
-        
-        document.getElementById('musicBubble').innerHTML = '<i class="fas fa-volume-up"></i>';
-    }
-
-    function stopMusic() {
-        activeMusicChannel = null;
-        if (focusYtPlayer) {
-            try { focusYtPlayer.destroy(); } catch(e) {}
-            focusYtPlayer = null;
-        }
-        document.querySelectorAll('.channel-item').forEach(item => item.classList.remove('active'));
-        document.getElementById('musicIframeContainer').innerHTML = '';
-        document.getElementById('musicBubble').innerHTML = '<i class="fas fa-headphones-alt"></i>';
-    }
-
-    function changeVolume(val) {
-        if (focusYtPlayer && typeof focusYtPlayer.setVolume === 'function') {
-            focusYtPlayer.setVolume(val);
-        }
-    }
-</script>
+<script th:src="@{/js/pages/detail.js}"></script>
 
 <!-- ===== FOCUS MUSIC WIDGET HTML ===== -->
 <div class="focus-music-widget">
