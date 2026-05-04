@@ -1,596 +1,179 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <th:block th:replace="~{layout :: headMeta}"></th:block>
-  <title>Chỉnh Sửa Hồ Sơ - Course Management System</title>
+  <title>Chỉnh Sửa Hồ Sơ - CMS</title>
   <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+  <link rel="stylesheet" th:href="@{/css/profile.css}">
   <link rel="stylesheet" th:href="@{/css/admin.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
   <link rel="stylesheet" th:href="@{/css/pages/admin-edit.css}">
 </head>
+
 <body>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-    <div class="admin-shell-main">
-
-<div class="admin-container">
-  <div class="admin-header">
-    <h1><i class="fas fa-user-edit"></i> Chỉnh Sửa Hồ Sơ</h1>
-    <p>Cập nhật thông tin cá nhân và mật khẩu của bạn</p>
+<div class="profile-dashboard-wrapper">
+  <!-- Hero Area -->
+  <div class="profile-hero" style="background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);">
+    <div class="profile-hero-content">
+      <h1><i class="fas fa-user-cog"></i> Account Settings</h1>
+      <p>Quản lý thông tin cá nhân và bảo mật tài khoản</p>
+    </div>
   </div>
 
-  <!-- Alert Messages -->
-  <div th:if="${updateError}" class="alert-danger-custom" role="alert">
-    <i class="fas fa-exclamation-circle"></i>
-    <span th:text="${updateError}"></span>
-  </div>
-  <div th:if="${changePasswordError}" class="alert-danger-custom" role="alert">
-    <i class="fas fa-exclamation-circle"></i>
-    <span th:text="${changePasswordError}"></span>
-  </div>
-  <div th:if="${param.passwordUpdated}" class="alert-success-custom" role="alert">
-    <i class="fas fa-check-circle"></i>
-    <span>Đổi mật khẩu thành công!</span>
-  </div>
-  <div th:if="${param.updated}" class="alert-success-custom" role="alert">
-    <i class="fas fa-check-circle"></i>
-    <span>Cập nhật thông tin thành công!</span>
-  </div>
+  <div class="dashboard-container">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+      <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    </aside>
 
-  <div class="admin-content">
-    <div class="row">
-
-      <!-- Avatar Section -->
-      <div class="col-lg-3 mb-4">
-        <div class="profile-avatar-card">
-          <div class="avatar-wrapper">
-            <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar" class="avatar-image"/>
-            <img th:if="${#strings.isEmpty(user.avatar)}" src="https://via.placeholder.com/200?text=No+Avatar" alt="Avatar" class="avatar-image"/>
-          </div>
-          <p class="text-center mt-3"><strong th:text="${user.fullName}"></strong></p>
-          <p class="text-center text-muted" th:text="${user.userName}"></p>
+    <!-- Main Content Area -->
+    <main class="dashboard-main-content">
+      <!-- Alert Messages -->
+      <div class="mb-4">
+        <div th:if="${updateError != null or changePasswordError != null}" class="alert alert-danger rounded-4 shadow-sm" role="alert">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <span th:text="${!#strings.isEmpty(updateError) ? updateError : changePasswordError}"></span>
+        </div>
+        <div th:if="${param.passwordUpdated != null or param.updated != null}" class="alert alert-success rounded-4 shadow-sm" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          <span>Cập nhật thành công!</span>
         </div>
       </div>
 
-      <!-- Form Section -->
-      <div class="col-lg-9">
+      <div class="row">
+        <div class="col-12">
+          <!-- Profile Form -->
+          <div class="bg-white shadow-sm p-4 mb-4" style="border-radius: 20px;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-id-card text-primary me-2"></i>Thông Tin Cá Nhân</h5>
 
-        <!-- ============ FORM 1: Profile Information ============ -->
-        <div class="card profile-form-card mb-4">
-          <div class="card-header profile-card-header">
-            <h4 class="mb-0"><i class="fas fa-id-card"></i> Thông Tin Cá Nhân</h4>
-          </div>
-          <div class="card-body">
-            <form id="profileForm"
-                  th:action="@{/admin/profile/edit}"
-                  th:object="${userProfileDTO}"
-                  method="post"
-                  enctype="multipart/form-data"
-                  novalidate>
+            <form id="profileForm" th:action="@{/admin/profile/edit}" th:object="${userProfileDTO}" method="post" enctype="multipart/form-data" novalidate>
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-              <!-- Username (Read-only) -->
-              <div class="form-group">
-                <label for="usernameDisplay" class="form-label">
-                  <i class="fas fa-user"></i> Tên Đăng Nhập
-                </label>
-                <input type="text" id="usernameDisplay" class="form-control"
-                       th:value="${user.userName}" readonly />
-                <small class="form-text text-muted">Tên đăng nhập không thể thay đổi</small>
-              </div>
+              <div class="row g-3">
+                <!-- Tên đăng nhập (Readonly) -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold small">Tên Đăng Nhập</label>
+                  <input type="text" class="form-control rounded-pill px-3 bg-light" th:value="${user.userName}" readonly>
+                </div>
 
-              <!-- Full Name -->
-              <div class="form-group" id="pg-fullName">
-                <label for="pFullName" class="form-label">
-                  <i class="fas fa-id-card-alt"></i> Họ Và Tên <span style="color:#ef4444">*</span>
-                </label>
-                <input type="text" id="pFullName" class="form-control"
-                       th:field="*{fullName}"
-                       th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
-                       placeholder="Nhập họ và tên đầy đủ" />
-                <!-- server error -->
-                <div th:if="${#fields.hasErrors('fullName')}" class="field-error">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span th:errors="*{fullName}"></span>
+                <!-- Họ tên -->
+                <div class="col-md-6 mb-3">
+                  <label for="pFullName" class="form-label fw-bold small">Họ Và Tên <span class="text-danger">*</span></label>
+                  <input type="text" id="pFullName" th:field="*{fullName}" class="form-control rounded-pill px-3" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
+                  <div class="invalid-feedback ms-2" id="err-pFullName-msg" th:errors="*{fullName}"></div>
                 </div>
-                <!-- client error -->
-                <div class="field-error" id="err-pFullName" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-pFullName-msg"></span>
-                </div>
-              </div>
 
-              <!-- Email -->
-              <div class="form-group" id="pg-email">
-                <label for="pEmail" class="form-label">
-                  <i class="fas fa-envelope"></i> Email <span style="color:#ef4444">*</span>
-                </label>
-                <input type="email" id="pEmail" class="form-control"
-                       th:field="*{email}"
-                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
-                       placeholder="Nhập địa chỉ email" />
-                <div th:if="${#fields.hasErrors('email')}" class="field-error">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span th:errors="*{email}"></span>
+                <!-- Email -->
+                <div class="col-md-6 mb-3">
+                  <label for="pEmail" class="form-label fw-bold small">Email <span class="text-danger">*</span></label>
+                  <input type="email" id="pEmail" th:field="*{email}" class="form-control rounded-pill px-3">
+                  <div class="invalid-feedback ms-2" id="err-pEmail-msg"></div>
                 </div>
-                <div class="field-error" id="err-pEmail" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-pEmail-msg"></span>
-                </div>
-              </div>
 
-              <!-- Phone -->
-              <div class="form-group" id="pg-phone">
-                <label for="pPhone" class="form-label">
-                  <i class="fas fa-phone"></i> Số Điện Thoại
-                </label>
-                <input type="text" id="pPhone" class="form-control"
-                       th:field="*{phone}"
-                       th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
-                       placeholder="Ví dụ: 0912345678" maxlength="15" />
-                <div th:if="${#fields.hasErrors('phone')}" class="field-error">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span th:errors="*{phone}"></span>
+                <!-- Số điện thoại -->
+                <div class="col-md-6 mb-3">
+                  <label for="pPhone" class="form-label fw-bold small">Số Điện Thoại</label>
+                  <input type="text" id="pPhone" th:field="*{phone}" class="form-control rounded-pill px-3">
+                  <div class="invalid-feedback ms-2" id="err-pPhone-msg"></div>
                 </div>
-                <div class="field-error" id="err-pPhone" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-pPhone-msg"></span>
-                </div>
-              </div>
 
-              <!-- Address -->
-              <div class="form-group" id="pg-address">
-                <label for="pAddress" class="form-label">
-                  <i class="fas fa-map-marker-alt"></i> Địa Chỉ
-                </label>
-                <input type="text" id="pAddress" class="form-control"
-                       th:field="*{address}"
-                       th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''"
-                       placeholder="Nhập địa chỉ của bạn" maxlength="255" />
-                <div th:if="${#fields.hasErrors('address')}" class="field-error">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span th:errors="*{address}"></span>
+                <!-- Avatar Upload (New Field Integrated) -->
+                <div class="col-12 mb-3">
+                  <label for="avatarFile" class="form-label fw-bold small">Ảnh Đại Diện</label>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="flex-grow-1">
+                      <input type="file" id="avatarFile" name="avatarFile" class="form-control rounded-pill px-3" accept="image/*">
+                      <div class="invalid-feedback ms-2" id="err-avatar-msg"></div>
+                    </div>
+                  </div>
+                  <!-- Preview ảnh mới chọn -->
+                  <div id="avatarPreviewBox" class="mt-3" style="display: none;">
+                    <div class="d-flex align-items-center p-2 border rounded-4 bg-light">
+                      <img id="avatarPreviewImg" src="" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;" class="me-3">
+                      <span class="small text-success fw-bold"><i class="fas fa-check"></i> Ảnh mới đã sẵn sàng để tải lên</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="field-error" id="err-pAddress" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-pAddress-msg"></span>
-                </div>
-              </div>
 
-              <!-- Avatar Upload -->
-              <div class="form-group" id="pg-avatar">
-                <label for="avatarFile" class="form-label">
-                  <i class="fas fa-image"></i> Ảnh Đại Diện
-                </label>
-                <div class="file-input-wrapper">
-                  <input type="file" id="avatarFile" name="avatarFile"
-                         accept="image/jpeg,image/png,image/gif,image/webp"
-                         class="form-control" />
-                  <small class="form-text text-muted">Hỗ trợ: JPG, PNG, GIF, WEBP. Tối đa 5MB</small>
+                <!-- Địa chỉ -->
+                <div class="col-12 mb-3">
+                  <label for="pAddress" class="form-label fw-bold small">Địa Chỉ</label>
+                  <input type="text" id="pAddress" th:field="*{address}" class="form-control rounded-pill px-3">
+                  <div class="invalid-feedback ms-2" id="err-pAddress-msg"></div>
                 </div>
-                <div class="field-error" id="err-avatar" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-avatar-msg"></span>
-                </div>
-                <!-- Preview ảnh được chọn -->
-                <div class="avatar-preview-box" id="avatarPreviewBox">
-                  <img id="avatarPreviewImg" src="" alt="Xem trước ảnh đại diện" />
-                  <small class="d-block mt-1 text-muted">Xem trước ảnh mới</small>
-                </div>
-              </div>
 
-              <!-- Button -->
-              <div class="form-group mb-0">
-                <button type="submit" class="btn btn-primary" id="profileSubmitBtn">
-                  <i class="fas fa-save"></i> Cập Nhật Thông Tin
-                </button>
-                <a th:href="@{/admin/profile}" class="btn btn-outline-secondary ms-2">
-                  <i class="fas fa-times"></i> Hủy
-                </a>
+                <div class="col-12 text-end mt-4">
+                  <hr>
+                  <a th:href="@{/admin/profile}" class="btn btn-light rounded-pill px-4 me-2">Hủy</a>
+                  <button type="submit" class="btn btn-primary rounded-pill px-4">Lưu Thay Đổi</button>
+                </div>
               </div>
             </form>
           </div>
-        </div>
 
-        <!-- ============ FORM 2: Change Password ============ -->
-        <div class="card profile-form-card">
-          <div class="card-header profile-card-header">
-            <h4 class="mb-0"><i class="fas fa-lock"></i> Thay Đổi Mật Khẩu</h4>
-          </div>
-          <div class="card-body">
-            <form id="changePasswordForm"
-                  th:action="@{/admin/profile/change-password}"
-                  method="post"
-                  novalidate>
+          <!-- Change Password Form -->
+          <div class="bg-white shadow-sm p-4" style="border-radius: 20px;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-shield-alt text-success me-2"></i>Bảo Mật & Mật Khẩu</h5>
+            <form id="changePasswordForm" th:action="@{/admin/profile/change-password}" method="post" novalidate>
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-              <!-- Current Password -->
-              <div class="form-group" id="cpg-currentPassword">
-                <label for="currentPassword" class="form-label">
-                  <i class="fas fa-key"></i> Mật Khẩu Hiện Tại <span style="color:#ef4444">*</span>
-                </label>
-                <div style="position:relative;">
-                  <input type="password" id="currentPassword" name="currentPassword"
-                         class="form-control"
-                         placeholder="Nhập mật khẩu hiện tại"
-                         autocomplete="current-password" />
-                  <span class="password-toggle" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;"
-                        onclick="togglePw('currentPassword', this)">
-                    <i class="fas fa-eye"></i>
-                  </span>
+              <div class="mb-4">
+                <label for="currentPassword" class="form-label fw-bold small">Mật Khẩu Hiện Tại</label>
+                <div class="input-group">
+                  <input type="password" id="currentPassword" name="currentPassword" class="form-control border-end-0 px-3" style="border-radius: 50px 0 0 50px;">
+                  <span class="input-group-text bg-white border-start-0" style="border-radius: 0 50px 50px 0; cursor: pointer;" onclick="togglePw('currentPassword', this)">
+                                        <i class="fas fa-eye text-muted"></i>
+                                    </span>
                 </div>
-                <div class="field-error" id="err-currentPassword" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-currentPassword-msg"></span>
-                </div>
+                <div class="invalid-feedback ms-2" id="err-currentPassword-msg"></div>
               </div>
 
-              <!-- New Password -->
-              <div class="form-group" id="cpg-newPassword">
-                <label for="newPassword" class="form-label">
-                  <i class="fas fa-lock"></i> Mật Khẩu Mới <span style="color:#ef4444">*</span>
-                </label>
-                <div style="position:relative;">
-                  <input type="password" id="newPassword" name="newPassword"
-                         class="form-control"
-                         placeholder="Tối thiểu 8 ký tự"
-                         autocomplete="new-password" />
-                  <span class="password-toggle" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;"
-                        onclick="togglePw('newPassword', this)">
-                    <i class="fas fa-eye"></i>
-                  </span>
+              <div class="mb-4">
+                <label for="newPassword" class="form-label fw-bold small">Mật Khẩu Mới</label>
+                <div class="input-group">
+                  <input type="password" id="newPassword" name="newPassword" class="form-control border-end-0 px-3" style="border-radius: 50px 0 0 50px;">
+                  <span class="input-group-text bg-white border-start-0" style="border-radius: 0 50px 50px 0; cursor: pointer;" onclick="togglePw('newPassword', this)">
+                                        <i class="fas fa-eye text-muted"></i>
+                                    </span>
                 </div>
-                <!-- Strength Bar -->
-                <div class="pw-strength-bar" id="cpStrengthBar"><div class="fill" id="cpStrengthFill"></div></div>
-                <div class="pw-strength-label" id="cpStrengthLabel"></div>
-                <!-- Requirements -->
-                <div class="pw-requirements">
-                  <ul>
-                    <li id="cp-req-length"><i class="fas fa-circle"></i>Ít nhất 8 ký tự</li>
-                    <li id="cp-req-upper"><i class="fas fa-circle"></i>Có ít nhất 1 chữ HOA</li>
-                    <li id="cp-req-lower"><i class="fas fa-circle"></i>Có ít nhất 1 chữ thường</li>
-                    <li id="cp-req-digit"><i class="fas fa-circle"></i>Có ít nhất 1 chữ số</li>
+                <div class="mt-2 px-2">
+                  <div class="pw-strength-bar bg-light rounded-pill" id="cpStrengthBar" style="height: 6px; display: none;">
+                    <div class="fill rounded-pill" id="cpStrengthFill" style="height: 100%; width: 0%; transition: all 0.3s ease;"></div>
+                  </div>
+                  <div id="cpStrengthLabel" class="small mt-1"></div>
+                </div>
+                <div class="pw-requirements mt-2 small text-muted px-2">
+                  <ul class="list-unstyled d-flex flex-wrap gap-3 mb-0">
+                    <li id="cp-req-length"><i class="fas fa-circle me-1" style="font-size: 8px;"></i>8+ ký tự</li>
+                    <li id="cp-req-upper"><i class="fas fa-circle me-1" style="font-size: 8px;"></i>1 Chữ hoa</li>
+                    <li id="cp-req-digit"><i class="fas fa-circle me-1" style="font-size: 8px;"></i>1 Số</li>
                   </ul>
                 </div>
-                <div class="field-error" id="err-newPassword" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-newPassword-msg"></span>
-                </div>
+                <div class="invalid-feedback ms-2" id="err-newPassword-msg"></div>
               </div>
 
-              <!-- Confirm Password -->
-              <div class="form-group" id="cpg-confirmPassword">
-                <label for="cpConfirmPassword" class="form-label">
-                  <i class="fas fa-check-circle"></i> Xác Nhận Mật Khẩu Mới <span style="color:#ef4444">*</span>
-                </label>
-                <div style="position:relative;">
-                  <input type="password" id="cpConfirmPassword" name="confirmPassword"
-                         class="form-control"
-                         placeholder="Nhập lại mật khẩu mới"
-                         autocomplete="new-password" />
-                  <span class="password-toggle" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;"
-                        onclick="togglePw('cpConfirmPassword', this)">
-                    <i class="fas fa-eye"></i>
-                  </span>
-                </div>
-                <div class="field-error" id="err-cpConfirmPassword" style="display:none;">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <span id="err-cpConfirmPassword-msg"></span>
-                </div>
+              <div class="mb-4">
+                <label for="cpConfirmPassword" class="form-label fw-bold small">Xác Nhận Mật Khẩu</label>
+                <input type="password" id="cpConfirmPassword" name="confirmPassword" class="form-control rounded-pill px-3">
+                <div class="invalid-feedback ms-2" id="err-cpConfirmPassword-msg"></div>
               </div>
 
-              <!-- Button -->
-              <div class="form-group mb-0">
-                <button type="submit" class="btn btn-success" id="changePwBtn">
-                  <i class="fas fa-key"></i> Cập Nhật Mật Khẩu
-                </button>
+              <div class="text-end mt-4">
+                <button type="submit" class="btn btn-success rounded-pill px-4">Cập Nhật Mật Khẩu</button>
               </div>
             </form>
           </div>
         </div>
-
-      </div><!-- /col-lg-9 -->
-    </div><!-- /row -->
-  </div><!-- /admin-content -->
-</div><!-- /admin-container -->
-
-    </div>
+      </div>
+    </main>
+  </div>
 </div>
 
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
-<script>
-// =========================================================
-//  PROFILE EDIT PAGE — FULL VALIDATION MODULE
-// =========================================================
-
-// ---------- Shared helpers ----------
-
-function setValid(inputEl, errId) {
-  inputEl.classList.add('is-valid');
-  inputEl.classList.remove('is-invalid');
-  const errDiv = document.getElementById(errId);
-  if (errDiv) errDiv.style.display = 'none';
-}
-
-function setInvalid(inputEl, errId, msg) {
-  inputEl.classList.add('is-invalid');
-  inputEl.classList.remove('is-valid');
-  const errDiv = document.getElementById(errId);
-  if (errDiv) {
-    errDiv.style.display = 'flex';
-    const msgEl = document.getElementById(errId + '-msg');
-    if (msgEl) msgEl.textContent = msg;
-  }
-}
-
-function clearState(inputEl, errId) {
-  inputEl.classList.remove('is-valid', 'is-invalid');
-  const errDiv = document.getElementById(errId);
-  if (errDiv) errDiv.style.display = 'none';
-}
-
-function togglePw(fieldId, toggleBtn) {
-  const input = document.getElementById(fieldId);
-  const icon  = toggleBtn.querySelector('i');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.classList.replace('fa-eye', 'fa-eye-slash');
-  } else {
-    input.type = 'password';
-    icon.classList.replace('fa-eye-slash', 'fa-eye');
-  }
-}
-
-// =========================================================
-//  FORM 1 — PROFILE INFORMATION
-// =========================================================
-
-function validatePFullName() {
-  const el  = document.getElementById('pFullName');
-  const val = el.value.trim();
-  if (!val)               return setInvalid(el, 'err-pFullName', 'Họ tên không được để trống'), false;
-  if (val.length < 2)     return setInvalid(el, 'err-pFullName', 'Họ tên phải có ít nhất 2 ký tự'), false;
-  if (val.length > 100)   return setInvalid(el, 'err-pFullName', 'Họ tên không được vượt quá 100 ký tự'), false;
-  if (!/^[\p{L} ]+$/u.test(val)) return setInvalid(el, 'err-pFullName', 'Họ tên không được chứa số hoặc ký tự đặc biệt'), false;
-  setValid(el, 'err-pFullName');
-  return true;
-}
-
-function validatePEmail() {
-  const el  = document.getElementById('pEmail');
-  const val = el.value.trim();
-  if (!val)  return setInvalid(el, 'err-pEmail', 'Email không được để trống'), false;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
-             return setInvalid(el, 'err-pEmail', 'Email không đúng định dạng (ví dụ: name@gmail.com)'), false;
-  if (val.length > 100) return setInvalid(el, 'err-pEmail', 'Email không được vượt quá 100 ký tự'), false;
-  setValid(el, 'err-pEmail');
-  return true;
-}
-
-function validatePPhone() {
-  const el  = document.getElementById('pPhone');
-  const val = el.value.trim();
-  if (!val) { clearState(el, 'err-pPhone'); return true; } // optional field
-  if (!/^\+?[0-9]{10,15}$/.test(val))
-    return setInvalid(el, 'err-pPhone', 'Số điện thoại không hợp lệ (10-15 chữ số, có thể bắt đầu bằng +)'), false;
-  setValid(el, 'err-pPhone');
-  return true;
-}
-
-function validatePAddress() {
-  const el  = document.getElementById('pAddress');
-  const val = el.value.trim();
-  if (!val) { clearState(el, 'err-pAddress'); return true; } // optional field
-  if (val.length > 255)
-    return setInvalid(el, 'err-pAddress', 'Địa chỉ không được vượt quá 255 ký tự'), false;
-  setValid(el, 'err-pAddress');
-  return true;
-}
-
-function validateAvatar() {
-  const input   = document.getElementById('avatarFile');
-  const errId   = 'err-avatar';
-  const errMsgId = 'err-avatar-msg';
-  if (!input.files || input.files.length === 0) return true; // optional
-
-  const file     = input.files[0];
-  const maxSize  = 5 * 1024 * 1024; // 5MB
-  const allowed  = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-  if (!allowed.includes(file.type)) {
-    document.getElementById(errId).style.display = 'flex';
-    document.getElementById(errMsgId).textContent = 'Chỉ chấp nhận file ảnh JPG, PNG, GIF, WEBP';
-    return false;
-  }
-  if (file.size > maxSize) {
-    document.getElementById(errId).style.display = 'flex';
-    document.getElementById(errMsgId).textContent = 'Kích thước file không được vượt quá 5MB';
-    return false;
-  }
-  document.getElementById(errId).style.display = 'none';
-  return true;
-}
-
-// Real-time listeners — Profile form
-['blur', 'input'].forEach(function(evt) {
-  document.getElementById('pFullName').addEventListener(evt, function() {
-    if (this.value) validatePFullName(); else clearState(this, 'err-pFullName');
-  });
-  document.getElementById('pEmail').addEventListener(evt, function() {
-    if (this.value) validatePEmail(); else clearState(this, 'err-pEmail');
-  });
-});
-document.getElementById('pPhone').addEventListener('input', function() {
-  if (this.value) validatePPhone(); else clearState(this, 'err-pPhone');
-});
-document.getElementById('pPhone').addEventListener('blur', validatePPhone);
-document.getElementById('pAddress').addEventListener('input', function() {
-  if (this.value) validatePAddress(); else clearState(this, 'err-pAddress');
-});
-document.getElementById('pAddress').addEventListener('blur', validatePAddress);
-
-// Avatar — preview + validate
-document.getElementById('avatarFile').addEventListener('change', function() {
-  const previewBox = document.getElementById('avatarPreviewBox');
-  const previewImg = document.getElementById('avatarPreviewImg');
-
-  if (!validateAvatar()) {
-    previewBox.style.display = 'none';
-    this.value = '';
-    return;
-  }
-
-  if (this.files && this.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      previewImg.src = e.target.result;
-      previewBox.style.display = 'block';
-    };
-    reader.readAsDataURL(this.files[0]);
-  }
-});
-
-// Submit — Profile form
-document.getElementById('profileForm').addEventListener('submit', function(e) {
-  const v1 = validatePFullName();
-  const v2 = validatePEmail();
-  const v3 = validatePPhone();
-  const v4 = validatePAddress();
-  const v5 = validateAvatar();
-
-  if (!v1 || !v2 || !v3 || !v4 || !v5) {
-    e.preventDefault();
-    const first = this.querySelector('.is-invalid');
-    if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
-  }
-});
-
-// =========================================================
-//  FORM 2 — CHANGE PASSWORD
-// =========================================================
-
-function cpStrength(pwd) {
-  let s = 0;
-  if (pwd.length >= 8)  s++;
-  if (pwd.length >= 12) s++;
-  if (/[a-z]/.test(pwd)) s++;
-  if (/[A-Z]/.test(pwd)) s++;
-  if (/\d/.test(pwd))    s++;
-  if (/[^a-zA-Z0-9]/.test(pwd)) s++;
-  return s;
-}
-
-function updateCpStrengthBar(pwd) {
-  const bar   = document.getElementById('cpStrengthBar');
-  const fill  = document.getElementById('cpStrengthFill');
-  const label = document.getElementById('cpStrengthLabel');
-  bar.style.display   = pwd ? 'block' : 'none';
-  label.style.display = pwd ? 'block' : 'none';
-
-  const s = cpStrength(pwd);
-  let w, c, t;
-  if (s <= 2)      { w = '33%'; c = '#ef4444'; t = '🔴 Yếu'; }
-  else if (s <= 4) { w = '66%'; c = '#f59e0b'; t = '🟡 Trung bình'; }
-  else             { w = '100%'; c = '#10b981'; t = '🟢 Mạnh'; }
-
-  fill.style.width      = w;
-  fill.style.background = c;
-  label.textContent     = 'Độ mạnh: ' + t;
-  label.style.color     = c;
-}
-
-function updateCpRequirements(pwd) {
-  const toggle = (id, test) => {
-    const li = document.getElementById(id);
-    const i  = li.querySelector('i');
-    if (test) { li.classList.add('req-met'); i.className = 'fas fa-check-circle'; }
-    else       { li.classList.remove('req-met'); i.className = 'fas fa-circle'; }
-  };
-  toggle('cp-req-length', pwd.length >= 8);
-  toggle('cp-req-upper',  /[A-Z]/.test(pwd));
-  toggle('cp-req-lower',  /[a-z]/.test(pwd));
-  toggle('cp-req-digit',  /\d/.test(pwd));
-}
-
-function validateCurrentPassword() {
-  const el  = document.getElementById('currentPassword');
-  const val = el.value;
-  if (!val) return setInvalid(el, 'err-currentPassword', 'Mật khẩu hiện tại không được để trống'), false;
-  setValid(el, 'err-currentPassword');
-  return true;
-}
-
-function validateNewPassword() {
-  const el  = document.getElementById('newPassword');
-  const val = el.value;
-  if (!val)           return setInvalid(el, 'err-newPassword', 'Mật khẩu mới không được để trống'), false;
-  if (val.length < 8) return setInvalid(el, 'err-newPassword', 'Mật khẩu mới phải có ít nhất 8 ký tự'), false;
-  if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val))
-                      return setInvalid(el, 'err-newPassword', 'Mật khẩu phải chứa chữ hoa, chữ thường và chữ số'), false;
-
-  const curVal = document.getElementById('currentPassword').value;
-  if (curVal && val === curVal)
-                      return setInvalid(el, 'err-newPassword', 'Mật khẩu mới phải khác mật khẩu hiện tại'), false;
-  setValid(el, 'err-newPassword');
-  return true;
-}
-
-function validateCpConfirm() {
-  const el      = document.getElementById('cpConfirmPassword');
-  const newPwd  = document.getElementById('newPassword').value;
-  const val     = el.value;
-  if (!val)            return setInvalid(el, 'err-cpConfirmPassword', 'Vui lòng xác nhận mật khẩu mới'), false;
-  if (val !== newPwd)  return setInvalid(el, 'err-cpConfirmPassword', 'Mật khẩu xác nhận không khớp'), false;
-  setValid(el, 'err-cpConfirmPassword');
-  return true;
-}
-
-// Real-time listeners — Change password form
-document.getElementById('currentPassword').addEventListener('blur', validateCurrentPassword);
-document.getElementById('currentPassword').addEventListener('input', function() {
-  if (this.value) validateCurrentPassword(); else clearState(this, 'err-currentPassword');
-});
-
-document.getElementById('newPassword').addEventListener('input', function() {
-  const pwd = this.value;
-  updateCpStrengthBar(pwd);
-  updateCpRequirements(pwd);
-  if (pwd) validateNewPassword(); else clearState(this, 'err-newPassword');
-  // Re-validate confirm if needed
-  const cVal = document.getElementById('cpConfirmPassword').value;
-  if (cVal) validateCpConfirm();
-});
-document.getElementById('newPassword').addEventListener('blur', function() {
-  if (this.value) validateNewPassword();
-});
-
-document.getElementById('cpConfirmPassword').addEventListener('input', function() {
-  if (this.value) validateCpConfirm(); else clearState(this, 'err-cpConfirmPassword');
-});
-document.getElementById('cpConfirmPassword').addEventListener('blur', function() {
-  if (this.value) validateCpConfirm();
-});
-
-// Submit — Change password form
-document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
-  const v1 = validateCurrentPassword();
-  const v2 = validateNewPassword();
-  const v3 = validateCpConfirm();
-
-  if (!v1 || !v2 || !v3) {
-    e.preventDefault();
-    const first = this.querySelector('.is-invalid');
-    if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
-  }
-});
-
-// On page load - apply server-side invalid state icon
-document.querySelectorAll('.is-invalid').forEach(function(el) {
-  el.classList.add('is-invalid');
-});
-</script>
-
+<script th:src="@{/js/pages/admin-edit.js}"></script>
 </body>
 </html>
-

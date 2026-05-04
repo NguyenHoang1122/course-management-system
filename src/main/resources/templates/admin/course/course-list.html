@@ -6,161 +6,158 @@
     <title>Danh Sách Khóa Học - Course Management System</title>
 
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
 </head>
 
 <body>
 
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-<div class="admin-shell-main">
-<div class="admin-container">
-    <div class="admin-header">
-        <h1><i class="fas fa-graduation-cap"></i> Quản Lý Khóa Học</h1>
-        <p>Quản lý tất cả các khóa học trong hệ thống</p>
-    </div>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3 th:text="${totalItems != null ? totalItems : 0}">0</h3>
-            <p><i class="fas fa-book"></i> Tổng Khóa Học</p>
-        </div>
-        <div class="stat-card">
-            <h3 th:text="${#numbers.formatDecimal(totalValue / 1000000.0, 1, 'COMMA', 0, 'POINT')} + ' Triệu'">0</h3>
-            <p><i class="fas fa-dollar-sign"></i> Tổng Giá Trị</p>
-        </div>
-        <div class="stat-card">
-            <h3 th:text="${totalLessons != null ? totalLessons : 0}">0</h3>
-            <p><i class="fas fa-play-circle"></i> Tổng Bài Học</p>
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Area: Style Admin nhưng bố cục giống User -->
+    <div class="profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
+            <p>Hệ thống quản trị nội dung và khóa học</p>
         </div>
     </div>
 
-    <div class="admin-content">
-        <div class="mb-3 d-flex align-items-center justify-content-between">
-            <h3 style="color: var(--secondary-color); margin: 0;">
-                <i class="fas fa-list"></i> Danh Sách Khóa Học
-            </h3>
-            <a th:href="@{/admin/create-course}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Thêm Khóa Học Mới
-            </a>
-        </div>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation (Vị trí giống User) -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
 
-        <div class="mb-4" style="background: var(--white); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
-            <form th:action="@{/admin/course-list}" method="get" style="display: flex; gap: 10px; align-items: center;">
-                <input type="hidden" name="page" value="1">
-                <input type="hidden" name="size" th:value="${size}">
-                <input type="text" id="keyword" name="keyword" th:value="${keyword}" placeholder="Tìm theo tên khóa học..." style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
-                <a th:href="@{/admin/course-list}" class="btn btn-secondary"><i class="fas fa-redo"></i> Xóa bộ lọc</a>
-            </form>
-        </div>
+        <!-- Main Content Area -->
+        <main class="dashboard-main-content">
 
-        <div th:if="${courses != null and !courses.isEmpty()}" class="row">
-            <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
-                <div class="course-card shadow-sm" style="cursor: pointer;" th:onclick="|window.location.href='/admin/' + ${course.id}|">
-                    <div class="course-badge" th:text="${course.category != null ? course.category : 'Nhật Bản'}">Nhật Bản</div>
-                    <div class="course-card-img"
-                         th:style="'background-image: url(' + (${course.imageUrl != null and !course.imageUrl.isEmpty()} ? (${course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)}) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop') + '); background-size: cover; background-position: center; height: 200px;'">
+            <!-- Stats Grid (Đã chỉnh theo style User) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon enrolled"><i class="fas fa-book"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${totalItems != null ? totalItems : 0}">0</h4>
+                        <p>Tổng Khóa Học</p>
                     </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon active"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${#numbers.formatDecimal(totalValue / 1000000.0, 1, 'COMMA', 0, 'POINT')} + ' Tr'">0</h4>
+                        <p>Tổng Giá Trị</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon completed"><i class="fas fa-play-circle"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${totalLessons != null ? totalLessons : 0}">0</h4>
+                        <p>Tổng Bài Học</p>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="course-card-body">
-                        <div class="course-rating">
-                            <th:block th:with="rating=${averageRatings != null and averageRatings.get(course.id) != null ? averageRatings.get(course.id).intValue() : 0}">
-                                <i th:each="i : ${#numbers.sequence(1, 5)}" th:class="${i <= rating ? 'fas fa-star' : 'far fa-star'}"></i>
-                            </th:block>
-                            <span class="text-muted ml-2" th:text="'(' + ${averageRatings != null and averageRatings.get(course.id) != null ? #numbers.formatDecimal(averageRatings.get(course.id), 1, 1) : '0.0'} + ')'">(0.0)</span>
+            <!-- Content Section -->
+            <div class="course-section-header mt-4">
+                <h3><i class="fas fa-list"></i> Danh Sách Khóa Học</h3>
+                <a th:href="@{/admin/create-course}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-plus"></i> Thêm Mới
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mb-4 bg-white p-3 shadow-sm" style="border-radius: 15px;">
+                <form th:action="@{/admin/course-list}" method="get" class="row g-2 align-items-center">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${size}">
+                    <div class="col-md-8">
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control border-0 bg-light" placeholder="Tìm theo tên khóa học..." style="border-radius: 10px;">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1" style="border-radius: 10px;">Tìm kiếm</button>
+                        <a th:href="@{/admin/course-list}" class="btn btn-light" style="border-radius: 10px;"><i class="fas fa-redo"></i></a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Course Grid -->
+            <div th:if="${courses != null and !courses.isEmpty()}" class="row">
+                <div th:each="course : ${courses}" class="col-lg-4 col-md-6 mb-4">
+                    <div class="dashboard-course-card shadow-sm h-100" style="cursor: pointer;" th:onclick="|window.location.href='/admin/' + ${course.id}|">
+                        <div class="db-course-image"
+                             th:style="'background-image: url(' + (${course.imageUrl != null and !course.imageUrl.isEmpty()} ? (${course.imageUrl.startsWith('http') ? course.imageUrl : (course.imageUrl.startsWith('/') ? course.imageUrl : '/' + course.imageUrl)}) : 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000') + '); height: 180px;'">
                         </div>
+                        <div class="db-course-body">
+                            <span class="db-course-category" th:text="${course.category != null ? course.category : 'Nhật Bản'}">Nhật Bản</span>
+                            <h4 class="db-course-title mb-2" th:text="${course.title}">Course Title</h4>
 
-                        <h3 class="course-title">
-                            <a th:href="@{'/admin/' + ${course.id}}" th:text="${course.title}" style="color: inherit; text-decoration: none;">Course Title</a>
-                        </h3>
-
-                        <div class="course-meta">
-                            <img th:if="${course.instructor != null and course.instructor.avatar != null}"
-                                 th:src="${course.instructor.avatar.startsWith('http') ? course.instructor.avatar : (course.instructor.avatar.startsWith('/') ? course.instructor.avatar : '/' + course.instructor.avatar)}"
-                                 alt="author" style="width:25px; height:25px; border-radius: 50%; object-fit: cover;">
-                            <i th:unless="${course.instructor != null and course.instructor.avatar != null}" class="fas fa-user-circle mr-2" style="font-size: 25px; color: #ddd;"></i>
-                            <span>By <strong th:text="${course.instructor != null ? course.instructor.fullName : 'Admin'}">Admin</strong></span>
-                        </div>
-
-                        <div class="course-price-row d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                    <span class="course-price text-primary font-weight-bold" style="font-size: 1.1rem;">
-                        <th:block th:if="${course.price != null and course.price > 0}"
-                                  th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
-                        </th:block>
-                        <th:block th:if="${course.price == null or course.price == 0}">Free</th:block>
-                    </span>
+                            <div class="d-flex align-items-center mb-3 text-muted" style="font-size: 0.85rem;">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span th:text="${course.instructor != null ? course.instructor.fullName : 'Admin'}">Admin</span>
                             </div>
-                            <a th:href="@{'/admin/' + ${course.id}}" class="btn btn-primary btn-sm px-4"
-                               style="background-color: #4285f4; border: none; border-radius: 4px;">Xem</a>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fw-bold text-primary">
+                                    <th:block th:if="${course.price != null and course.price > 0}" th:text="${#numbers.formatDecimal(course.price, 1, 'COMMA', 0, 'POINT')} + ' đ'"></th:block>
+                                    <th:block th:if="${course.price == null or course.price == 0}">Miễn phí</th:block>
+                                </span>
+                                <a th:href="@{'/admin/' + ${course.id}}" class="btn btn-sm btn-outline-primary px-3 rounded-pill">Quản lý</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-        <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5">
-            <i class="fas fa-graduation-cap"
-               style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-            <h4 style="color: var(--text-muted);">Không tìm thấy khóa học phù hợp</h4>
-            <p style="color: var(--text-muted);">Thử từ khóa khác hoặc xóa bộ lọc tìm kiếm.</p>
-            <a th:href="@{/admin/create-course}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tạo Khóa Học Đầu Tiên
-            </a>
-        </div>
-
-        <nav th:if="${totalPages != null and totalPages gt 1}" aria-label="Admin course pagination" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{'/admin/course-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-left"></i></a>
-                </li>
-
-                <li class="page-item"
-                    th:each="i : ${#numbers.sequence(1, totalPages)}"
-                    th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{'/admin/course-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}"
-                       th:text="${i}">1</a>
-                </li>
-
-                <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{'/admin/course-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-right"></i></a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-    <div id="courseConfirmBox" class="modal-overlay">
-        <div class="modal-content">
-            <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Xác Nhận Xóa Khóa Học</h3>
-            <p>Bạn có chắc chắn muốn xóa "<strong id="courseTitleDisplay"></strong>" không?</p>
-            <p style="color: var(--danger-color); font-size: 0.9rem;">Hành động này không thể hoàn tác!</p>
-
-            <div class="modal-actions">
-                <form id="deleteCourseForm" method="post">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash"></i> Xóa
-                    </button>
-                </form>
-                <button type="button" onclick="hideCourseConfirm()" class="btn btn-secondary">
-                    Hủy
-                </button>
+            <!-- Empty State -->
+            <div th:if="${courses == null or courses.isEmpty()}" class="text-center py-5 bg-white shadow-sm" style="border-radius: 20px;">
+                <i class="fas fa-search mb-3" style="font-size: 3rem; color: #dee2e6;"></i>
+                <h4>Không tìm thấy khóa học nào</h4>
+                <p class="text-muted">Vui lòng thử từ khóa khác.</p>
             </div>
+
+            <!-- Pagination (Style giống Dashboard) -->
+            <nav th:if="${totalPages != null and totalPages gt 1}" class="mt-4">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle" th:href="@{'/admin/course-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle" th:href="@{'/admin/course-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}" th:text="${i}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle" th:href="@{'/admin/course-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa (Giữ nguyên logic cũ) -->
+<div id="courseConfirmBox" class="modal-overlay">
+    <div class="modal-content text-center p-4" style="border-radius: 20px;">
+        <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 2.5rem;"></i>
+        <h3>Xác Nhận Xóa</h3>
+        <p>Bạn có chắc chắn muốn xóa "<strong id="courseTitleDisplay"></strong>"?</p>
+        <div class="modal-actions d-flex justify-content-center gap-2 mt-4">
+            <form id="deleteCourseForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-danger px-4 rounded-pill">Xóa ngay</button>
+            </form>
+            <button type="button" onclick="hideCourseConfirm()" class="btn btn-secondary px-4 rounded-pill">Hủy</button>
         </div>
     </div>
 </div>
-</div>
-</div>
 
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
 <script th:src="@{/js/pages/course-list.js}"></script>
 
 </body>
-
 </html>
-

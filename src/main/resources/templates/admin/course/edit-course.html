@@ -13,263 +13,294 @@
 <div class="admin-shell">
     <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
     <div class="admin-shell-main">
-<div class="admin-container">
-    <!-- Header -->
-    <div class="admin-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; text-align: left;">
-            <div>
-                <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
-                <p>Cập nhật thông tin khóa học</p>
+        <div class="admin-container">
+            <!-- Header -->
+            <div class="admin-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; text-align: left;">
+                    <div>
+                        <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
+                        <p>Cập nhật thông tin khóa học</p>
+                    </div>
+                    <a th:href="@{'/admin/' + ${courseDTO.id}}" class="btn btn-outline-secondary btn-sm"
+                       style="text-transform: none; padding: 10px 18px; font-weight: 600;">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
             </div>
-            <a th:href="@{'/admin/' + ${courseDTO.id}}" class="btn btn-outline-secondary btn-sm" style="text-transform: none; padding: 10px 18px; font-weight: 600;">
-                <i class="fas fa-arrow-left"></i> Quay Lại
-            </a>
+
+
+            <!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
+            <!--    <nav aria-label="breadcrumb">-->
+            <!--        <ol class="breadcrumb">-->
+            <!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
+            <!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
+            <!--            <li class="breadcrumb-item"><a th:href="@{'/admin/' + ${courseDTO.id}}">Chi Tiết</a></li>-->
+            <!--            <li class="breadcrumb-item active" aria-current="page">Chỉnh Sửa</li>-->
+            <!--        </ol>-->
+            <!--    </nav>-->
+
+            <div class="admin-content">
+                <div class="form-container">
+                    <form th:action="@{/admin/update}" th:object="${courseDTO}" method="post" id="courseForm"
+                          novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                        <!-- Hidden ID -->
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label for="title">
+                                <i class="fas fa-heading"></i> Tên Khóa Học <span
+                                    style="color: var(--danger-color);">*</span>
+                            </label>
+                            <input type="text" id="title" th:field="*{title}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                                   placeholder="Nhập tên khóa học" required minlength="3" maxlength="200">
+                            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+                                 class="invalid-feedback d-block"></div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên khóa học (từ 3 đến 200 ký tự).
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="description">
+                                <i class="fas fa-align-left"></i> Mô Tả Khóa Học <span
+                                    style="color: var(--danger-color);">*</span>
+                            </label>
+                            <textarea id="description" th:field="*{description}" class="form-control"
+                                      th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                                      placeholder="Nhập mô tả chi tiết về khóa học" rows="5" required minlength="10"
+                                      maxlength="2000"></textarea>
+                            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                                 class="invalid-feedback d-block"></div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mô tả khóa học (từ 10 đến 2000 ký tự).
+                            </div>
+                            <small style="color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> Mô tả nên bao gồm mục tiêu học tập và nội dung chính
+                                của
+                                khóa học.
+                            </small>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label for="price">
+                                <i class="fas fa-dollar-sign"></i> Giá Khóa Học (VND) <span
+                                    style="color: var(--danger-color);">*</span>
+                            </label>
+                            <!-- Changed to type="number" to ensure Spring binding works for Double -->
+                            <input type="number" id="price" th:field="*{price}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+                                   placeholder="Nhập giá khóa học" required min="0" step="1000">
+                            <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"
+                                 class="invalid-feedback d-block"></div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập giá khóa học hợp lệ (tối thiểu 0).
+                            </div>
+                            <small style="color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.
+                            </small>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="category">
+                                <i class="fas fa-tags"></i> Danh Mục
+                            </label>
+                            <input type="text" id="category" th:field="*{category}" class="form-control"
+                                   placeholder="Ví dụ: Web Development, Data Science, Design...">
+                            <small style="color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> Nhập chủ đề chính của khóa học.
+                            </small>
+                        </div>
+
+                        <!-- Image URL -->
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label for="imageUrl">
+                                <i class="fas fa-image"></i> Link Ảnh Khóa Học
+                            </label>
+                            <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
+                                   placeholder="Nhập link ảnh (URL)">
+                            <small style="color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> Sử dụng link ảnh từ Unsplash hoặc các nguồn host ảnh
+                                khác.
+                            </small>
+                        </div>
+
+                        <!-- Preview Video URL -->
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label for="previewVideoUrl">
+                                <i class="fas fa-video"></i> Link Video Giới Thiệu
+                            </label>
+                            <input type="text" id="previewVideoUrl" th:field="*{previewVideoUrl}" class="form-control"
+                                   placeholder="Dán link YouTube, Vimeo hoặc link .mp4 trực tiếp">
+                            <small style="color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> Hỗ trợ YouTube, Vimeo và link file video trực tiếp.
+                            </small>
+                        </div>
+
+                        <!-- Instructor -->
+                        <div class="form-group">
+                            <label for="instructorId">
+                                <i class="fas fa-user-tie"></i> Giảng Viên <span
+                                    style="color: var(--danger-color);">*</span>
+                            </label>
+                            <select id="instructorId" th:field="*{instructorId}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('instructorId')} ? 'is-invalid' : ''"
+                                    required>
+                                <option value="">-- Chọn Giảng Viên --</option>
+                                <option th:each="user : ${instructors}" th:value="${user.id}"
+                                        th:text="${user.fullName}">
+                                </option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('instructorId')}" th:errors="*{instructorId}"
+                                 class="invalid-feedback d-block"></div>
+                            <div class="invalid-feedback">
+                                Vui lòng chọn giảng viên cho khóa học.
+                            </div>
+                        </div>
+
+                        <hr style="grid-column: span 1; margin: 20px 0; border-top: 1px dashed var(--border-color);">
+                        <h4 style="grid-column: span 1; color: var(--secondary-color); margin-bottom: 15px;">
+                            <i class="fas fa-star"></i> Thông Số Premium
+                        </h4>
+
+                        <!-- Level -->
+                        <div class="form-group">
+                            <label for="level">
+                                <i class="fas fa-signal"></i> Trình Độ
+                            </label>
+                            <select id="level" th:field="*{level}" class="form-control">
+                                <option value="">-- Chọn Trình Độ --</option>
+                                <option value="Tất cả trình độ">Tất cả trình độ</option>
+                                <option value="Cơ bản (Beginner)">Cơ bản (Beginner)</option>
+                                <option value="Trung cấp (Intermediate)">Trung cấp (Intermediate)</option>
+                                <option value="Nâng cao (Advanced)">Nâng cao (Advanced)</option>
+                            </select>
+                        </div>
+
+                        <!-- Duration -->
+                        <div class="form-group">
+                            <label for="duration">
+                                <i class="far fa-clock"></i> Thời Lượng
+                            </label>
+                            <input type="text" id="duration" th:field="*{duration}" class="form-control"
+                                   placeholder="Ví dụ: 15 giờ, 8 tuần...">
+                        </div>
+
+                        <!-- Learning Points -->
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label for="learningPoints">
+                                <i class="fas fa-check-double"></i> Kết quả đạt được (Phân cách bằng dấu |)
+                            </label>
+                            <textarea id="learningPoints" th:field="*{learningPoints}" class="form-control" rows="3"
+                                      placeholder="Ví dụ: Hiểu cơ bản về Java | Xây dựng ứng dụng web..."></textarea>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label for="requirements">
+                                <i class="fas fa-list-check"></i> Yêu Cầu Đầu Vào (Phân cách bằng dấu |)
+                            </label>
+                            <textarea id="requirements" th:field="*{requirements}" class="form-control" rows="3"
+                                      placeholder="Ví dụ: Có kiến thức cơ bản về HTML | Máy tính có cài JDK..."></textarea>
+                        </div>
+
+                        <!-- Target Audience -->
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label for="targetAudience">
+                                <i class="fas fa-users"></i> Đối Tượng Học Viên (Phân cách bằng dấu |)
+                            </label>
+                            <textarea id="targetAudience" th:field="*{targetAudience}" class="form-control" rows="3"
+                                      placeholder="Ví dụ: Sinh viên CNTT | Người mới bắt đầu học code..."></textarea>
+                        </div>
+
+
+                        <!-- Preview Section -->
+                        <div class="admin-content" style="margin-top: 30px;">
+                            <h4 style="color: var(--secondary-color); margin-bottom: 20px;">
+                                <i class="fas fa-eye"></i> Xem Trước Khóa Học
+                            </h4>
+
+                            <div class="course-card">
+                                <div class="course-card-img" style="height: 150px; background: #eee; overflow: hidden;">
+                                    <div th:with="hasImage=${!#strings.isEmpty(courseDTO.imageUrl)}">
+
+                                        <img id="preview-img"
+                                             th:src="${courseDTO.imageUrl}"
+                                             alt=""
+                                             th:style="${hasImage ?
+                                                'width: 100%; height: 100%; object-fit: cover; display: block;' :
+                                                  'display: none; width: 100%; height: 100%; object-fit: cover;'}">
+
+                                        <div id="preview-img-placeholder"
+                                             th:style="${hasImage ?
+                         'display: none;' :
+                         'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc;'}">
+                                            <i class="fas fa-image fa-3x"></i>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="course-card-header">
+                                    <h3 id="preview-title" th:text="${courseDTO.title}">Tên Khóa Học</h3>
+                                    <div class="price" id="preview-price"
+                                         th:text="${#numbers.formatDecimal(courseDTO.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
+                                        0 VND
+                                    </div>
+                                </div>
+
+                                <div class="course-card-body">
+                                    <p id="preview-description" th:text="${courseDTO.description}">Mô tả khóa học sẽ
+                                        hiển thị ở
+                                        đây...</p>
+                                    <div class="course-meta-small">
+                                        <small style="color: var(--text-muted);">
+                                            <i class="fas fa-tag"></i>
+                                            <span id="preview-category"
+                                                  th:text="${#strings.isEmpty(courseDTO.category) ? 'Chưa có danh mục' : courseDTO.category}">
+                                            Chưa có danh mục
+                                            </span>
+                                        </small>
+                                        <br>
+                                        <small style="color: var(--text-muted);">
+                                            <i class="fas fa-user-tie"></i> <span id="preview-instructor">Chưa chọn giảng viên</span>
+                                        </small>
+                                        <br>
+                                        <small style="color: var(--text-muted);">
+                                            <i class="fas fa-play-circle"></i> <span
+                                                th:text="${courseDTO.lessons != null ? courseDTO.lessons.size() : 0}">0</span>
+                                            bài học
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-group"
+                             style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+                            <div class="form-actions-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Cập Nhật
+                                </button>
+                                <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Hủy bỏ
+                                </a>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
 
-
-<!--    &lt;!&ndash; Breadcrumb &ndash;&gt;-->
-<!--    <nav aria-label="breadcrumb">-->
-<!--        <ol class="breadcrumb">-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>-->
-<!--            <li class="breadcrumb-item"><a th:href="@{/admin/course-list}">Khóa Học</a></li>-->
-<!--            <li class="breadcrumb-item"><a th:href="@{'/admin/' + ${courseDTO.id}}">Chi Tiết</a></li>-->
-<!--            <li class="breadcrumb-item active" aria-current="page">Chỉnh Sửa</li>-->
-<!--        </ol>-->
-<!--    </nav>-->
-
-    <div class="admin-content">
-        <div class="form-container">
-            <form th:action="@{/admin/update}" th:object="${courseDTO}" method="post" id="courseForm" novalidate>
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-
-                <!-- Hidden ID -->
-                <input type="hidden" th:field="*{id}">
-
-                <!-- Title -->
-                <div class="form-group">
-                    <label for="title">
-                        <i class="fas fa-heading"></i> Tên Khóa Học <span style="color: var(--danger-color);">*</span>
-                    </label>
-                    <input type="text" id="title" th:field="*{title}" class="form-control"
-                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
-                           placeholder="Nhập tên khóa học" required minlength="3" maxlength="200">
-                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback d-block"></div>
-                    <div class="invalid-feedback">
-                        Vui lòng nhập tên khóa học (từ 3 đến 200 ký tự).
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <div class="form-group">
-                    <label for="description">
-                        <i class="fas fa-align-left"></i> Mô Tả Khóa Học <span style="color: var(--danger-color);">*</span>
-                    </label>
-                    <textarea id="description" th:field="*{description}" class="form-control"
-                              th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
-                              placeholder="Nhập mô tả chi tiết về khóa học" rows="5" required minlength="10" maxlength="2000"></textarea>
-                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback d-block"></div>
-                    <div class="invalid-feedback">
-                        Vui lòng nhập mô tả khóa học (từ 10 đến 2000 ký tự).
-                    </div>
-                    <small style="color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> Mô tả nên bao gồm mục tiêu học tập và nội dung chính của
-                        khóa học.
-                    </small>
-                </div>
-
-                <!-- Price -->
-                <div class="form-group">
-                    <label for="price">
-                        <i class="fas fa-dollar-sign"></i> Giá Khóa Học (VND) <span style="color: var(--danger-color);">*</span>
-                    </label>
-                    <!-- Changed to type="number" to ensure Spring binding works for Double -->
-                    <input type="number" id="price" th:field="*{price}" class="form-control"
-                           th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
-                           placeholder="Nhập giá khóa học" required min="0" step="1000">
-                    <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="invalid-feedback d-block"></div>
-                    <div class="invalid-feedback">
-                        Vui lòng nhập giá khóa học hợp lệ (tối thiểu 0).
-                    </div>
-                    <small style="color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> Nhập 0 nếu khóa học miễn phí.
-                    </small>
-                </div>
-
-                <!-- Category -->
-                <div class="form-group">
-                    <label for="category">
-                        <i class="fas fa-tags"></i> Danh Mục
-                    </label>
-                    <input type="text" id="category" th:field="*{category}" class="form-control"
-                           placeholder="Ví dụ: Web Development, Data Science, Design...">
-                    <small style="color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> Nhập chủ đề chính của khóa học.
-                    </small>
-                </div>
-
-                <!-- Image URL -->
-                <div class="form-group" style="grid-column: span 1;">
-                    <label for="imageUrl">
-                        <i class="fas fa-image"></i> Link Ảnh Khóa Học
-                    </label>
-                    <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
-                           placeholder="Nhập link ảnh (URL)">
-                    <small style="color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> Sử dụng link ảnh từ Unsplash hoặc các nguồn host ảnh khác.
-                    </small>
-                </div>
-
-                <!-- Preview Video URL -->
-                <div class="form-group" style="grid-column: span 1;">
-                    <label for="previewVideoUrl">
-                        <i class="fas fa-video"></i> Link Video Giới Thiệu
-                    </label>
-                    <input type="text" id="previewVideoUrl" th:field="*{previewVideoUrl}" class="form-control"
-                           placeholder="Dán link YouTube, Vimeo hoặc link .mp4 trực tiếp">
-                    <small style="color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> Hỗ trợ YouTube, Vimeo và link file video trực tiếp.
-                    </small>
-                </div>
-
-                <!-- Instructor -->
-                <div class="form-group">
-                    <label for="instructorId">
-                        <i class="fas fa-user-tie"></i> Giảng Viên <span style="color: var(--danger-color);">*</span>
-                    </label>
-                    <select id="instructorId" th:field="*{instructorId}" class="form-control"
-                            th:classappend="${#fields.hasErrors('instructorId')} ? 'is-invalid' : ''"
-                            required>
-                        <option value="">-- Chọn Giảng Viên --</option>
-                        <option th:each="user : ${instructors}" th:value="${user.id}" th:text="${user.fullName}">
-                        </option>
-                    </select>
-                    <div th:if="${#fields.hasErrors('instructorId')}" th:errors="*{instructorId}" class="invalid-feedback d-block"></div>
-                    <div class="invalid-feedback">
-                        Vui lòng chọn giảng viên cho khóa học.
-                    </div>
-                </div>
-
-                <hr style="grid-column: span 1; margin: 20px 0; border-top: 1px dashed var(--border-color);">
-                <h4 style="grid-column: span 1; color: var(--secondary-color); margin-bottom: 15px;">
-                    <i class="fas fa-star"></i> Thông Số Premium
-                </h4>
-
-                <!-- Level -->
-                <div class="form-group">
-                    <label for="level">
-                        <i class="fas fa-signal"></i> Trình Độ
-                    </label>
-                    <select id="level" th:field="*{level}" class="form-control">
-                        <option value="">-- Chọn Trình Độ --</option>
-                        <option value="Tất cả trình độ">Tất cả trình độ</option>
-                        <option value="Cơ bản (Beginner)">Cơ bản (Beginner)</option>
-                        <option value="Trung cấp (Intermediate)">Trung cấp (Intermediate)</option>
-                        <option value="Nâng cao (Advanced)">Nâng cao (Advanced)</option>
-                    </select>
-                </div>
-
-                <!-- Duration -->
-                <div class="form-group">
-                    <label for="duration">
-                        <i class="far fa-clock"></i> Thời Lượng
-                    </label>
-                    <input type="text" id="duration" th:field="*{duration}" class="form-control"
-                           placeholder="Ví dụ: 15 giờ, 8 tuần...">
-                </div>
-
-                <!-- Learning Points -->
-                <div class="form-group" style="grid-column: span 1;">
-                    <label for="learningPoints">
-                        <i class="fas fa-check-double"></i> Kết quả đạt được (Phân cách bằng dấu |)
-                    </label>
-                    <textarea id="learningPoints" th:field="*{learningPoints}" class="form-control" rows="3"
-                              placeholder="Ví dụ: Hiểu cơ bản về Java | Xây dựng ứng dụng web..."></textarea>
-                </div>
-
-                <!-- Requirements -->
-                <div class="form-group" style="grid-column: span 1;">
-                    <label for="requirements">
-                        <i class="fas fa-list-check"></i> Yêu Cầu Đầu Vào (Phân cách bằng dấu |)
-                    </label>
-                    <textarea id="requirements" th:field="*{requirements}" class="form-control" rows="3"
-                              placeholder="Ví dụ: Có kiến thức cơ bản về HTML | Máy tính có cài JDK..."></textarea>
-                </div>
-
-                <!-- Target Audience -->
-                <div class="form-group" style="grid-column: span 1;">
-                    <label for="targetAudience">
-                        <i class="fas fa-users"></i> Đối Tượng Học Viên (Phân cách bằng dấu |)
-                    </label>
-                    <textarea id="targetAudience" th:field="*{targetAudience}" class="form-control" rows="3"
-                              placeholder="Ví dụ: Sinh viên CNTT | Người mới bắt đầu học code..."></textarea>
-                </div>
-
-
-                <!-- Preview Section -->
-                <div class="admin-content" style="margin-top: 30px;">
-                    <h4 style="color: var(--secondary-color); margin-bottom: 20px;">
-                        <i class="fas fa-eye"></i> Xem Trước Khóa Học
-                    </h4>
-
-                    <div class="course-card">
-                        <div class="course-card-img" style="height: 150px; background: #eee; overflow: hidden;">
-                            <img id="preview-img" th:src="${courseDTO.imageUrl}" alt="" 
-                                 th:style="${courseDTO.imageUrl != null && !courseDTO.imageUrl.empty ? 'width: 100%; height: 100%; object-fit: cover; display: block;' : 'display: none; width: 100%; height: 100%; object-fit: cover;'}">
-                            <div id="preview-img-placeholder" 
-                                 th:style="${courseDTO.imageUrl != null && !courseDTO.imageUrl.empty ? 'display: none;' : 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc;'}">
-                                <i class="fas fa-image fa-3x"></i>
-                            </div>
-                        </div>
-                        <div class="course-card-header">
-                            <h3 id="preview-title" th:text="${courseDTO.title}">Tên Khóa Học</h3>
-                            <div class="price" id="preview-price"
-                                 th:text="${#numbers.formatDecimal(courseDTO.price, 1, 'COMMA', 0, 'POINT')} + ' VND'">
-                                0 VND
-                            </div>
-                        </div>
-
-                        <div class="course-card-body">
-                            <p id="preview-description" th:text="${courseDTO.description}">Mô tả khóa học sẽ hiển thị ở
-                                đây...</p>
-                            <div class="course-meta-small">
-                                <small style="color: var(--text-muted);">
-                                    <i class="fas fa-tag"></i> <span id="preview-category" th:text="${courseDTO.category != null && !courseDTO.category.empty ? courseDTO.category : 'Chưa có danh mục'}">Chưa có danh mục</span>
-                                </small>
-                                <br>
-                                <small style="color: var(--text-muted);">
-                                    <i class="fas fa-user-tie"></i> <span id="preview-instructor">Chưa chọn giảng viên</span>
-                                </small>
-                                <br>
-                                <small style="color: var(--text-muted);">
-                                    <i class="fas fa-play-circle"></i> <span th:text="${courseDTO.lessons != null ? courseDTO.lessons.size() : 0}">0</span> bài học
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="form-group" style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 30px;">
-                    <div class="form-actions-end">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Cập Nhật
-                        </button>
-                        <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i> Hủy bỏ
-                        </a>
-                    </div>
-                </div>
-
-            </form>
-        </div>
     </div>
 </div>
-
-</div>
-</div>
-
-
 
 
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
