@@ -34,7 +34,10 @@ public class Course {
 
     private String imageUrl; //anh thu nho khoa hoc
     private String previewVideoUrl; //video gioi thieu khoa hoc
-    private String category; //danh muc khoa hoc
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     // === NEW FIELDS ===
     /** Trình độ: Beginner / Intermediate / Advanced */

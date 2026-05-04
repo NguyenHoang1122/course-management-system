@@ -2,26 +2,84 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
-    <title>Profile</title>
+    <title>Thông tin cá nhân</title>
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <!-- Bạn có thể thêm css riêng của user tại đây nếu cần -->
 </head>
 <body>
 
 <div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
-<h2>Profile</h2>
+<main class="main-content">
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h2 class="fw-bold">Hồ sơ cá nhân</h2>
+                <hr>
+            </div>
 
-<p>Username: <span th:text="${user.userName}"></span></p>
-<p>Full name: <span th:text="${user.fullName}"></span></p>
-<p>Email: <span th:text="${user.email}"></span></p>
-<p>Phone: <span th:text="${user.phone}"></span></p>
-<p>Gender: <span th:text="${user.gender}"></span></p>
-<p>Address: <span th:text="${user.address}"></span></p>
-<p>Role: <span th:text="${user.roleName}"></span></p>
+            <!-- Cột bên trái: Ảnh đại diện và các thao tác nhanh -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="avatar-wrapper mb-3">
+                            <img th:if="${user.avatar}" th:src="${user.avatar}" alt="Avatar"
+                                 class="img-fluid rounded-circle border"
+                                 style="width: 150px; height: 150px; object-fit: cover;"/>
+                            <img th:if="${#strings.isEmpty(user.avatar)}" src="https://via.placeholder.com/150"
+                                 alt="Avatar" class="img-fluid rounded-circle border"
+                                 style="width: 150px; height: 150px; object-fit: cover;"/>
+                        </div>
 
-<img th:src="${user.avatar}" width="150"/>
+                        <h5 class="fw-bold" th:text="${user.fullName}"></h5>
+                        <p class="text-muted mb-1" th:text="'@' + ${user.userName}"></p>
+                        <span class="badge bg-info text-dark mb-3" th:text="${user.roleName}"></span>
+
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/profile/edit}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-edit me-1"></i> Chỉnh sửa hồ sơ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột bên phải: Chi tiết thông tin -->
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2"></i>Chi tiết tài khoản</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Họ và tên:</div>
+                            <div class="col-sm-8 fw-bold" th:text="${user.fullName}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Email:</div>
+                            <div class="col-sm-8" th:text="${user.email}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Số điện thoại:</div>
+                            <div class="col-sm-8" th:text="${user.phone}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Giới tính:</div>
+                            <div class="col-sm-8" th:text="${user.gender}"></div>
+                        </div>
+                        <div class="row mb-0">
+                            <div class="col-sm-4 text-muted">Địa chỉ:</div>
+                            <div class="col-sm-8" th:text="${user.address}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
 <div th:replace="~{layout :: siteFooter}"></div>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
+
 </body>
 </html>

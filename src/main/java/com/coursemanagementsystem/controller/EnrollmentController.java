@@ -3,7 +3,7 @@ package com.coursemanagementsystem.controller;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.UserRepository;
-import com.coursemanagementsystem.service.CourseService;
+import com.coursemanagementsystem.service.course.CourseService;
 import com.coursemanagementsystem.service.EnrollmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

@@ -22,7 +22,59 @@ body {
     color: var(--text-color);
     line-height: 1.6;
 }
+.admin-profile-dashboard-wrapper {
+    min-height: 100vh;
+    background: #f8fafc;
+    padding-bottom: 50px;
+}
 
+.admin-profile-hero {
+    position: relative;
+    height: 350px;
+    padding: 0;
+    text-align: left;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: -100px;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 120px;
+}
+
+.admin-dashboard-container {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    position: relative;
+    z-index: 10;
+    padding: 0 10px;
+    margin-top: 30px;
+}
+
+.admin-dashboard-sidebar {
+    /*width: calc(25% - 15px);*/
+    flex-shrink: 0;
+}
+
+.admin-dashboard-main-content {
+    width: calc(75% - 5px);
+    flex-shrink: 0;
+    min-width: 0;
+}
+@media (max-width: 991px) {
+    .admin-dashboard-container {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 15px;
+    }
+
+    .admin-dashboard-sidebar,
+    .admin-dashboard-main-content {
+        width: 100%;
+    }
+}
 .admin-shell {
     display: flex;
     min-height: 100vh;
@@ -991,20 +1043,33 @@ body.admin-sidebar-collapsed .sidebar-icon-wrap {
 }
 
 /* Stats Cards */
-.stats-grid {
+.admin-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-bottom: 30px;
 }
 
-.stat-card {
+.admin-stat-card {
     background: var(--white);
-    border-radius: 10px;
+    border-radius: 20px;
     padding: 25px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-left: 0;
+    transition: transform 0.3s ease;
+}
+.admin-stat-card:hover {
+    transform: translateY(-5px);
+}
+@media (max-width: 768px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .stat-card h3 {

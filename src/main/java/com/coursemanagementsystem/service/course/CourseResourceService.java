@@ -1,8 +1,9 @@
-package com.coursemanagementsystem.service;
+package com.coursemanagementsystem.service.course;
 
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.CourseResource;
 import com.coursemanagementsystem.repository.course.CourseResourceRepository;
+import com.coursemanagementsystem.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

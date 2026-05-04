@@ -1,7 +1,7 @@
 package com.coursemanagementsystem.controller.admin;
 
 import com.coursemanagementsystem.model.*;
-import com.coursemanagementsystem.service.CourseService;
+import com.coursemanagementsystem.service.course.CourseService;
 import com.coursemanagementsystem.service.ReviewService;
 import com.coursemanagementsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

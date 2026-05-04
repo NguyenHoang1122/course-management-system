@@ -60,21 +60,41 @@
 
 /* Main Content Layout */
 .dashboard-container {
-    max-width: 1300px;
-    margin: 0 auto;
+    width: 100%;
     display: flex;
-    gap: 30px;
+    /* Thiết lập khoảng cách giữa sidebar và content đúng 20px */
+    gap: 20px;
     position: relative;
     z-index: 10;
-    padding: 0 15px;
+    /* Lề trái và phải 10px như yêu cầu trước đó */
+    padding: 0 10px;
+    margin-top: 30px;
 }
 
-/* Sidebar Navigation */
+/* Sidebar Navigation - Chiếm chính xác 1/4 trừ đi một phần của gap */
 .dashboard-sidebar {
-    width: 300px;
+    width: calc(25% - 15px);
     flex-shrink: 0;
 }
 
+/* Main Panel - Chiếm chính xác 3/4 trừ đi một phần của gap */
+.dashboard-main-content {
+    width: calc(75% - 5px);
+    flex-shrink: 0;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 991px) {
+    .dashboard-container {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 15px;
+    }
+    .dashboard-sidebar,
+    .dashboard-main-content {
+        width: 100%; /* Trở về full width trên màn hình nhỏ */
+    }
+}
 .sidebar-card {
     background: var(--sidebar-bg);
     border-radius: 20px;
@@ -166,11 +186,6 @@
 .sidebar-menu li.active a i,
 .sidebar-menu li a:hover i {
     color: var(--accent-color);
-}
-
-/* Main Panel */
-.dashboard-main-content {
-    flex-grow: 1;
 }
 
 /* Statistics Grid */
@@ -318,18 +333,6 @@
     transform: scale(1.02);
 }
 
-/* Responsive */
-@media (max-width: 991px) {
-    .dashboard-container {
-        flex-direction: column;
-    }
-    .dashboard-sidebar {
-        width: 100%;
-    }
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
 /* --- Tối ưu lại phần Logout Sidebar --- */
 
 .logout-container {

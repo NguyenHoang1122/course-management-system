@@ -6,7 +6,7 @@ import com.coursemanagementsystem.model.Enrollment;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.FileService;
-import com.coursemanagementsystem.service.LessonProgressService;
+import com.coursemanagementsystem.service.lesson.LessonProgressService;
 import com.coursemanagementsystem.service.NotificationService;
 import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;

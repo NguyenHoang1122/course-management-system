@@ -1,15 +1,16 @@
-/* 1. Container chính - Biến thành dạng Card */
+/* admin-sidebar.css */
 .admin-sidebar {
+    width: 100%;
+    margin: 0;
+    padding: 30px 20px;
+    height: auto;
+    box-sizing: border-box;
     background: #ffffff;
     border-radius: 20px;
-    padding: 30px 20px;
+    border: 1px solid #eeeeee;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    width: 280px; /* Độ rộng cố định giống user */
-    height: fit-content;
-    margin: 20px; /* Tạo khoảng cách với mép màn hình */
+    overflow: hidden;
 }
-
 /* 2. Header & Brand - Làm gọn lại */
 .admin-sidebar-header {
     text-align: center;
@@ -32,49 +33,52 @@
 }
 
 /* 3. User Info Section - Căn giữa giống User Profile */
-.admin-sidebar-user {
+.admin-user-avatar-wrap {
+    width: 100px; /* Chỉnh lại kích thước vừa phải */
+    height: 100px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    border: 3px solid #f1f5f9;
+    overflow: hidden;
+}
+
+.admin-user-avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-user-info {
     text-align: center;
     margin-bottom: 30px;
     display: block;
     text-decoration: none;
 }
 
-.user-avatar-wrap {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 15px;
-    border-radius: 50%;
-    border: 5px solid white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    overflow: hidden;
-    background: #eee;
-}
-
-.user-avatar-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.user-info .user-name {
+.admin-user-name {
     display: block;
     font-size: 1.1rem;
     font-weight: 700;
     color: #1e293b;
+    line-height: 1.3;
+    word-break: normal;
 }
 
-.user-info .user-role {
+.admin-user-role {
+    display: block;
     font-size: 0.85rem;
-    color: #6366f1; /* Màu tím chủ đạo */
+    color: #6366f1;
     font-weight: 600;
+    line-height: 1.4;
+    word-break: normal;
 }
-
 /* 4. Navigation Menu - Dạng phẳng (Flat List) */
 .admin-sidebar-nav {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
+
 
 .sidebar-group-label {
     padding: 15px 15px 5px;
@@ -88,18 +92,16 @@
 .admin-sidebar-link {
     display: flex;
     align-items: center;
+    width: 100%;
     padding: 12px 15px;
     color: #64748b;
     text-decoration: none;
     border-radius: 12px;
     transition: all 0.3s ease;
     font-weight: 500;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
-.admin-sidebar-link:hover {
-    background-color: #f8fafc;
-    color: #6366f1;
-}
-
 .admin-sidebar-link:hover {
     background-color: #f8fafc;
     color: #6366f1;
@@ -113,11 +115,12 @@
 
 .sidebar-icon-wrap {
     width: 30px;
+    min-width: 30px;
     font-size: 1.1rem;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
-
 /* 5. Footer & Logout Button */
 .admin-sidebar-footer {
     margin-top: 20px;
@@ -156,6 +159,9 @@
     font-weight: 500;
     margin-left: 10px;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 /* Biến icon FontAwesome bên trong wrap thành kích thước chuẩn */
 .sidebar-icon-wrap i {
@@ -191,5 +197,5 @@
     }
 }
 .admin-sidebar-link.active .sidebar-icon-wrap {
-    color: #6366f1; /* Icon cũng chuyển màu tím khi active */
+    color: #6366f1;
 }

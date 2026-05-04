@@ -3,7 +3,7 @@ package com.coursemanagementsystem.controller;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.Review;
 import com.coursemanagementsystem.model.User;
-import com.coursemanagementsystem.service.CourseService;
+import com.coursemanagementsystem.service.course.CourseService;
 import com.coursemanagementsystem.service.EnrollmentService;
 import com.coursemanagementsystem.service.ReviewService;
 import com.coursemanagementsystem.service.UserService;

@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.service;
+package com.coursemanagementsystem.service.lesson;
 
 import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Course;
@@ -6,6 +6,7 @@ import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.repository.course.CourseRepository;
 import com.coursemanagementsystem.repository.course.CourseSectionRepository;
 import com.coursemanagementsystem.repository.lesson.LessonRepository;
+import com.coursemanagementsystem.service.EnrollmentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
