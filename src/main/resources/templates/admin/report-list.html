@@ -52,7 +52,7 @@
                                 </div>
                                 <div style="margin-left: auto;">
                                     <span class="report-meta">Thuộc khóa học: </span>
-                                    <a th:href="@{/courses/{id}(id=${report.review.course.id})}" target="_blank" 
+                                    <a th:href="@{/courses/{id}(id=${report.review.course.id})}" target="_blank"
                                        style="font-weight: 600; color: #6d28d9; text-decoration: none;" th:text="${report.review.course.title}">Khóa học</a>
                                 </div>
                             </div>
@@ -61,7 +61,7 @@
                             </div>
                         </div>
                         <div class="report-actions">
-                            <form th:action="@{/admin/reviews/{id}/delete(id=${report.review.id})}" method="post" 
+                            <form th:action="@{/admin/reviews/{id}/delete(id=${report.review.id})}" method="post"
                                   onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này? Hành động này sẽ xóa luôn tất cả báo cáo liên quan.')">
                                 <button type="submit" class="btn btn-danger">
                                     <i class="fas fa-trash-alt"></i> Xóa Đánh Giá

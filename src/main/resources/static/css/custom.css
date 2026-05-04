@@ -1449,18 +1449,62 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,1);
 }
 
+/* Container quản lý khoảng cách giữa các nút */
 .footer-app-buttons {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Căn giữa các nút theo trục dọc của container */
     gap: 12px;
 }
 
-.footer-app-btn {
-    border-radius: 50px;
-    height: 55px;
-    width: 210px;
-    text-decoration: none;
+/* Tinh chỉnh nút: Ép icon và chữ cùng 1 hàng */
+.custom-app-btn.footer-app-btn {
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    border-radius: 30px !important;
+
+    /* QUAN TRỌNG: Căn giữa nội dung */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    /* Kích thước */
+    width: 180px !important;   /* Tăng nhẹ để đủ chỗ cho icon và chữ */
+    height: 45px !important;    /* Khóa chiều cao cố định */
+    padding: 0 15px !important; /* Xóa padding top/bottom để center chuẩn hơn */
+
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+    box-sizing: border-box;
+}
+
+/* Xóa bỏ hiệu ứng dải màu cũ và các line-height lạ */
+.custom-app-btn.footer-app-btn::before {
+    display: none !important;
+}
+
+/* Icon - Khoảng cách với chữ */
+.custom-app-btn.footer-app-btn i {
+    margin-right: 10px !important;
+    margin-bottom: 0 !important; /* Xóa margin thừa nếu có */
+    font-size: 18px !important;
+    line-height: 1 !important;  /* Đảm bảo không tạo khoảng trống dòng */
+}
+
+/* Chữ - Ngăn nhảy dòng */
+.custom-app-btn.footer-app-btn span {
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;  /* Đảm bảo không tạo khoảng trống dòng */
+}
+
+/* Hiệu ứng Hover */
+.custom-app-btn.footer-app-btn:hover {
+    background-color: rgba(255, 255, 255, 1) !important;
+    color: #007bff !important;
+    border-color: transparent !important;
 }
 
 .footer-bottom {

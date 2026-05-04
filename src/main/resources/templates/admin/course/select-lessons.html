@@ -1,99 +1,145 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Chọn Bài Học Cho Chương - Course Management System</title>
 
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <!-- Import các CSS mới để đồng bộ style -->
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
+    <!-- Giữ lại CSS riêng cho trang nếu có các hiệu ứng chọn -->
     <link rel="stylesheet" th:href="@{/css/pages/select-lessons.css}">
 </head>
 
 <body>
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-    <div class="admin-shell-main">
-<div class="admin-container">
-    <!-- Header -->
-    <div class="admin-header">
-        <h1><i class="fas fa-list-check"></i> Chọn Bài Học Cho Chương</h1>
-        <p>Chọn các bài học để thêm vào chương "<strong th:text="${section.title}">Chương</strong>" của khóa học "<strong th:text="${course.title}">Khóa học</strong>"</p>
-    </div>
 
-    <!-- Course Info -->
-    <div class="admin-content">
-        <div class="course-info-card">
-            <div class="d-flex align-items-center">
-                <div class="course-icon">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <div>
-                    <h4 th:text="${course.title}" style="margin: 0; color: var(--secondary-color);"></h4>
-                    <p style="margin: 0; color: var(--text-muted);">Chương: <strong th:text="${section.title}"></strong></p>
-                </div>
-            </div>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Area -->
+    <div class="profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-list-check"></i> Assign Lessons</h1>
+            <p>Sắp xếp bài giảng vào chương trình học</p>
         </div>
     </div>
 
-    <!-- Form -->
-    <div class="admin-content">
-        <form th:action="@{'/admin/course/' + ${course.id} + '/assign-lessons'}" method="post">
-            <input type="hidden" name="sectionId" th:value="${section.id}">
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
 
-            <div class="form-group">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 style="margin: 0; color: var(--secondary-color);">Danh Sách Bài Học</h4>
-                    <div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Lưu Thay Đổi
-                        </button>
-                        <a th:href="@{'/admin/' + ${course.id}}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay Lại
-                        </a>
-                    </div>
-                </div>
+        <!-- Main Content Area -->
+        <main class="dashboard-main-content">
 
-                <div th:if="${allLessons != null and !allLessons.isEmpty()}" class="lesson-selection-list">
-                    <div th:each="lesson : ${allLessons}" class="lesson-selection-item">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" th:id="'lesson-' + ${lesson.id}"
-                                   th:value="${lesson.id}" th:name="lessonIds"
-                                   th:checked="${assignedLessonIds.contains(lesson.id)}">
-                            <label class="form-check-label" th:for="'lesson-' + ${lesson.id}">
-                                <div class="lesson-info">
-                                    <div class="lesson-title" th:text="${lesson.title}">Lesson Title</div>
-                                    <div class="lesson-meta">
-                                        <small class="text-muted">
-                                            <i class="fas fa-play-circle"></i>
-                                            <span th:if="${lesson.section != null and lesson.section.id == section.id}" class="badge badge-success">Đã chọn</span>
-                                            <span th:if="${lesson.section != null and lesson.section.id != section.id}" class="badge badge-warning">Thuộc chương khác</span>
-                                            <span th:if="${lesson.section == null}" class="badge badge-secondary">Chưa phân loại</span>
-                                        </small>
-                                    </div>
-                                </div>
-                            </label>
+            <!-- Info Header Card -->
+            <div class="bg-white shadow-sm p-4 mb-4" style="border-radius: 20px;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary-light p-3 me-3 text-primary">
+                            <i class="fas fa-book-open fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1" th:text="${course.title}">Tên Khóa Học</h5>
+                            <p class="text-muted mb-0">
+                                Đang chỉnh sửa chương: <span class="text-primary fw-bold" th:text="${section.title}">Chương 1</span>
+                            </p>
                         </div>
                     </div>
-                </div>
-
-                <div th:if="${allLessons == null or allLessons.isEmpty()}" class="text-center py-5">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #e2e8f0; margin-bottom: 20px; display: block;"></i>
-                    <h4 style="color: #94a3b8;">Khóa học này chưa có bài học nào</h4>
-                    <p style="color: #94a3b8;">Hãy tạo bài học trước khi thêm vào chương.</p>
-                    <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson'}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Thêm Bài Học Mới
-                    </a>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark rounded-pill px-3" th:text="${allLessons != null ? allLessons.size() : 0} + ' bài học tổng cộng'">0 bài học</span>
+                    </div>
                 </div>
             </div>
-        </form>
+
+            <!-- Selection List Form -->
+            <div class="bg-white shadow-sm p-4" style="border-radius: 20px;">
+                <form th:action="@{'/admin/course/' + ${course.id} + '/assign-lessons'}" method="post">
+                    <input type="hidden" name="sectionId" th:value="${section.id}">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Danh Sách Bài Học</h5>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{'/admin/' + ${course.id}}" class="btn btn-light rounded-pill px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lesson List -->
+                    <div th:if="${allLessons != null and !allLessons.isEmpty()}" class="lesson-selection-list">
+                        <div th:each="lesson : ${allLessons}" class="mb-2">
+                            <div class="lesson-selection-item p-3 rounded-4 border d-flex align-items-center transition-all hover-bg-light"
+                                 th:style="${assignedLessonIds.contains(lesson.id)} ? 'border-color: var(--primary-color); background: #f0f7ff;' : 'border-color: #f1f5f9;'">
+
+                                <div class="form-check d-flex align-items-center w-100">
+                                    <input class="form-check-input me-3" type="checkbox"
+                                           th:id="'lesson-' + ${lesson.id}"
+                                           th:value="${lesson.id}" th:name="lessonIds"
+                                           th:checked="${assignedLessonIds.contains(lesson.id)}"
+                                           style="width: 22px; height: 22px; cursor: pointer;">
+
+                                    <label class="form-check-label w-100" th:for="'lesson-' + ${lesson.id}" style="cursor: pointer;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${lesson.title}">Lesson Title</div>
+                                                <div class="small text-muted mt-1">
+                                                    <i class="far fa-clock me-1"></i> <span th:text="${lesson.duration != null ? lesson.duration : 'N/A'}"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="lesson-status">
+                                                <!-- Status Badge -->
+                                                <span th:if="${lesson.section != null and lesson.section.id == section.id}"
+                                                      class="badge rounded-pill bg-success px-3">Trong chương này</span>
+
+                                                <span th:if="${lesson.section != null and lesson.section.id != section.id}"
+                                                      class="badge rounded-pill bg-warning text-dark px-3">
+                                                        Thuộc: <span th:text="${lesson.section.title}"></span>
+                                                    </span>
+
+                                                <span th:if="${lesson.section == null}"
+                                                      class="badge rounded-pill bg-light text-muted px-3 border">Chưa phân loại</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div th:if="${allLessons == null or allLessons.isEmpty()}" class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-clipboard-list fa-4x text-light"></i>
+                        </div>
+                        <h5 class="text-muted">Khóa học này chưa có bài học nào</h5>
+                        <p class="text-muted small">Vui lòng tạo bài học trước khi tiến hành phân chương.</p>
+                        <a th:href="@{'/admin/course/' + ${course.id} + '/add-lesson'}" class="btn btn-outline-primary rounded-pill px-4 mt-2">
+                            <i class="fas fa-plus me-2"></i>Thêm bài học mới
+                        </a>
+                    </div>
+
+                    <!-- Floating Action Bar for Mobile (Optional) -->
+                    <div class="d-md-none fixed-bottom p-3 bg-white border-top text-center shadow-lg">
+                        <button type="submit" class="btn btn-primary rounded-pill w-100 py-2">Lưu Thay Đổi</button>
+                    </div>
+                </form>
+            </div>
+        </main>
     </div>
 </div>
-</div>
-</div>
 
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
-
 
 </body>
 </html>

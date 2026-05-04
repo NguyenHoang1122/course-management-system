@@ -1,136 +1,146 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <th:block th:replace="~{layout :: headMeta}"></th:block>
     <title>Danh Sách Bài Học - Course Management System</title>
 
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <!-- Import CSS giống course-list để đồng bộ style -->
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
 </head>
 
 <body>
 
-<div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
-    <div class="admin-shell-main">
-        <div class="admin-container">
-            <div class="admin-header">
-                <h1><i class="fas fa-play-circle"></i> Quản Lý Bài Học</h1>
-                <p>Danh sách toàn bộ bài học trong hệ thống</p>
-            </div>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Area: Đồng bộ với Course List -->
+    <div class="profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-play-circle"></i> Admin Lesson Management</h1>
+            <p>Quản lý toàn bộ nội dung bài học trong hệ thống</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation (Đã thay đổi theo layout course-list) -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main-content">
+
+            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3 th:text="${totalItems != null ? totalItems : 0}">0</h3>
-                    <p><i class="fas fa-list"></i> Tổng Bài Học</p>
+                    <div class="stat-icon enrolled"><i class="fas fa-play"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${totalItems != null ? totalItems : 0}">0</h4>
+                        <p>Tổng Bài Học</p>
+                    </div>
                 </div>
+                <!-- Bạn có thể thêm các card stats khác ở đây nếu cần -->
             </div>
-            <div class="admin-content">
-                <div class="mb-3 d-flex align-items-center justify-content-between">
-                    <h3 style="color: var(--secondary-color); margin: 0;">
-                        <i class="fas fa-list"></i> Danh Sách Bài Học
-                    </h3>
-                    <a th:href="@{/admin/create-lesson}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Tạo Bài Học Mới
-                    </a>
-                </div>
 
-                <div class="mb-4" style="background: var(--white); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
-                    <form th:action="@{/admin/lesson-list}" method="get" style="display: flex; gap: 10px; align-items: center;">
-                        <input type="hidden" name="page" value="1">
-                        <input type="hidden" name="size" th:value="${size}">
-                        <input type="text" id="keyword" name="keyword"
-                               th:value="${keyword}"
+            <!-- Content Section Header -->
+            <div class="course-section-header mt-4">
+                <h3><i class="fas fa-list"></i> Danh Sách Bài Học</h3>
+                <a th:href="@{/admin/create-lesson}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-plus"></i> Tạo Bài Học Mới
+                </a>
+            </div>
+
+            <!-- Search Bar (Style đồng bộ) -->
+            <div class="mb-4 bg-white p-3 shadow-sm" style="border-radius: 15px;">
+                <form th:action="@{/admin/lesson-list}" method="get" class="row g-2 align-items-center">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${size}">
+                    <div class="col-md-8">
+                        <input type="text" name="keyword" th:value="${keyword}"
+                               class="form-control border-0 bg-light"
                                placeholder="Tìm theo tên bài học hoặc khóa học..."
-                               style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
-                        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
-                            <i class="fas fa-search"></i> Tìm kiếm
-                        </button>
-                        <a th:href="@{/admin/lesson-list}" class="btn btn-secondary" style="white-space: nowrap;">
-                            <i class="fas fa-redo"></i> Xóa bộ lọc
+                               style="border-radius: 10px;">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1" style="border-radius: 10px;">Tìm kiếm</button>
+                        <a th:href="@{/admin/lesson-list}" class="btn btn-light" style="border-radius: 10px;">
+                            <i class="fas fa-redo"></i>
                         </a>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
 
-                <div th:if="${lessons != null and !lessons.isEmpty()}" class="row">
-                    <div th:each="lesson, iterStat : ${lessons}" class="col-lg-4 col-md-6 mb-4">
-                        <div class="course-card shadow-sm h-100">
-<!--                            <div class="course-badge" th:text="'Bài ' + ${iterStat.index + 1}">Bài 1</div>-->
+            <!-- Lesson Grid (Sử dụng style card của dashboard) -->
+            <div th:if="${lessons != null and !lessons.isEmpty()}" class="row">
+                <div th:each="lesson : ${lessons}" class="col-lg-4 col-md-6 mb-4">
+                    <div class="dashboard-course-card shadow-sm h-100"
+                         style="cursor: pointer;"
+                         th:onclick="|window.location.href='/admin/lesson-detail/' + ${lesson.id}|">
 
-                            <div class="course-card-img" style="height: 200px; background: #000; overflow: hidden;">
-                                <div th:if="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}"
-                                     class="lesson-video-item"
-                                     th:data-video-url="${lesson.videoUrl}"
-                                     style="height: 100%;">
-                                    <iframe class="lesson-card-iframe" width="100%" height="100%"
-                                            src="" frameborder="0" allowfullscreen
-                                            style="display: none; pointer-events: none;"></iframe>
-                                    <div class="video-placeholder d-flex align-items-center justify-content-center" style="height: 100%;">
-                                        <i class="fas fa-play-circle" style="font-size: 3rem; color: white; opacity: 0.7;"></i>
-                                    </div>
-                                </div>
-                                <div th:unless="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}"
-                                     class="d-flex align-items-center justify-content-center" style="height: 100%; background: #f8f9fa;">
-                                    <i class="fas fa-video-slash" style="font-size: 3rem; color: #ccc;"></i>
-                                </div>
+                        <!-- Thumbnail/Video Preview Area -->
+                        <div class="db-course-image d-flex align-items-center justify-content-center"
+                             style="height: 180px; background: #000;">
+                            <div th:if="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}" class="text-center">
+                                <i class="fas fa-play-circle" style="font-size: 3rem; color: white; opacity: 0.7;"></i>
                             </div>
+                            <div th:unless="${lesson.videoUrl != null and !#strings.isEmpty(lesson.videoUrl)}">
+                                <i class="fas fa-video-slash" style="font-size: 3rem; color: #ccc;"></i>
+                            </div>
+                        </div>
 
-                            <div class="course-card-body d-flex flex-column">
-                                <h3 class="course-title mt-2 text-center">
-                                    <a th:href="@{/admin/lesson-detail/{id}(id=${lesson.id})}"
-                                       th:text="${lesson.title}"
-                                       style="color: inherit; text-decoration: none;">Tên bài học</a>
-                                </h3>
+                        <div class="db-course-body">
+                            <span class="db-course-category" th:text="${lesson.course != null ? lesson.course.title : 'N/A'}">Tên Khóa Học</span>
+                            <h4 class="db-course-title mb-2" th:text="${lesson.title}">Lesson Title</h4>
 
-                                <div class="course-meta mb-3 text-center">
-                                    <div class="d-flex align-items-center justify-content-center mb-1">
-                                        <i class="fas fa-book-open mr-2 text-muted"></i>
-                                        <small th:text="${lesson.course != null ? lesson.course.title : '-'}">Khóa học</small>
-                                    </div>
-                                </div>
-
-                                <div class="mt-auto pt-3 border-top d-flex justify-content-center">
-                                    <a th:href="@{/admin/lesson-detail/{id}(id=${lesson.id})}"
-                                       class="btn btn-primary px-5"
-                                       style="background-color: #4285f4; border: none; border-radius: 4px; font-weight: 600;">
-                                        <i class="fas fa-eye"></i> Xem bài học
-                                    </a>
-                                </div>
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="far fa-clock me-1"></i> Video</span>
+                                <a th:href="@{'/admin/lesson-detail/' + ${lesson.id}}" class="btn btn-sm btn-outline-primary px-3 rounded-pill">Chi tiết</a>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div th:if="${lessons == null or lessons.isEmpty()}" class="text-center py-5">
-                    <i class="fas fa-play-circle" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
-                    <h4 style="color: var(--text-muted);">Chưa có bài học nào</h4>
-                    <p style="color: var(--text-muted);">Hãy tạo bài học đầu tiên cho hệ thống.</p>
-                    <a th:href="@{/admin/create-lesson}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Tạo Bài Học Đầu Tiên
-                    </a>
-                </div>
-
-                <nav th:if="${totalPages != null && totalPages > 1}" aria-label="Lesson pagination" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-left"></i></a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
-                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}" th:text="${i}">1</a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
-                            <a class="page-link" th:href="@{'/admin/lesson-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}"><i class="fas fa-chevron-right"></i></a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
-        </div>
+
+            <!-- Empty State -->
+            <div th:if="${lessons == null or lessons.isEmpty()}" class="text-center py-5 bg-white shadow-sm" style="border-radius: 20px;">
+                <i class="fas fa-play-circle mb-3" style="font-size: 3rem; color: #dee2e6;"></i>
+                <h4>Chưa có bài học nào</h4>
+                <p class="text-muted">Vui lòng kiểm tra lại hoặc tạo mới bài học.</p>
+            </div>
+
+            <!-- Pagination (Style đồng bộ) -->
+            <nav th:if="${totalPages != null and totalPages gt 1}" class="mt-4">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <li class="page-item" th:classappend="${currentPage le 1} ? 'disabled'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
+                           th:href="@{'/admin/lesson-list?page=' + ${currentPage - 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
+                           th:href="@{'/admin/lesson-list?page=' + ${i} + '&size=' + ${size} + '&keyword=' + ${keyword}}" th:text="${i}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage ge totalPages} ? 'disabled'">
+                        <a class="page-link border-0 shadow-sm mx-1 rounded-circle"
+                           th:href="@{'/admin/lesson-list?page=' + ${currentPage + 1} + '&size=' + ${size} + '&keyword=' + ${keyword}}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
     </div>
 </div>
-<th:block th:replace="~{layout :: coreScripts}"></th:block>
 
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
 <script th:src="@{/js/pages/lesson-list.js}"></script>
 
 </body>
 </html>
-
