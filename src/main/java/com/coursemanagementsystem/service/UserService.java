@@ -58,7 +58,6 @@ public class UserService {
 
     private UserDTO convertToDTO(User user) {
         UserDTO dto = modelMapper.map(user, UserDTO.class);
-
         if (user.getRole() != null) {
             dto.setRoleName(user.getRole().getName());
         }

@@ -9,7 +9,9 @@
 <body>
 
 <div class="admin-shell">
-    <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <aside class="dashboard-sidebar">
+        <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    </aside>
     <div class="admin-shell-main">
         <div class="container mt-5 mb-5">
             <h2>Profile</h2>

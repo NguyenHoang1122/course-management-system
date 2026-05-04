@@ -2,7 +2,9 @@ package com.coursemanagementsystem.controller.admin;
 
 import com.coursemanagementsystem.dto.LessonDTO;
 import com.coursemanagementsystem.model.Lesson;
-import com.coursemanagementsystem.service.*;
+import com.coursemanagementsystem.service.course.CourseSectionService;
+import com.coursemanagementsystem.service.course.CourseService;
+import com.coursemanagementsystem.service.lesson.LessonService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

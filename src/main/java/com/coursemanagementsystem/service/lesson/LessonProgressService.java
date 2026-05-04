@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.service;
+package com.coursemanagementsystem.service.lesson;
 
 import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.model.LessonProgress;

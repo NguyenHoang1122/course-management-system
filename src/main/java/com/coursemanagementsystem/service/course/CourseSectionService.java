@@ -1,4 +1,4 @@
-package com.coursemanagementsystem.service;
+package com.coursemanagementsystem.service.course;
 
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.CourseSection;

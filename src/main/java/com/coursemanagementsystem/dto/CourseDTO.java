@@ -27,7 +27,9 @@ public class CourseDTO {
 
     private String imageUrl;
     private String previewVideoUrl;
-    private String category;
+
+    @NotNull(message = "Vui lòng chọn danh mục")
+    private Long categoryId;
 
     // --- NEW PREMIUM FIELDS ---
     private String level;

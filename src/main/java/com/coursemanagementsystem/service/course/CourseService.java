@@ -1,8 +1,10 @@
-package com.coursemanagementsystem.service;
+package com.coursemanagementsystem.service.course;
 
 import com.coursemanagementsystem.dto.CourseDTO;
+import com.coursemanagementsystem.model.Category;
 import com.coursemanagementsystem.model.Course;
 import com.coursemanagementsystem.model.User;
+import com.coursemanagementsystem.repository.CategoryRepository;
 import com.coursemanagementsystem.repository.UserRepository;
 import com.coursemanagementsystem.repository.course.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class CourseService {
     private CourseRepository courseRepository;
 
     @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     public void saveFromDTO(CourseDTO dto) {
@@ -38,18 +43,26 @@ public class CourseService {
                 throw new RuntimeException("Course not found");
             }
 
-            // map thủ công (AN TOÀN - không đụng tới relation)
+            // map thủ công
             course.setTitle(dto.getTitle());
             course.setDescription(dto.getDescription());
             course.setPrice(dto.getPrice());
             course.setImageUrl(dto.getImageUrl());
             course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
-            course.setCategory(dto.getCategory());
             course.setLevel(dto.getLevel());
             course.setDuration(dto.getDuration());
             course.setLearningPoints(dto.getLearningPoints());
             course.setRequirements(dto.getRequirements());
             course.setTargetAudience(dto.getTargetAudience());
+
+            // ✅ Xử lý Category đúng cách
+            if (dto.getCategoryId() != null) {
+                Category category = categoryRepository.findById(dto.getCategoryId()).orElse(null);
+                if (category == null) {
+                    throw new RuntimeException("Category không tồn tại");
+                }
+                course.setCategory(category);
+            }
 
         } else {
             // CREATE
@@ -59,16 +72,24 @@ public class CourseService {
             course.setPrice(dto.getPrice());
             course.setImageUrl(dto.getImageUrl());
             course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
-            course.setCategory(dto.getCategory());
             course.setLevel(dto.getLevel());
             course.setDuration(dto.getDuration());
             course.setLearningPoints(dto.getLearningPoints());
             course.setRequirements(dto.getRequirements());
             course.setTargetAudience(dto.getTargetAudience());
             course.setCreatedAt(LocalDate.now());
+
+            // ✅ Xử lý Category đúng cách
+            if (dto.getCategoryId() != null) {
+                Category category = categoryRepository.findById(dto.getCategoryId()).orElse(null);
+                if (category == null) {
+                    throw new RuntimeException("Category không tồn tại");
+                }
+                course.setCategory(category);
+            }
         }
 
-        // xử lý instructor (QUAN TRỌNG)
+        // xử lý instructor
         if (dto.getInstructorId() != null) {
             User instructor = userRepository.findByIdAndDeletedFalse(dto.getInstructorId()).orElse(null);
 
@@ -199,7 +220,9 @@ public class CourseService {
         dto.setPrice(course.getPrice());
         dto.setImageUrl(course.getImageUrl());
         dto.setPreviewVideoUrl(course.getPreviewVideoUrl());
-        dto.setCategory(course.getCategory());
+        if (course.getCategory() != null) {
+            dto.setCategoryId(course.getCategory().getId());
+        }
         dto.setLevel(course.getLevel());
         dto.setDuration(course.getDuration());
         dto.setLearningPoints(course.getLearningPoints());
