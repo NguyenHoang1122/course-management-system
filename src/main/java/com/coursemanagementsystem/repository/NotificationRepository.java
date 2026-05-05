@@ -10,11 +10,12 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
-    long countByUserAndIsReadFalse(User user);
-    
-    // For marking all as read
-    List<Notification> findByUserAndIsReadFalse(User user);
+    //   danh sách thông báo theo time
+    List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-    void deleteByUser(User user);
+    // tat ca thong báo chưa đọc
+    List<Notification> findAllByUserIdAndIsReadFalse(Long userId);
+
+    //    Đếm số lượng thông báo chưa đọc
+    long countByUserIdAndIsReadFalse(Long userId);
 }

@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/about", "/contact", "/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
 
+                        .requestMatchers("/api/notifications/**").authenticated()
                         .requestMatchers("/courses/my-courses").authenticated()
                         .requestMatchers(HttpMethod.GET, "/courses", "/courses/", "/courses/*", "/courses/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/courses/*/reviews", "/enrollments/**", "/lessons/*/complete").authenticated()

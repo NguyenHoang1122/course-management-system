@@ -4,11 +4,9 @@ import com.coursemanagementsystem.dto.UserProfileDTO;
 import com.coursemanagementsystem.dto.EnrollmentCourseProgressDTO;
 import com.coursemanagementsystem.model.Enrollment;
 import com.coursemanagementsystem.model.User;
-import com.coursemanagementsystem.service.EnrollmentService;
-import com.coursemanagementsystem.service.FileService;
+import com.coursemanagementsystem.security.CustomUserDetails;
+import com.coursemanagementsystem.service.*;
 import com.coursemanagementsystem.service.lesson.LessonProgressService;
-import com.coursemanagementsystem.service.NotificationService;
-import com.coursemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -196,12 +194,17 @@ public class ProfileController {
     // Hiển thị thông báo của user
     @GetMapping("/notifications")
     public String viewNotifications(Model model, Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+        Long userId = null;
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getId();
+        }
 
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+        User user = userService.findById(userId);
         model.addAttribute("user", user);
-        model.addAttribute("notifications",
-                notificationService.getAllNotifications(user));
-
+        model.addAttribute("notifications", notificationService.getNotificationsForUser(userId));
         return "profile/notifications";
     }
 

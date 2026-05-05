@@ -34,4 +34,9 @@ public class Lesson {
     private int displayOrder;
 
     private String duration;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    private boolean isPreview = false;
 }

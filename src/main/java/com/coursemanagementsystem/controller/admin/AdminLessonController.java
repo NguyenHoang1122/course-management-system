@@ -55,7 +55,7 @@ public class AdminLessonController {
     public String lessonDetail(@PathVariable("id") Long id, Model model) {
         Lesson lesson = lessonService.findById(id);
         if (lesson == null) {
-            return "redirect:/admin/lesson/lesson-list";
+            return "redirect:/admin/lesson-list";
         }
         model.addAttribute("lesson", lesson);
         model.addAttribute("activeMenu", "lessons");
@@ -93,9 +93,9 @@ public class AdminLessonController {
         }
         lessonService.saveFromDTO(dto);
         if (dto.getCourseId() != null) {
-            return "redirect:/admin/lesson/" + dto.getCourseId();
+            return "redirect:/admin/" + dto.getCourseId();
         }
-        return "redirect:/admin/lesson/lesson-list";
+        return "redirect:/admin//lesson-list";
     }
 
 
@@ -104,7 +104,7 @@ public class AdminLessonController {
     public String editLesson(@PathVariable("id") Long id, Model model) {
         Lesson lesson = lessonService.findById(id);
         if (lesson == null) {
-            return "redirect:/admin/lesson/lesson-list";
+            return "redirect:/admin/lesson-list";
         }
         LessonDTO dto = new LessonDTO();
         dto.setId(lesson.getId());
@@ -137,7 +137,7 @@ public class AdminLessonController {
     @PostMapping("/delete-lesson-from-list/{id}")
     public String deleteLessonFromList(@PathVariable("id") Long id) {
         lessonService.deleteById(id);
-        return "redirect:/admin/lesson/lesson-list";
+        return "redirect:/admin/lesson-list";
     }
 
     @GetMapping("/create-lesson")

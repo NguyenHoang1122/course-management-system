@@ -16,75 +16,12 @@
     --text-muted: #6c757d;
 }
 
-body {
-    font-family: 'Mulish', sans-serif;
-    background: var(--gray-bg);
-    color: var(--text-color);
-    line-height: 1.6;
-}
-.admin-profile-dashboard-wrapper {
-    min-height: 100vh;
-    background: #f8fafc;
-    padding-bottom: 50px;
-}
-
-.admin-profile-hero {
-    position: relative;
-    height: 350px;
-    padding: 0;
-    text-align: left;
-    color: white;
-    background-size: cover;
-    background-position: center;
-    border-radius: 0 0 30px 30px;
-    margin-bottom: -100px;
-    display: flex;
-    align-items: flex-end;
-    padding-bottom: 120px;
-}
-
-.admin-dashboard-container {
-    width: 100%;
-    display: flex;
-    gap: 20px;
-    position: relative;
-    z-index: 10;
-    padding: 0 10px;
-    margin-top: 30px;
-}
-
-.admin-dashboard-sidebar {
-    /*width: calc(25% - 15px);*/
-    flex-shrink: 0;
-}
-
-.admin-dashboard-main-content {
-    width: calc(75% - 5px);
-    flex-shrink: 0;
-    min-width: 0;
-}
-@media (max-width: 991px) {
-    .admin-dashboard-container {
-        flex-direction: column;
-        gap: 20px;
-        padding: 0 15px;
-    }
-
-    .admin-dashboard-sidebar,
-    .admin-dashboard-main-content {
-        width: 100%;
-    }
-}
-.admin-shell {
-    display: flex;
-    min-height: 100vh;
-}
-
-.admin-shell-main {
-    flex: 1;
-    min-width: 0;
-}
-
+/*body {*/
+/*    font-family: 'Mulish', sans-serif;*/
+/*    background: var(--gray-bg);*/
+/*    color: var(--text-color);*/
+/*    line-height: 1.6;*/
+/*}*/
 .user-avatar-wrap {
     width: 45px;
     height: 45px;
@@ -331,7 +268,7 @@ body.admin-sidebar-collapsed .sidebar-icon-wrap {
 
 .breadcrumb-item + .breadcrumb-item::before {
     content: ">";
-    color: #333;
+    color: #FFFFFF;
     font-weight: 600;
 }
 
@@ -1554,8 +1491,35 @@ body.admin-sidebar-collapsed .sidebar-icon-wrap {
 }
 
 /* Đảm bảo content nổi lên trên background */
-.admin-shell,
 .admin-container {
     position: relative;
     z-index: 1;
+}
+.dashboard-main-content .row {
+    display: flex;
+    align-items: stretch;
+}
+
+.dashboard-main-content .col-lg-8,
+.dashboard-main-content .col-lg-4 {
+    display: flex;
+    flex-direction: column;
+}
+.lesson-video-player-wrap,
+.bg-white.shadow-sm.overflow-hidden.mb-4 {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.ratio.ratio-16x9 {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 350px; /* hoặc giá trị phù hợp */
+}
+#lessonYoutubeFrame {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 350px;
+    display: block;
 }

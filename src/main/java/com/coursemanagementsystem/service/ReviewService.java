@@ -26,7 +26,7 @@ public class ReviewService {
     private ReviewReportRepository reportRepository;
 
     @Autowired
-    private NotificationService notificationService;
+    private NotificationServiceImpl notificationServiceImpl;
 
     @Autowired
     private UserService userService;
@@ -88,12 +88,12 @@ public class ReviewService {
 
                 // Notification: Review Author gets notified when someone likes their review
                 if (!review.getUser().getId().equals(user.getId())) {
-                    notificationService.createNotification(
-                        review.getUser(),
-                        "Lượt thích mới",
-                        "<b>" + user.getFullName() + "</b> đã thích đánh giá của bạn trong khóa học <b>" + review.getCourse().getTitle() + "</b>",
-                        "SUCCESS",
-                        "/courses/" + review.getCourse().getId() + "#reviews"
+                    notificationServiceImpl.createNotification(
+                            review.getUser().getId(),
+                            "Lượt thích mới",
+                            "Nội dung thông báo...",
+                            "/link-den-bai-viet",
+                            "SUCCESS"
                     );
                 }
             }
@@ -112,12 +112,12 @@ public class ReviewService {
             // Notification: All Admins get notified when a review is reported
             List<User> admins = userService.findAllAdmins();
             for (User admin : admins) {
-                notificationService.createNotification(
-                    admin,
-                    "Báo cáo đánh giá mới",
-                    "<b>" + user.getFullName() + "</b> đã báo cáo một đánh giá trong khóa học <b>" + review.getCourse().getTitle() + "</b>",
-                    "DANGER",
-                    "/admin/reports"
+                notificationServiceImpl.createNotification(
+                        admin.getId(), // Truyền ID
+                        "Báo cáo đánh giá mới",
+                        "<b>" + user.getFullName() + "</b> đã báo cáo một đánh giá...",
+                        "/admin/reports",
+                        "DANGER"
                 );
             }
         }

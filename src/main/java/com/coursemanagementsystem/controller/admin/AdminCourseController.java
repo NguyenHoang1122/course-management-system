@@ -39,6 +39,8 @@ public class AdminCourseController {
     private CourseSectionService courseSectionService;
     @Autowired
     private CourseResourceService courseResourceService;
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping("/course-list")
     public String findALlCourseList(@RequestParam(value = "page", defaultValue = "1") int page,
@@ -88,6 +90,7 @@ public class AdminCourseController {
     public String createCourse(Model model) {
         model.addAttribute("courseDTO", new CourseDTO());
         model.addAttribute("instructors", userService.findAllInstructor());
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("activeMenu", "courses");
         return "admin/course/create-course";
     }
@@ -109,6 +112,7 @@ public class AdminCourseController {
     public String editCourse(@PathVariable("id") Long id, Model model) {
         model.addAttribute("courseDTO", courseService.findDTOById(id));
         model.addAttribute("instructors", userService.findAllInstructor());
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("activeMenu", "courses");
         return "admin/course/edit-course";
     }
@@ -119,6 +123,7 @@ public class AdminCourseController {
                                Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("instructors", userService.findAllInstructor());
+            model.addAttribute("categories", categoryService.getAllCategories());
             model.addAttribute("activeMenu", "courses");
             return "admin/course/edit-course";
         }

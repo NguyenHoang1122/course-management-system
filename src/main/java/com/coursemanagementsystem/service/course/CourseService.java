@@ -32,74 +32,41 @@ public class CourseService {
     private UserRepository userRepository;
 
     public void saveFromDTO(CourseDTO dto) {
+        //Xác định entity (mới hoặc cũ)
+        Course course = (dto.getId() != null)
+                ? courseRepository.findById(dto.getId())
+                  .orElseThrow(() -> new RuntimeException("Course không tồn tại"))
+                : new Course();
+        //Map các trường từ DTO sang entity
+        course.setTitle(dto.getTitle());
+        course.setDescription(dto.getDescription());
+        course.setPrice(dto.getPrice());
+        course.setImageUrl(dto.getImageUrl());
+        course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
+        course.setLevel(dto.getLevel());
+        course.setDuration(dto.getDuration());
+        course.setLearningPoints(dto.getLearningPoints());
+        course.setRequirements(dto.getRequirements());
+        course.setTargetAudience(dto.getTargetAudience());
 
-        Course course;
-
-        if (dto.getId() != null) {
-            // UPDATE
-            course = courseRepository.findById(dto.getId()).orElse(null);
-
-            if (course == null) {
-                throw new RuntimeException("Course not found");
-            }
-
-            // map thủ công
-            course.setTitle(dto.getTitle());
-            course.setDescription(dto.getDescription());
-            course.setPrice(dto.getPrice());
-            course.setImageUrl(dto.getImageUrl());
-            course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
-            course.setLevel(dto.getLevel());
-            course.setDuration(dto.getDuration());
-            course.setLearningPoints(dto.getLearningPoints());
-            course.setRequirements(dto.getRequirements());
-            course.setTargetAudience(dto.getTargetAudience());
-
-            // ✅ Xử lý Category đúng cách
-            if (dto.getCategoryId() != null) {
-                Category category = categoryRepository.findById(dto.getCategoryId()).orElse(null);
-                if (category == null) {
-                    throw new RuntimeException("Category không tồn tại");
-                }
-                course.setCategory(category);
-            }
-
-        } else {
-            // CREATE
-            course = new Course();
-            course.setTitle(dto.getTitle());
-            course.setDescription(dto.getDescription());
-            course.setPrice(dto.getPrice());
-            course.setImageUrl(dto.getImageUrl());
-            course.setPreviewVideoUrl(dto.getPreviewVideoUrl());
-            course.setLevel(dto.getLevel());
-            course.setDuration(dto.getDuration());
-            course.setLearningPoints(dto.getLearningPoints());
-            course.setRequirements(dto.getRequirements());
-            course.setTargetAudience(dto.getTargetAudience());
+        // set ngày tạo
+        if (dto.getId() == null) {
             course.setCreatedAt(LocalDate.now());
-
-            // ✅ Xử lý Category đúng cách
-            if (dto.getCategoryId() != null) {
-                Category category = categoryRepository.findById(dto.getCategoryId()).orElse(null);
-                if (category == null) {
-                    throw new RuntimeException("Category không tồn tại");
-                }
-                course.setCategory(category);
-            }
         }
 
-        // xử lý instructor
+        // Xử lý Category
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
+            course.setCategory(category);
+        }
+
+        // Xử lý Instructor
         if (dto.getInstructorId() != null) {
-            User instructor = userRepository.findByIdAndDeletedFalse(dto.getInstructorId()).orElse(null);
-
-            if (instructor == null) {
-                throw new RuntimeException("Instructor không tồn tại");
-            }
-
+            User instructor = userRepository.findByIdAndDeletedFalse(dto.getInstructorId())
+                    .orElseThrow(() -> new RuntimeException("Instructor không tồn tại"));
             course.setInstructor(instructor);
         }
-
         courseRepository.save(course);
     }
 

@@ -6,7 +6,6 @@
     <title>Chi Tiết Khóa Học - Course Management System</title>
 
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
-    <!-- Import các CSS mới để đồng bộ style -->
     <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,8 +17,7 @@
 <th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
 <div class="profile-dashboard-wrapper">
-    <!-- Hero Area: Đồng bộ với trang danh sách -->
-    <div class="profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+    <div class="profile-hero" style="background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1600')">
         <div class="profile-hero-content">
             <h1><i class="fas fa-book-open"></i> Course Details</h1>
             <p>Quản lý thông tin chi tiết và nội dung đào tạo</p>
@@ -128,10 +126,9 @@
                                 <div class="section-body p-2" th:id="'section-body-' + ${section.id}">
                                     <div th:each="lesson, lessonStat : ${section.lessons}" class="d-flex justify-content-between align-items-center p-2 mx-2 rounded-3 hover-bg-light">
                                         <div class="d-flex align-items-center">
-                                            <span class="text-muted me-3 small" th:text="${lessonStat.index + 1}">1</span>
                                             <span class="text-dark" th:text="${lesson.title}">Lesson Title</span>
                                             <span th:if="${lesson.duration != null}" class="badge bg-light text-muted ms-2 fw-normal" style="font-size: 10px;">
-                                                    <i class="far fa-clock me-1"></i>[[${lesson.duration}]]
+                                                    <i class="far fa-clock me-1"> </i>[[${lesson.duration}]]
                                                 </span>
                                         </div>
                                         <div>

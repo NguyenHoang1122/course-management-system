@@ -113,27 +113,6 @@ public class AdminCategoryController {
         return "admin/category/category-detail";
     }
 
-    /**
-     * Form chỉnh sửa danh mục
-     */
-    @GetMapping("/{id}/edit")
-    public String editCategoryForm(
-            @PathVariable("id") Long id,
-            Model model) {
-
-        Category category = categoryService.getCategoryById(id);
-        if (category == null) {
-            return "redirect:/admin/categories";
-        }
-
-        model.addAttribute("category", category);
-        model.addAttribute("activeMenu", "categories");
-        return "admin/category/edit-category";
-    }
-
-    /**
-     * Cập nhật danh mục
-     */
     @PostMapping("/{id}/update")
     public String updateCategory(
             @PathVariable("id") Long id,
@@ -143,25 +122,23 @@ public class AdminCategoryController {
             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
+            Category originalCategory = categoryService.getCategoryById(id);
+            model.addAttribute("category", category);
             model.addAttribute("activeMenu", "categories");
-            return "admin/category/edit-category";
+            return "admin/category/category-detail";
         }
 
         try {
             category.setId(id);
             categoryService.saveCategory(category);
-            redirectAttributes.addFlashAttribute("successMessage", "Danh mục đã được cập nhật thành công!");
-            return "redirect:/admin/categories/" + id;
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thành công!");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Có lỗi khi cập nhật danh mục: " + e.getMessage());
-            model.addAttribute("activeMenu", "categories");
-            return "admin/category/edit-category";
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
+
+        return "redirect:/admin/categories/" + id;
     }
 
-    /**
-     * Xóa danh mục
-     */
     @PostMapping("/{id}/delete")
     public String deleteCategory(
             @PathVariable("id") Long id,

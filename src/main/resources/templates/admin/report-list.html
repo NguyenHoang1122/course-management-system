@@ -14,28 +14,24 @@
 
 <body>
 
-<!-- Header giống course-list -->
 <th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-<div class="admin-profile-dashboard-wrapper">
+<div class="profile-dashboard-wrapper">
 
-    <!-- HERO giống dashboard -->
-    <div class="admin-profile-hero" style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);">
+    <div class="profile-hero" style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);">
         <div class="profile-hero-content">
             <h1><i class="fas fa-flag"></i> Quản Lý Báo Cáo</h1>
             <p>Xử lý các báo cáo vi phạm từ người dùng</p>
         </div>
     </div>
 
-    <div class="admin-dashboard-container">
-
-        <!-- SIDEBAR (GIỐNG course-list) -->
-        <aside class="admin-dashboard-sidebar">
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
             <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
         </aside>
 
         <!-- MAIN CONTENT -->
-        <main class="admin-dashboard-main-content">
+        <main class="dashboard-main-content">
 
             <!-- Thông báo -->
             <div th:if="${successMessage}" class="alert alert-success mb-4">
