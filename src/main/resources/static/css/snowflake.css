@@ -1,0 +1,42 @@
+/* Snowflake Effect */
+.snowflake {
+    position: fixed;
+    top: -10px;
+    z-index: 999;
+    user-select: none;
+    cursor: default;
+    color: white;
+    font-size: 1em;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    opacity: 0.8;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    from {
+        transform: translateY(0px) translateX(0px) rotate(0deg);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(100vh) translateX(100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes sway {
+
+    0%,
+    100% {
+        transform: translateX(0px);
+    }
+
+    50% {
+        transform: translateX(20px);
+    }
+}
+
+.snowflake.sway {
+    animation: fall linear forwards, sway 3s ease-in-out infinite;
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Thông báo của tôi | Coursia</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/notifications.css}">
+</head>
+<body>
+
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+    <div class="profile-hero" th:style="'background-image: url(' + (${user.coverPhoto != null} ? (${user.coverPhoto.startsWith('http') ? user.coverPhoto : (user.coverPhoto.startsWith('/') ? user.coverPhoto : '/' + user.coverPhoto)}) : 'https://images.unsplash.com/photo-1510070112810-d4e9a46d9e91?auto=format&fit=crop&q=80&w=1600') + ')'">
+        <div class="profile-hero-content">
+            <h1>Thông báo của bạn</h1>
+            <p>Luôn cập nhật những tin tức mới nhất về hoạt động của bạn.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{profile/fragments/sidebar :: profileSidebar('notifications')}"></div>
+        </aside>
+
+        <main class="dashboard-main-content">
+            <div class="course-section-header">
+                <h3>Tất cả thông báo</h3>
+                <div class="header-actions">
+                    <button id="pageMarkAllRead" class="btn-dashboard-primary">Đánh dấu đã đọc hết</button>
+                    <button id="pageDeleteAll" class="btn-dashboard-danger">Xóa tất cả</button>
+                </div>
+            </div>
+
+            <div class="notification-page-list" th:if="${notifications != null and !notifications.isEmpty()}">
+                <a th:each="n : ${notifications}" 
+                   th:href="${n.link != null ? n.link : 'javascript:void(0)'}" 
+                   class="notification-page-item" 
+                   th:classappend="${!n.isRead ? 'unread' : ''}"
+                   th:data-id="${n.id}">
+                    <div class="noti-icon" th:classappend="'noti-' + ${n.type}">
+                        <i th:class="${n.type == 'SUCCESS' ? 'fas fa-check-circle' : (n.type == 'DANGER' ? 'fas fa-exclamation-circle' : (n.type == 'WARNING' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle'))}"></i>
+                    </div>
+                    <div class="noti-content">
+                        <span class="noti-title">
+                            <span th:text="${n.title}">Tiêu đề</span>
+                            <span th:if="${!n.isRead}" class="mark-read-badge">Mới</span>
+                        </span>
+                        <span class="noti-message" th:utext="${n.message}">Nội dung</span>
+                        <span class="noti-time" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">Thời gian</span>
+                    </div>
+                    <button class="noti-page-delete-btn" th:onclick="'deleteFromPage(' + ${n.id} + ', event)'" title="Xóa thông báo">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </a>
+            </div>
+
+            <div th:if="${notifications == null or notifications.isEmpty()}" class="empty-state-container">
+                <i class="fas fa-bell-slash empty-main-icon"></i>
+                <h4>Bạn chưa có thông báo nào.</h4>
+                <p class="text-muted">Mọi tin nhắn quan trọng sẽ xuất hiện ở đây!</p>
+                <a th:href="@{/courses}" class="btn-dashboard-primary btn-large">Khám phá khóa học</a>
+            </div>
+        </main>
+    </div>
+</div>
+<div id="deleteAllConfirmBox" class="modal-overlay">
+    <div class="custom-confirm-modal">
+        <div class="modal-header">
+            <i class="fas fa-exclamation-circle warning-icon"></i>
+            <h2>Xác Nhận Xóa Tất Cả</h2>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa <strong>TOÀN BỘ</strong> thông báo không?</p>
+            <span class="text-danger-action">Hành động này không thể hoàn tác!</span>
+        </div>
+        <div class="modal-footer">
+            <button id="confirmDeleteAllBtn" class="btn-action-confirm btn-delete-red">
+                <i class="fas fa-trash"></i> XÓA TẤT CẢ
+            </button>
+            <button class="btn-action-confirm btn-cancel-blue" onclick="hideDeleteAllConfirm()">
+                <i class="fas fa-times"></i> HỦY
+            </button>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+<script th:src="@{/js/pages/notifications.js}"></script>
+
+</body>
+</html>

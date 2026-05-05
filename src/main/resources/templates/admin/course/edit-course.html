@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Chỉnh Sửa Khóa Học - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <!-- Import CSS tương ứng để đồng nhất -->
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
+</head>
+
+<body>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Section (Đồng nhất với trang danh sách) -->
+    <div class="profile-hero" style="background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1600')">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-edit"></i> Chỉnh Sửa Khóa Học</h1>
+            <p>Cập nhật thông tin chi tiết cho khóa học của bạn</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation (Cấu trúc giống trang danh sách) -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main-content">
+
+            <div class="admin-header mb-4">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 class="mb-0"><i class="fas fa-info-circle text-primary"></i> Thông tin khóa học</h3>
+                    </div>
+                    <a th:href="@{'/admin/' + ${courseDTO.id}}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+            </div>
+
+            <div class="admin-content bg-white p-4 shadow-sm" style="border-radius: 20px;">
+                <div class="form-container">
+                    <form th:action="@{/admin/update}" th:object="${courseDTO}" method="post" id="courseForm" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Grid layout cho form nếu cần (có thể dùng row g-3 của bootstrap) -->
+                        <div class="row g-3">
+                            <!-- Title -->
+                            <div class="col-12 form-group mb-3">
+                                <label class="form-label fw-bold" for="title">
+                                    <i class="fas fa-heading"></i> Tên Khóa Học <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="title" th:field="*{title}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                                       placeholder="Nhập tên khóa học" required>
+                                <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="invalid-feedback d-block"></div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12 form-group mb-3">
+                                <label class="form-label fw-bold" for="description">
+                                    <i class="fas fa-align-left"></i> Mô Tả Khóa Học <span class="text-danger">*</span>
+                                </label>
+                                <textarea id="description" th:field="*{description}" class="form-control" rows="5" required></textarea>
+                            </div>
+
+                            <!-- Price & Category -->
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="form-label fw-bold" for="price"><i class="fas fa-dollar-sign"></i> Giá (VND)</label>
+                                <input type="number" id="price" th:field="*{price}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="form-label fw-bold" for="categoryId"><i class="fas fa-tags"></i> Danh Mục <span class="text-danger">*</span></label>
+                                <select id="categoryId" th:field="*{categoryId}" class="form-select"
+                                        th:classappend="${#fields.hasErrors('categoryId')} ? 'is-invalid' : ''" required>
+                                    <option value="">-- Chọn Danh Mục --</option>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.name}"></option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}" class="invalid-feedback d-block"></div>
+                            </div>
+
+                            <!-- Image & Video -->
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="form-label fw-bold" for="imageUrl"><i class="fas fa-image"></i> Link Ảnh</label>
+                                <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control">
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="form-label fw-bold" for="previewVideoUrl"><i class="fas fa-video"></i> Video Giới Thiệu</label>
+                                <input type="text" id="previewVideoUrl" th:field="*{previewVideoUrl}" class="form-control">
+                            </div>
+
+                            <!-- Instructor -->
+                            <div class="col-12 form-group mb-3">
+                                <label class="form-label fw-bold" for="instructorId"><i class="fas fa-user-tie"></i> Giảng Viên</label>
+                                <select id="instructorId" th:field="*{instructorId}" class="form-select" required>
+                                    <option value="">-- Chọn Giảng Viên --</option>
+                                    <option th:each="user : ${instructors}" th:value="${user.id}" th:text="${user.fullName}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <h4 class="text-primary mb-3"><i class="fas fa-star"></i> Thông Số Premium</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Trình Độ</label>
+                                    <select th:field="*{level}" class="form-select">
+                                        <option value="Tất cả trình độ">Tất cả trình độ</option>
+                                        <option value="Cơ bản (Beginner)">Cơ bản (Beginner)</option>
+                                        <option value="Trung cấp (Intermediate)">Trung cấp (Intermediate)</option>
+                                        <option value="Nâng cao (Advanced)">Nâng cao (Advanced)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Thời Lượng</label>
+                                    <input type="text" th:field="*{duration}" class="form-control" placeholder="Ví dụ: 15 giờ">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-actions mt-4 d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                                <i class="fas fa-save"></i> Cập Nhật
+                            </button>
+                            <a th:href="@{/admin/course-list}" class="btn btn-outline-secondary px-4 rounded-pill">
+                                <i class="fas fa-times"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<script th:src="@{/js/pages/edit-course.js}"></script>
+
+</body>
+</html>

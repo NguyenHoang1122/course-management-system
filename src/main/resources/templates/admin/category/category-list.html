@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Meta & Core CSS từ Layout -->
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Danh Sách Danh Mục - Course Management System</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+
+    <!-- Thư viện ngoài -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS của hệ thống -->
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-categories.css}">
+</head>
+
+<body>
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+    <!-- Hero Area -->
+    <div class="profile-hero admin-gradient-bg">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
+            <p>Hệ thống quản trị nội dung và khóa học</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main-content">
+
+            <!-- Thẻ thống kê nhanh -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-icon enrolled"><i class="fas fa-th-list"></i></div>
+                    <div class="stat-info">
+                        <h4 th:text="${totalItems ?: 0}">0</h4>
+                        <p>Tổng Danh Mục</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tiêu đề và nút thêm mới -->
+            <div class="course-section-header mt-4">
+                <h3><i class="fas fa-list"></i> Danh Sách Danh Mục</h3>
+                <a th:href="@{/admin/categories/create}" class="btn btn-primary btn-rounded-custom">
+                    <i class="fas fa-plus"></i> Thêm Mới
+                </a>
+            </div>
+
+            <!-- Thông báo Flash Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show custom-alert" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+                <i class="fas fa-times-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Bộ lọc tìm kiếm -->
+            <div class="search-container-wrapper mb-4">
+                <form th:action="@{/admin/categories}" method="get" class="row g-2 align-items-center">
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="size" th:value="${size}">
+                    <div class="col-md-8">
+                        <input type="text" name="keyword" th:value="${keyword}"
+                               class="form-control search-input"
+                               placeholder="Tìm theo tên danh mục...">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1 action-btn-radius">Tìm kiếm</button>
+                        <a th:href="@{/admin/categories}" class="btn btn-light action-btn-radius">
+                            <i class="fas fa-redo"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bảng dữ liệu -->
+            <div th:if="${categories != null and !categories.isEmpty()}" class="table-container">
+                <div class="table-responsive">
+                    <table class="table custom-admin-table">
+                        <thead>
+                        <tr>
+                            <th class="col-id">ID</th>
+                            <th class="col-name">Tên Danh Mục</th>
+                            <th class="col-count">Số Khóa Học</th>
+                            <th class="col-action">Hành Động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="category : ${categories}">
+                            <td>
+                                <span class="fw-bold text-primary" th:text="${category.id}">1</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/categories/{id}(id=${category.id})}"
+                                   class="category-name-link"
+                                   th:text="${category.name}">Category Name</a>
+                            </td>
+                            <td>
+                                <span class="badge count-badge"
+                                      th:text="${category.courses != null ? category.courses.size() : 0}">0</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{/admin/categories/{id}(id=${category.id})}" class="btn-sm-action btn-view">
+                                        <i class="fas fa-eye"></i> Xem Chi Tiết
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Trạng thái trống -->
+            <div th:if="${categories == null or categories.isEmpty()}" class="empty-state-container">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h4>Không có danh mục nào</h4>
+                <p class="no-data-message">Hãy tạo danh mục mới để bắt đầu quản lý.</p>
+            </div>
+
+            <!-- Phân trang -->
+            <nav th:if="${totalPages > 1}" aria-label="Pagination" class="mt-4">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <!-- Trước -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/categories(page=${currentPage - 1}, size=${size}, keyword=${keyword})}">&laquo;</a>
+                    </li>
+
+                    <!-- Trang đầu -->
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/categories(page=1, size=${size}, keyword=${keyword})}">1</a>
+                    </li>
+
+                    <li class="page-item disabled" th:if="${currentPage > 3}">
+                        <span class="page-link">...</span>
+                    </li>
+
+                    <!-- Các trang giữa -->
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                        th:if="${i > 1 and i < totalPages}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/categories(page=${i}, size=${size}, keyword=${keyword})}" th:text="${i}"></a>
+                    </li>
+
+                    <li class="page-item disabled" th:if="${currentPage < totalPages - 2}">
+                        <span class="page-link">...</span>
+                    </li>
+
+                    <!-- Trang cuối -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/categories(page=${totalPages}, size=${size}, keyword=${keyword})}" th:text="${totalPages}"></a>
+                    </li>
+
+                    <!-- Sau -->
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/categories(page=${currentPage + 1}, size=${size}, keyword=${keyword})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </main>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>Quản Lý Người Dùng - Course Management System</title>
+
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <!-- Import CSS đồng nhất với Report List -->
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
+</head>
+<body>
+
+<!-- Thêm Header trang web -->
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+
+    <!-- HERO Section đồng nhất -->
+    <div class="profile-hero" style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);">
+        <div class="profile-hero-content">
+            <h1><i class="fas fa-users"></i> Quản Lý Người Dùng</h1>
+            <p>Cập nhật vai trò, quản lý STUDENT/TEACHER và trạng thái tài khoản.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+
+
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main-content">
+
+            <!-- Thông báo -->
+            <div th:if="${successMessage}" class="alert alert-success mb-4 shadow-sm" style="border-radius: 12px;">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger mb-4 shadow-sm" style="border-radius: 12px;">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- TABLE CONTAINER (Sử dụng style trắng, bo góc như trang report) -->
+            <div class="admin-content bg-white p-4 shadow-sm" style="border-radius: 20px;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0" style="color: var(--secondary-color);">
+                        <i class="fas fa-user-check me-2"></i>Danh sách người dùng
+                    </h3>
+                    <span class="badge rounded-pill bg-primary px-3 py-2" th:text="${users != null ? users.size() + ' Thành viên' : '0 Thành viên'}">0</span>
+                </div>
+
+                <div class="table-responsive" th:if="${users != null and !users.isEmpty()}">
+                    <table class="table table-hover align-middle custom-admin-table">
+                        <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Người dùng</th> <!-- Gộp Username & Họ tên -->
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th class="text-end pe-3">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td class="ps-3 text-muted" th:text="${'#' + user.id}"></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-3 bg-light rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px; font-weight: bold; color: #7c3aed;">
+                                        <span th:text="${#strings.substring(user.fullName, 0, 1).toUpperCase()}">U</span>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" th:text="${user.fullName}"></div>
+                                        <small class="text-muted" th:text="${user.userName}"></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${user.email}"></td>
+                            <td>
+                                <span class="role-badge role-student" th:if="${user.role != null and user.role.name == 'STUDENT'}">STUDENT</span>
+                                <span class="role-badge role-teacher" th:if="${user.role != null and user.role.name == 'INSTRUCTOR'}">TEACHER</span>
+                                <span class="role-badge role-admin" th:if="${user.role != null and user.role.name == 'ADMIN'}">ADMIN</span>
+                                <span class="role-badge role-unknown" th:if="${user.role == null}">N/A</span>
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <!-- Form đổi Role -->
+                                    <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post"
+                                          class="d-flex gap-1"
+                                          th:if="${user.role == null or user.role.name != 'ADMIN'}">
+                                        <select name="roleName" class="form-select form-select-sm" style="width: 130px; border-radius: 8px;">
+                                            <option value="STUDENT" th:selected="${user.role != null and user.role.name == 'STUDENT'}">Học viên</option>
+                                            <option value="INSTRUCTOR" th:selected="${user.role != null and user.role.name == 'INSTRUCTOR'}">Giảng viên</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary rounded-8">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Nút Xóa -->
+                                    <button th:if="${user.role == null or user.role.name != 'ADMIN'}"
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger rounded-8 btn-delete-user"
+                                            th:data-id="${user.id}"
+                                            th:data-name="${user.userName}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${users == null or users.isEmpty()}" class="text-center py-5">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5058/5058436.png" width="80" class="mb-3 opacity-50">
+                    <p class="text-muted">Không tìm thấy người dùng nào trong hệ thống.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal xác nhận (Giống style trang Report/Course) -->
+<div id="userConfirmBox" class="modal-overlay">
+    <div class="modal-content text-center p-4" style="border-radius: 20px; max-width: 400px;">
+        <div class="mb-3">
+            <i class="fas fa-exclamation-circle text-danger" style="font-size: 3rem;"></i>
+        </div>
+        <h3 class="fw-bold">Xác nhận xóa</h3>
+        <p>Bạn có chắc muốn xóa người dùng <br><strong id="userNameDisplay" class="text-primary"></strong>?</p>
+
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <form id="deleteUserForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-danger px-4 rounded-pill">Xóa ngay</button>
+            </form>
+            <button onclick="hideUserConfirm()" class="btn btn-light px-4 rounded-pill">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+<script th:src="@{/js/pages/user-list.js}"></script>
+</body>
+</html>

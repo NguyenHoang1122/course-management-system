@@ -1,0 +1,28 @@
+package com.coursemanagementsystem.repository;
+
+import com.coursemanagementsystem.model.PersistentLogin;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+@Repository
+public interface PersistentLoginRepository extends JpaRepository<PersistentLogin, String> {
+
+    // quan ly session user
+    Optional<PersistentLogin> findByUsername(String username);
+
+    //   Xac thuc auto login
+    Optional<PersistentLogin> findBySeries(String series);
+
+    // logout/revoke token
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM PersistentLogin p WHERE p.username = :username")
+    void deleteByUsername(@Param("username") String username);
+}
+

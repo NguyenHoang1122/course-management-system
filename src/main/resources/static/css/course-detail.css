@@ -1,0 +1,67 @@
+/* ===== COURSE DETAIL PAGE STYLES ===== */
+
+.course-detail-header-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.course-detail-header-wrap img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.course-info h2 {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.course-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.course-rating-section {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.course-rating-display {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+.course-rating-display .stars {
+    color: #ffc107;
+    margin-left: 6px;
+}
+
+.course-rating-display .star-icon {
+    opacity: 1;
+}
+
+.course-rating-display .star-icon.empty {
+    opacity: 0.25;
+}
+
+.course-rating-text {
+    color: var(--text-muted);
+}
+
+.course-lesson-title {
+    color: var(--secondary-color);
+    margin-bottom: 25px;
+}
+
+.course-review-title {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+}
+

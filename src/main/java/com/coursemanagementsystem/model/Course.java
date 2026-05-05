@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "courses")
+@Table(name = "courses")    
 @Data
 public class Course {
     @Id
@@ -32,6 +32,39 @@ public class Course {
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
-    @OneToMany(mappedBy = "course",fetch = FetchType.LAZY)
+    private String imageUrl; //anh thu nho khoa hoc
+    private String previewVideoUrl; //video gioi thieu khoa hoc
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    // === NEW FIELDS ===
+    /** Trình độ: Beginner / Intermediate / Advanced */
+    private String level;
+
+    /** Thời lượng khóa học, ví dụ: "30 hours", "12 weeks" */
+    private String duration;
+
+    /** Các điểm bạn sẽ học được - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String learningPoints;
+
+    /** Yêu cầu đầu vào - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String requirements;
+
+    /** Đối tượng học viên phù hợp - phân cách bởi dấu | */
+    @Column(columnDefinition = "TEXT")
+    private String targetAudience;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CourseSection> sections;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseResource> resources;
 }

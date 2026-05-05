@@ -1,0 +1,32 @@
+<div th:fragment="profileSidebar(activeTab)" class="sidebar-card">
+    <div class="sidebar-user-info">
+        <div class="sidebar-avatar-wrapper">
+            <img th:if="${user.avatar != null and !user.avatar.isEmpty()}" 
+                 th:src="${user.avatar.startsWith('http') ? user.avatar : (user.avatar.startsWith('/') ? user.avatar : '/' + user.avatar)}" alt="Avatar">
+            <div th:unless="${user.avatar != null and !user.avatar.isEmpty()}" class="fallback-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+        </div>
+        <h3 th:text="${user.fullName}">User Name</h3>
+        <p th:text="${user.email}">user@email.com</p>
+    </div>
+
+    <ul class="sidebar-menu">
+        <li th:classappend="${activeTab == 'dashboard' ? 'active' : ''}"><a th:href="@{/profile}"><i class="fas fa-th-large"></i> Dashboard</a></li>
+        <li th:classappend="${activeTab == 'edit' ? 'active' : ''}"><a th:href="@{/users/profile}"><i class="fas fa-user"></i> My Profile</a></li>
+        <li th:classappend="${activeTab == 'courses' ? 'active' : ''}"><a th:href="@{/courses/my-courses}"><i class="fas fa-play-circle"></i> Enrolled Courses</a></li>
+        <li th:classappend="${activeTab == 'wishlist' ? 'active' : ''}"><a th:href="@{/profile/wishlist}"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li th:classappend="${activeTab == 'notifications' ? 'active' : ''}"><a th:href="@{/notifications}"><i class="fas fa-bell"></i> Notifications</a></li>
+        <li th:classappend="${activeTab == 'reviews' ? 'active' : ''}"><a href="#"><i class="fas fa-star"></i> Reviews</a></li>
+        <li th:classappend="${activeTab == 'history' ? 'active' : ''}"><a href="#"><i class="fas fa-history"></i> Order History</a></li>
+        <li th:classappend="${activeTab == 'settings' ? 'active' : ''}"><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+
+    <div class="logout-container">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-logout-sidebar">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </button>
+        </form>
+    </div>
+</div>

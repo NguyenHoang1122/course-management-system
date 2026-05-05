@@ -6,7 +6,7 @@
     <th:block th:replace="~{layout :: headCoreCss}"></th:block>
 </head>
 <body>
-<div th:replace="~{layout :: siteHeader}"></div>
+<div th:replace="~{layout :: siteHeader(isTransparent=false)}"></div>
 
 <tr th:each="course : ${courses}">
     <td th:text="${course.title}"></td>

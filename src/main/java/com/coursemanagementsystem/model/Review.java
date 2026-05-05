@@ -21,4 +21,6 @@ public class Review {
     private Integer rating; // 1-5
 
     private String comment;
+
+    private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
 }

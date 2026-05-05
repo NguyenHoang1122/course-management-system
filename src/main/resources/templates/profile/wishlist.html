@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <th:block th:replace="~{layout :: headMeta}"></th:block>
+    <title>My Wishlist | Courses</title>
+    <th:block th:replace="~{layout :: headCoreCss}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/wishlist.css}">
+</head>
+<body>
+
+<th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
+
+<div class="profile-dashboard-wrapper">
+    <div class="profile-hero" th:style="'background-image: url(' + (${user.coverPhoto != null} ? (${user.coverPhoto.startsWith('http') ? user.coverPhoto : (user.coverPhoto.startsWith('/') ? user.coverPhoto : '/' + user.coverPhoto)}) : 'https://images.unsplash.com/photo-1510070112810-d4e9a46d9e91?auto=format&fit=crop&q=80&w=1600') + ')'">
+        <div class="profile-hero-content">
+            <h1>My Wishlist</h1>
+            <p>Courses you've saved for later.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
+            <div th:replace="~{profile/fragments/sidebar :: profileSidebar('wishlist')}"></div>
+        </aside>
+
+        <main class="dashboard-main-content">
+            <div class="course-section-header">
+                <h3>Saved Courses (<span th:text="${wishlistPage.totalElements}">0</span>)</h3>
+            </div>
+
+            <div class="row" th:if="${wishlistPage != null and !wishlistPage.isEmpty()}">
+                <div class="col-md-6 col-lg-4 mb-4" th:each="item : ${wishlistPage.content}" th:id="'wishlist-item-' + ${item.course.id}">
+                    <div class="wishlist-card">
+                        <button class="remove-wishlist" th:onclick="'toggleWishlist(' + ${item.course.id} + ', true)'" title="Remove from wishlist">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <div class="wishlist-image" th:style="'background-image: url(' + (${item.course.imageUrl != null and !item.course.imageUrl.isEmpty()} ? (${item.course.imageUrl.startsWith('http') ? item.course.imageUrl : (item.course.imageUrl.startsWith('/') ? item.course.imageUrl : '/' + item.course.imageUrl)}) : 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800') + ')'"></div>
+                        <div class="wishlist-body">
+                            <span class="wishlist-category" th:text="${item.course.category != null ? item.course.category : 'General'}">Category</span>
+                            <h4 class="wishlist-title" th:text="${item.course.title}">Course Title</h4>
+                            
+                            <div class="wishlist-meta">
+                                <span class="wishlist-price">
+                                    <th:block th:if="${item.course.price != null and item.course.price > 0}"
+                                              th:text="${#numbers.formatDecimal(item.course.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></th:block>
+                                    <th:block th:if="${item.course.price == null or item.course.price == 0}">Free</th:block>
+                                </span>
+                                <span style="font-size: 12px; color: #999;">
+                                    <i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy')}"></span>
+                                </span>
+                            </div>
+                            <div class="wishlist-body">
+                                <a th:href="@{'/courses/' + ${item.course.id}}" class="btn-dashboard-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${wishlistPage.totalPages > 1}" class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${wishlistPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/profile/wishlist(page=${wishlistPage.number - 1})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, wishlistPage.totalPages - 1)}" th:classappend="${wishlistPage.number == i} ? 'active'">
+                            <a class="page-link" th:href="@{/profile/wishlist(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${wishlistPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/profile/wishlist(page=${wishlistPage.number + 1})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${wishlistPage == null or wishlistPage.isEmpty()}" class="empty-state-container">
+                <div class="empty-state-container">
+                    <i class="far fa-heart empty-main-icon"></i></div>
+                <h4>Your wishlist is empty</h4>
+                <p class="text-muted">You haven't saved any courses to your wishlist yet.</p>
+                <a th:href="@{/courses}" class="btn-dashboard-primary btn-large">Explore Courses</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: siteFooter}"></th:block>
+<th:block th:replace="~{layout :: coreScripts}"></th:block>
+
+<script th:src="@{/js/pages/wishlist.js}"></script>
+
+</body>
+</html>

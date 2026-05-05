@@ -1,21 +1,28 @@
 package com.coursemanagementsystem.controller;
 
 import com.coursemanagementsystem.dto.UserProfileDTO;
+import com.coursemanagementsystem.dto.EnrollmentCourseProgressDTO;
+import com.coursemanagementsystem.model.Enrollment;
 import com.coursemanagementsystem.model.User;
-import com.coursemanagementsystem.service.EnrollmentService;
-import com.coursemanagementsystem.service.FileService;
-import com.coursemanagementsystem.service.UserService;
+import com.coursemanagementsystem.security.CustomUserDetails;
+import com.coursemanagementsystem.service.*;
+import com.coursemanagementsystem.service.lesson.LessonProgressService;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,47 +31,99 @@ public class ProfileController {
     private final UserService userService;
     private final FileService fileService;
     private final EnrollmentService enrollmentService;
+    private final UserDetailsService userDetailsService;
+    private final LessonProgressService lessonProgressService;
+    private final NotificationService notificationService;
 
-    public ProfileController(UserService userService, FileService fileService, EnrollmentService enrollmentService) {
+    public ProfileController(UserService userService,
+                             FileService fileService,
+                             EnrollmentService enrollmentService,
+                             UserDetailsService userDetailsService,
+                             LessonProgressService lessonProgressService,
+                             NotificationService notificationService) {
         this.userService = userService;
         this.fileService = fileService;
         this.enrollmentService = enrollmentService;
+        this.userDetailsService = userDetailsService;
+        this.lessonProgressService = lessonProgressService;
+        this.notificationService = notificationService;
     }
+
+    // ──────────────────────────────────────────────────────────────
+    // ─────── USER PROFILE ENDPOINTS ────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
 
     @GetMapping("/profile")
     public String viewProfile(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/auth/login";
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (isAdmin) {
+            return "redirect:/admin/profile";
         }
-
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-
+        
         List<Enrollment> enrollments = enrollmentService.findByUserId(user.getId());
+        List<EnrollmentCourseProgressDTO> enrollmentProgress = new ArrayList<>();
+        long enrolledCount = enrollments.size();
+        long activeCount = 0;
+        long completedCount = 0;
+
+        for (Enrollment enrollment : enrollments) {
+            long totalLessons = enrollment.getCourse() != null && enrollment.getCourse().getLessons() != null
+                    ? enrollment.getCourse().getLessons().size()
+                    : 0;
+            long completedLessons = enrollment.getCourse() == null
+                    ? 0
+                    : lessonProgressService.countCompletedLessons(user.getId(), enrollment.getCourse().getId());
+            int progressPercent = totalLessons == 0 ? 0 : (int) ((completedLessons * 100) / totalLessons);
+            String learningStatus = progressPercent == 100 ? "Hoan thanh" : (progressPercent > 0 ? "Dang hoc" : "Chua bat dau");
+
+            if (progressPercent == 100) completedCount++;
+            else if (progressPercent > 0) activeCount++;
+
+            enrollmentProgress.add(new EnrollmentCourseProgressDTO(
+                    enrollment,
+                    completedLessons,
+                    totalLessons,
+                    progressPercent,
+                    learningStatus
+            ));
+        }
 
         model.addAttribute("user", user);
         model.addAttribute("enrollments", enrollments);
-
+        model.addAttribute("enrollmentProgress", enrollmentProgress);
+        model.addAttribute("enrolledCount", enrolledCount);
+        model.addAttribute("activeCount", activeCount);
+        model.addAttribute("completedCount", completedCount);
         return "profile/view";
     }
 
     @GetMapping("/profile/edit")
     public String editProfile(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/auth/login";
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (isAdmin) {
+            return "redirect:/admin/profile/edit";
         }
 
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-
-        UserProfileDTO profileDTO = new UserProfileDTO();
-        profileDTO.setFullName(user.getFullName());
-        profileDTO.setEmail(user.getEmail());
-        profileDTO.setPhone(user.getPhone());
-        profileDTO.setAddress(user.getAddress());
-
         model.addAttribute("user", user);
-        model.addAttribute("userProfileDTO", profileDTO);
+        model.addAttribute("userProfileDTO", buildProfileDTO(user));
         return "profile/edit";
     }
 
@@ -74,17 +133,13 @@ public class ProfileController {
                                 @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
                                 Principal principal,
                                 Model model) {
-        if (principal == null) {
-            return "redirect:/auth/login";
-        }
+        if (principal == null) return "redirect:/auth/login";
 
         String username = principal.getName();
-
         User currentUser = userService.findByUsername(username);
-        if (currentUser == null) {
-            return "redirect:/auth/login";
-        }
+        if (currentUser == null) return "redirect:/auth/login";
 
+        // Handle avatar upload
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
                 profileDTO.setAvatar(fileService.uploadFile(avatarFile));
@@ -104,6 +159,7 @@ public class ProfileController {
 
         try {
             userService.updateProfile(username, profileDTO);
+            refreshSecurityContext(username);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("user", currentUser);
             model.addAttribute("updateError", ex.getMessage());
@@ -119,15 +175,11 @@ public class ProfileController {
                                  @RequestParam("confirmPassword") String confirmPassword,
                                  Principal principal,
                                  Model model) {
-        if (principal == null) {
-            return "redirect:/auth/login";
-        }
+        if (principal == null) return "redirect:/auth/login";
 
         String username = principal.getName();
         User currentUser = userService.findByUsername(username);
-        if (currentUser == null) {
-            return "redirect:/auth/login";
-        }
+        if (currentUser == null) return "redirect:/auth/login";
 
         try {
             userService.changePassword(username, currentPassword, newPassword, confirmPassword);
@@ -139,6 +191,170 @@ public class ProfileController {
             return "profile/edit";
         }
     }
+    // Hiển thị thông báo của user
+    @GetMapping("/notifications")
+    public String viewNotifications(Model model, Principal principal) {
+        Long userId = null;
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getId();
+        }
+
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+        User user = userService.findById(userId);
+        model.addAttribute("user", user);
+        model.addAttribute("notifications", notificationService.getNotificationsForUser(userId));
+        return "profile/notifications";
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // ─────── ADMIN PROFILE ENDPOINTS ────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
+
+    @GetMapping("/admin/profile")
+    public String adminViewProfile(Model model, Principal principal) {
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("activeMenu", "profile");
+        return "admin/user/admin-view";
+    }
+
+    @GetMapping("/admin/profile/edit")
+    public String adminEditProfile(Model model, Principal principal) {
+        if (principal == null) return "redirect:/auth/login";
+
+        User user = userService.findByUsername(principal.getName());
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile/edit";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("userProfileDTO", buildProfileDTO(user));
+        model.addAttribute("activeMenu", "profile");
+        return "admin/user/admin-edit";
+    }
+
+    @PostMapping("/admin/profile/edit")
+    public String adminUpdateProfile(@Valid @ModelAttribute("userProfileDTO") UserProfileDTO profileDTO,
+                                     BindingResult bindingResult,
+                                     @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
+                                     Principal principal,
+                                     Model model) {
+        if (principal == null) return "redirect:/auth/login";
+
+        String username = principal.getName();
+        User currentUser = userService.findByUsername(username);
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        // Handle avatar upload
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            try {
+                profileDTO.setAvatar(fileService.uploadFile(avatarFile));
+            } catch (Exception ex) {
+                model.addAttribute("user", currentUser);
+                model.addAttribute("updateError", ex.getMessage());
+                model.addAttribute("activeMenu", "profile");
+                return "admin/user/admin-edit";
+            }
+        } else {
+            profileDTO.setAvatar(currentUser.getAvatar());
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("activeMenu", "profile");
+            return "admin/user/admin-edit";
+        }
+
+        try {
+            userService.updateProfile(username, profileDTO);
+            refreshSecurityContext(username);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("updateError", ex.getMessage());
+            model.addAttribute("activeMenu", "profile");
+            return "admin/user/admin-edit";
+        }
+
+        return "redirect:/admin/profile?updated=true";
+    }
+
+    @PostMapping("/admin/profile/change-password")
+    public String adminChangePassword(@RequestParam("currentPassword") String currentPassword,
+                                      @RequestParam("newPassword") String newPassword,
+                                      @RequestParam("confirmPassword") String confirmPassword,
+                                      Principal principal,
+                                      Model model) {
+        if (principal == null) return "redirect:/auth/login";
+
+        String username = principal.getName();
+        User currentUser = userService.findByUsername(username);
+        
+        // Check if user is NOT admin
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return "redirect:/profile";
+        }
+
+        try {
+            userService.changePassword(username, currentPassword, newPassword, confirmPassword);
+            return "redirect:/admin/profile/edit?passwordUpdated=true";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("user", currentUser);
+            model.addAttribute("userProfileDTO", buildProfileDTO(currentUser));
+            model.addAttribute("changePasswordError", ex.getMessage());
+            model.addAttribute("activeMenu", "profile");
+            return "admin/user/admin-edit";
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // ─────── HELPER METHODS ────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
+
+    private void refreshSecurityContext(String username) {
+        UserDetails updatedDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken newAuth =
+                new UsernamePasswordAuthenticationToken(
+                        updatedDetails,
+                        updatedDetails.getPassword(),
+                        updatedDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+    }
 
     private UserProfileDTO buildProfileDTO(User user) {
         UserProfileDTO dto = new UserProfileDTO();
@@ -146,6 +362,7 @@ public class ProfileController {
         dto.setEmail(user.getEmail());
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
+        dto.setBio(user.getBio());
         return dto;
     }
 }

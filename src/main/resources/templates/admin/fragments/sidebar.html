@@ -1,0 +1,95 @@
+<aside class="admin-dashboard-sidebar" th:fragment="sidebar(activeMenu)"
+       th:attr="data-active-menu=${activeMenu}">
+
+    <div class="admin-sidebar">
+
+        <!-- User Info -->
+        <div class="admin-user-info">
+            <div class="admin-user-avatar-wrap">
+
+                <img th:if="${avatarUrl != null and !avatarUrl.isEmpty()}"
+                     th:src="${avatarUrl}" alt="Admin Avatar"/>
+
+                <div th:unless="${avatarUrl != null and !avatarUrl.isEmpty()}"
+                     class="fallback-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+
+            </div>
+
+            <h3 th:text="${fullName != null ? fullName : username}">Admin</h3>
+            <p><i class="fas fa-shield-alt"></i> Quản trị viên</p>
+        </div>
+
+        <!-- MENU -->
+        <ul class="sidebar-menu">
+
+            <li th:classappend="${activeMenu == 'home'} ? 'active'">
+                <a th:href="@{/}">
+                    <i class="fas fa-home"></i>
+                    <span>Về trang chủ</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'courses'} ? 'active'">
+                <a th:href="@{/admin/course-list}">
+                    <i class="fas fa-book"></i>
+                    <span>Khóa học</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'lessons'} ? 'active'">
+                <a th:href="@{/admin/lesson-list}">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Bài học</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'categories'} ? 'active'">
+                <a th:href="@{/admin/categories}">
+                    <i class="fas fa-th-list"></i>
+                    <span>Danh mục</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'reports'} ? 'active'">
+                <a th:href="@{/admin/reports}">
+                    <i class="fas fa-flag"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'users'} ? 'active'">
+                <a th:href="@{/admin/user-list}">
+                    <i class="fas fa-users"></i>
+                    <span>Người dùng</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'user-trash'} ? 'active'">
+                <a th:href="@{/admin/user-trash}">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Thùng rác</span>
+                </a>
+            </li>
+
+            <li th:classappend="${activeMenu == 'profile'} ? 'active'">
+                <a th:href="@{/profile}">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Hồ sơ cá nhân</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <!-- LOGOUT -->
+        <div class="logout-container">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-logout-sidebar">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+
+    </div>
+</aside>

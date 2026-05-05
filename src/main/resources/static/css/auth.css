@@ -25,6 +25,7 @@ body.auth-page .register-container {
     justify-content: center;
     min-height: calc(100vh - 220px);
     padding: 30px 20px;
+    margin-top: 80px;
 }
 
 .login-wrapper,
@@ -96,6 +97,7 @@ body.auth-page .register-container {
     max-width: 80px;
     height: auto;
     animation: fadeInDown 0.8s ease-out;
+    filter: brightness(0) saturate(100%) invert(50%) sepia(80%) hue-rotate(180deg) saturate(1.2);
 }
 
 .login-form h2,
@@ -451,8 +453,3 @@ body.auth-page .register-container {
         margin-right: 0;
     }
 }
-
-
-
-
-
