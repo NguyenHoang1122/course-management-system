@@ -10,231 +10,40 @@
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/pages/admin-sidebar.css}">
-    <style>
-        .detail-container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .detail-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a237e;
-        }
-
-        .detail-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-action {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            font-size: 0.95rem;
-        }
-
-        .btn-edit {
-            background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);
-            color: white;
-        }
-
-        .btn-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
-        }
-
-        .btn-delete {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .btn-delete:hover {
-            background: #ef5350;
-            color: white;
-        }
-
-        .detail-content {
-            margin-bottom: 30px;
-        }
-
-        .detail-row {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: #666;
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .detail-value {
-            color: #333;
-            font-size: 1.05rem;
-            word-break: break-word;
-        }
-
-        .courses-section {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #f0f0f0;
-        }
-
-        .courses-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a237e;
-            margin-bottom: 20px;
-        }
-
-        .courses-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .course-item {
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #4285f4;
-        }
-
-        .course-item-name {
-            font-weight: 600;
-            color: #1a237e;
-        }
-
-        .empty-courses {
-            text-align: center;
-            padding: 30px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            color: #999;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn-confirm {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-confirm-delete {
-            background: #ef5350;
-            color: white;
-        }
-
-        .btn-confirm-delete:hover {
-            background: #c62828;
-        }
-
-        .btn-confirm-cancel {
-            background: #e0e0e0;
-            color: #666;
-        }
-
-        .btn-confirm-cancel:hover {
-            background: #d0d0d0;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/pages/category.css}">
 </head>
 
 <body>
 
 <th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-<div class="admin-profile-dashboard-wrapper">
+<div class="profile-dashboard-wrapper">
     <!-- Hero Area -->
-    <div class="admin-profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+    <div class="profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
         <div class="profile-hero-content">
             <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
             <p>Hệ thống quản trị nội dung và khóa học</p>
         </div>
     </div>
 
-    <div class="admin-dashboard-container">
+    <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="admin-dashboard-sidebar">
+        <aside class="dashboard-sidebar">
             <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
         </aside>
 
         <!-- Main Content -->
-        <main class="admin-dashboard-main-content">
+        <main class="dashboard-main-content">
 
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/admin/categories}">Danh Mục</a></li>
-                    <li class="breadcrumb-item active" th:text="${category.name}">Category Name</li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/admin/categories}" class="text-white text-decoration-none opacity-75">Danh Mục</a>
+                    </li>
+                    <li class="breadcrumb-item active text-white" aria-current="page" th:text="${category.name}">
+                        Category Name
+                    </li>
                 </ol>
             </nav>
 
@@ -252,19 +61,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Content -->
-                <div class="detail-content">
-                    <div class="detail-row">
-                        <span class="detail-label">ID:</span>
-                        <span class="detail-value" th:text="${category.id}">1</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Tên Danh Mục:</span>
-                        <span class="detail-value" th:text="${category.name}">Category Name</span>
-                    </div>
-                </div>
-
                 <!-- Courses Section -->
                 <div class="courses-section">
                     <h3 class="courses-title">
@@ -318,30 +114,36 @@
     </div>
 </div>
 
+<!-- Edit Category Modal -->
+<div id="editCategoryModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="text-center mb-4">
+            <i class="fas fa-edit text-primary mb-3" style="font-size: 2.5rem;"></i>
+            <h3>Chỉnh Sửa Danh Mục</h3>
+        </div>
+
+        <form th:action="@{/admin/categories/{id}/update(id=${category.id})}" th:object="${category}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div class="mb-3 text-start">
+                <label for="name" class="form-label fw-bold">Tên danh mục</label>
+                <input type="text" id="name" name="name" th:value="*{name}"
+                       class="form-control rounded-pill px-4" required>
+            </div>
+            <div class="modal-actions mt-4">
+                <button type="submit" class="btn-confirm btn-edit px-4">
+                    <i class="fas fa-save"></i> Lưu thay đổi
+                </button>
+                <button type="button" class="btn-confirm btn-confirm-cancel px-4" onclick="hideEditModal()">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <th:block th:replace="~{layout :: siteFooter}"></th:block>
 <th:block th:replace="~{layout :: coreScripts}"></th:block>
-
-<script>
-    function editCategory() {
-        const categoryId = /*[[${category.id}]]*/ 0;
-        window.location.href = `/admin/categories/${categoryId}/edit`;
-    }
-
-    function showDeleteConfirm() {
-        document.getElementById('deleteConfirmModal').classList.add('show');
-    }
-
-    function hideDeleteConfirm() {
-        document.getElementById('deleteConfirmModal').classList.remove('show');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('deleteConfirmModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            this.classList.remove('show');
-        }
-    });
-</script>
-
+<script th:src="@{/js/pages/category.js}"></script>
 </body>
 </html>

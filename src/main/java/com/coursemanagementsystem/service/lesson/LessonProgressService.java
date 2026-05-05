@@ -4,6 +4,7 @@ import com.coursemanagementsystem.model.Lesson;
 import com.coursemanagementsystem.model.LessonProgress;
 import com.coursemanagementsystem.model.User;
 import com.coursemanagementsystem.repository.lesson.LessonProgressRepository;
+import com.coursemanagementsystem.service.EnrollmentService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,11 +13,13 @@ import java.util.Set;
 
 @Service
 public class LessonProgressService {
-
+    private final EnrollmentService enrollmentService;
     private final LessonProgressRepository lessonProgressRepository;
 
-    public LessonProgressService(LessonProgressRepository lessonProgressRepository) {
+    public LessonProgressService(LessonProgressRepository lessonProgressRepository
+            , EnrollmentService enrollmentService) {
         this.lessonProgressRepository = lessonProgressRepository;
+        this.enrollmentService = enrollmentService;
     }
 
     public boolean isCompleted(Long userId, Long lessonId) {
@@ -24,6 +27,12 @@ public class LessonProgressService {
     }
 
     public void markCompleted(User user, Lesson lesson) {
+
+        // Nếu chưa đăng ký mà chỉ đang xem thử, không lưu tiến độ
+        boolean enrolled = enrollmentService.isEnrolled(user.getId(), lesson.getCourse().getId());
+        if (!enrolled) {
+            return;
+        }
         if (lessonProgressRepository.findByUserIdAndLessonId(user.getId(), lesson.getId()).isPresent()) {
             return;
         }

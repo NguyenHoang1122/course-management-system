@@ -16,22 +16,22 @@
 
 <th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
-<div class="admin-profile-dashboard-wrapper">
-    <div class="admin-profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
+<div class="profile-dashboard-wrapper">
+    <div class="profile-hero" style="background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1600')">
         <div class="profile-hero-content">
             <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
             <p>Hệ thống quản trị nội dung và khóa học</p>
         </div>
     </div>
 
-    <div class="admin-dashboard-container">
+    <div class="dashboard-container">
         <!-- Sidebar Navigation (Vị trí giống User) -->
-        <aside class="admin-dashboard-sidebar">
+        <aside class="dashboard-sidebar">
             <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
         </aside>
 
         <!-- Main Content Area -->
-        <main class="admin-dashboard-main-content">
+        <main class="dashboard-main-content">
 
             <div class="admin-stats-grid">
                 <div class="admin-stat-card">

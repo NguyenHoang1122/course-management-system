@@ -42,6 +42,7 @@ public class LessonService {
             // create
             lesson = modelMapper.map(dto, Lesson.class);
         }
+        lesson.setPreview(dto.isPreview());
 
         Course course = courseRepository.findById(dto.getCourseId()).orElse(null);
         lesson.setCourse(course);
@@ -85,6 +86,10 @@ public class LessonService {
         }
         if (lesson.getCourse() == null) {
             return null;
+        }
+
+        if (lesson.isPreview()) {
+            return lesson;
         }
 
         boolean enrolled = enrollmentService.isEnrolled(userId, lesson.getCourse().getId());

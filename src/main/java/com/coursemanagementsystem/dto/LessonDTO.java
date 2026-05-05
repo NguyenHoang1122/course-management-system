@@ -1,9 +1,11 @@
 package com.coursemanagementsystem.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LessonDTO {
     private Long id;
 
@@ -25,4 +27,8 @@ public class LessonDTO {
     private Long sectionId;
 
     private String duration;
+
+    private String content;
+
+    private boolean isPreview;
 }

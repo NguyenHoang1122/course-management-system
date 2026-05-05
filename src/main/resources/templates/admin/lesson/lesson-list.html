@@ -18,7 +18,6 @@
 <th:block th:replace="~{layout :: siteHeader(isTransparent=false)}"></th:block>
 
 <div class="profile-dashboard-wrapper">
-    <!-- Hero Area: Đồng bộ với Course List -->
     <div class="admin-profile-hero" style="background: linear-gradient(135deg, #1a237e 0%, #4285f4 100%);">
         <div class="profile-hero-content">
             <h1><i class="fas fa-play-circle"></i> Admin Lesson Management</h1>
@@ -26,9 +25,8 @@
         </div>
     </div>
 
-    <div class="admin-dashboard-container">
-        <!-- Sidebar Navigation (Đã thay đổi theo layout course-list) -->
-        <aside class="admin-dashboard-sidebar">
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
             <div th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
         </aside>
 
@@ -36,7 +34,7 @@
         <main class="dashboard-main-content">
 
             <!-- Stats Grid -->
-            <div class="stats-grid">
+            <div class="admin-stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon enrolled"><i class="fas fa-play"></i></div>
                     <div class="stat-info">
